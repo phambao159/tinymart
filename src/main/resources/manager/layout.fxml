@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.net.URL?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ToggleButton?>
+<?import javafx.scene.control.ToggleGroup?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<AnchorPane id="AnchorPane" prefHeight="768.0" prefWidth="1024.0" styleClass="mainFxmlClass" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.manager.LayoutController">
+    <stylesheets>
+        <URL value="@layout.css" />
+    </stylesheets>
+    <children>
+        <VBox fx:id="menu" layoutX="35.0" layoutY="25.0" prefHeight="709.0" prefWidth="168.0">
+            <children>
+                <HBox fx:id="hBoxImage" alignment="CENTER" prefHeight="100.0" prefWidth="200.0">
+                    <children>
+                        <ImageView fx:id="imgLogo" fitHeight="121.0" fitWidth="179.0" pickOnBounds="true" preserveRatio="true">
+                            <image>
+                                <Image url="@../inventory/logotinymart.png" />
+                            </image>
+                        </ImageView>
+                    </children>
+                </HBox>
+                <HBox fx:id="hBoxWelcome" alignment="CENTER" prefHeight="39.0" prefWidth="168.0">
+                    <children>
+                        <Label fx:id="lbWelcome" text="Welcome, Bao!" />
+                    </children>
+                </HBox>
+                <HBox alignment="CENTER" prefHeight="60.0" prefWidth="169.0">
+                    <children>
+                        <ToggleButton mnemonicParsing="false" onAction="#onDashboard" prefHeight="40.0" prefWidth="175.0" text="Dashboard">
+                     <toggleGroup>
+                        <ToggleGroup fx:id="toggleMenu" />
+                     </toggleGroup></ToggleButton>
+                    </children>
+                </HBox>
+                <HBox alignment="CENTER" prefHeight="60.0" prefWidth="168.0">
+                    <children>
+                        <ToggleButton mnemonicParsing="false" onAction="#onProduct" prefHeight="40.0" prefWidth="171.0" selected="true" text="Product" toggleGroup="$toggleMenu" />
+                    </children>
+                </HBox>
+                <HBox alignment="CENTER" prefHeight="60.0" prefWidth="168.0">
+                    <children>
+                        <ToggleButton mnemonicParsing="false" onAction="#onEmployee" prefHeight="40.0" prefWidth="171.0" text="Employee" toggleGroup="$toggleMenu" />
+                    </children>
+                </HBox>
+                <HBox alignment="CENTER" prefHeight="60.0" prefWidth="168.0">
+                    <children>
+                        <ToggleButton mnemonicParsing="false" onAction="#onSupplier" prefHeight="40.0" prefWidth="168.0" text="Supplier" toggleGroup="$toggleMenu" />
+                    </children>
+                </HBox>
+                <HBox alignment="CENTER" prefHeight="60.0" prefWidth="168.0">
+                    <children>
+                        <ToggleButton mnemonicParsing="false" onAction="#onCustomer" prefHeight="40.0" prefWidth="180.0" text="Customer" toggleGroup="$toggleMenu" />
+                    </children>
+                </HBox>
+                <HBox alignment="CENTER" prefHeight="60.0" prefWidth="168.0">
+                    <children>
+                        <ToggleButton mnemonicParsing="false" onAction="#onLogout" prefHeight="40.0" prefWidth="172.0" text="LogOut" />
+                    </children>
+                </HBox>
+            </children>
+        </VBox>
+        <StackPane fx:id="view" layoutX="231.0" layoutY="25.0" prefHeight="709.0" prefWidth="735.0" />
+    </children>
+</AnchorPane>
