@@ -23,7 +23,6 @@
                       <ComboBox fx:id="cbCategory" prefHeight="30.0" prefWidth="137.0" promptText="Category" />
                       <ComboBox fx:id="cbSize" prefHeight="30.0" prefWidth="112.0" promptText="Size" />
                       <ComboBox fx:id="cbPromotion" prefHeight="30.0" prefWidth="150.0" promptText="Promotion" />
-                      <ComboBox fx:id="cbPaging" prefHeight="30.0" prefWidth="150.0" promptText="50 per page" />
                   </children>
               </HBox>
             <HBox alignment="CENTER_LEFT" prefHeight="45.0" prefWidth="685.0" spacing="10.0">

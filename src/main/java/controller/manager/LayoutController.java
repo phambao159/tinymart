@@ -40,11 +40,12 @@ public class LayoutController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        loadView("/manager/layoutEmployee.fxml");
+        loadView("/manager/report/layoutReport.fxml");
     }
 
     @FXML
     private void onDashboard(ActionEvent event) {
+        loadView("/manager/report/layoutReport.fxml");
     }
 
     @FXML
@@ -65,10 +66,12 @@ public class LayoutController implements Initializable {
 
     @FXML
     private void onCustomer(ActionEvent event) {
+        loadView("/manager/customer.fxml");
     }
 
     @FXML
     private void onLogout(ActionEvent event) {
+        
     }
 
     private void loadView(String fxmlPath) {

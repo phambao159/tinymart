@@ -16,7 +16,7 @@ public class ProductSizeDAO {
         List<ProductSize> list = new ArrayList<>();
         
         // SQL: Join ProductSize với Size để lấy thông tin hiển thị
-        String sql = "SELECT ps.ProuductSizeID, ps.ProductID, s.Type as SizeType, " +
+        String sql = "SELECT ps.ProductSizeID, ps.ProductID, s.Type as SizeType, " +
                      "ps.CostPrice, ps.SellingPrice, ps.StockQuantity " +
                      "FROM ProductSize ps " +
                      "JOIN Size s ON ps.SizeID = s.SizeID " +
