@@ -80,18 +80,17 @@ public class CashierController implements Initializable {
 
         txtInputId.textProperty().addListener((obs, oldV, newV) -> loadDataFromDB(newV));
     }
-    
+
     public void setEmployeeID(int id) {
         this.currentEmployeeID = id;
-        loadEmployeeName(); 
+        loadEmployeeName();
     }
 
     private void loadEmployeeName() {
         String fullName = cashierDAO.getEmployeeNameById(this.currentEmployeeID);
-
         if (fullName != null && !fullName.isEmpty()) {
             String[] parts = fullName.trim().split("\\s+");
-            String lastName = parts[parts.length - 1]; 
+            String lastName = parts[parts.length - 1];
             lblWelcome.setText("Welcome, " + lastName + "!");
         } else {
             lblWelcome.setText("Welcome, Staff");
@@ -208,15 +207,15 @@ public class CashierController implements Initializable {
     private void setProductImage(ImageView view, String dbImageName) {
         String defaultImg = "/image/coca.png";
         String targetImg = (dbImageName == null || dbImageName.isEmpty()) ? defaultImg : dbImageName;
-                URL url = getClass().getResource("/image/" + targetImg);
-        
+        URL url = getClass().getResource("/image/" + targetImg);
+
         if (url == null) {
-            url = getClass().getResource("/image/coca.png");
+            url = getClass().getResource(defaultImg);
         }
 
         if (url != null) {
             view.setImage(new Image(url.toExternalForm()));
-        }     
+        }
     }
 
     private void openOverlay(Product p) {
