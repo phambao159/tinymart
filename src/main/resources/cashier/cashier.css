@@ -1,0 +1,89 @@
+* {
+    -fx-primary-green: #2E7D32;
+    -fx-light-green-bg: #E8F5E9;
+    -fx-text-color: #333333;
+    -fx-font-family: 'Segoe UI', sans-serif;
+}
+
+.sidebar-panel {
+    -fx-background-color: white;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 10, 0, 0, 0);
+}
+
+.menu-btn {
+    -fx-background-color: transparent;
+    -fx-text-fill: #666; 
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+    -fx-alignment: CENTER_LEFT;
+    -fx-padding: 12 20;
+    -fx-cursor: hand;
+    -fx-background-radius: 10;
+    -fx-border-radius: 10;
+    -fx-margin: 0 10 0 10;
+}
+
+.menu-btn:hover {
+    -fx-background-color: -fx-light-green-bg;
+    -fx-text-fill: -fx-primary-green;
+}
+
+.menu-btn.active {
+    -fx-background-color: -fx-primary-green;
+    -fx-text-fill: white;
+    -fx-effect: dropshadow(three-pass-box, rgba(46, 125, 50, 0.3), 5, 0, 2, 2);
+}
+
+.cat-btn {
+    -fx-background-color: white;
+    -fx-text-fill: #555;
+    -fx-background-radius: 20;
+    -fx-padding: 8 25;
+    -fx-font-weight: bold;
+    -fx-border-color: #EEE;
+    -fx-border-radius: 20;
+    -fx-cursor: hand;
+}
+.cat-btn:hover {
+    -fx-background-color: #FAFAFA;
+    -fx-border-color: #DDD;
+}
+.cat-btn.active {
+    -fx-background-color: -fx-primary-green;
+    -fx-text-fill: white;
+    -fx-border-color: -fx-primary-green;
+}
+
+.shift-box {
+    -fx-background-color: #2E7D32;
+    -fx-background-radius: 15;
+    -fx-padding: 20;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.3), 8, 0, 4, 4);
+}
+
+.shift-text {
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+}
+
+.scroll-bar:horizontal, .scroll-bar:vertical{
+    -fx-background-color: transparent;
+}
+.scroll-bar:horizontal .track, .scroll-bar:vertical .track{
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-background-radius: 0em;
+}
+.scroll-bar:horizontal .thumb, .scroll-bar:vertical .thumb {
+    -fx-background-color: #D0D0D0;
+    -fx-background-radius: 5em;
+}
+
+.btn-checkin { -fx-background-color: #4CAF50; -fx-text-fill: white; -fx-background-radius: 5; }
+.btn-checkout { -fx-background-color: #FF9800; -fx-text-fill: white; -fx-background-radius: 5; }
+.search-field { -fx-background-color: white; -fx-background-radius: 20; -fx-border-color: #EEE; -fx-padding: 8 15; }
+.product-card { -fx-background-color: white; -fx-background-radius: 15; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 8, 0, 0, 2); }
+.product-card:hover { -fx-effect: dropshadow(three-pass-box, rgba(46, 125, 50, 0.2), 10, 0, 0, 4); -fx-translate-y: -2; }
+.bill-panel { -fx-background-color: white; }
+.btn-process { -fx-background-color: -fx-primary-green; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 20; }
