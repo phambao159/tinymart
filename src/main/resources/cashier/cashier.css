@@ -23,6 +23,8 @@
     -fx-margin: 0 10 0 10;
 }
 
+
+
 .menu-btn:hover {
     -fx-background-color: -fx-light-green-bg;
     -fx-text-fill: -fx-primary-green;
@@ -33,6 +35,7 @@
     -fx-text-fill: white;
     -fx-effect: dropshadow(three-pass-box, rgba(46, 125, 50, 0.3), 5, 0, 2, 2);
 }
+
 
 .cat-btn {
     -fx-background-color: white;
@@ -67,17 +70,37 @@
     -fx-font-size: 14px;
 }
 
-.scroll-bar:horizontal, .scroll-bar:vertical{
+
+.root {
+    -fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
+}
+
+.label {
+    -fx-focus-traversable: false;
+}
+
+.scroll-pane .scroll-bar:horizontal {
+    -fx-pref-height: 5px; 
     -fx-background-color: transparent;
 }
-.scroll-bar:horizontal .track, .scroll-bar:vertical .track{
-    -fx-background-color: transparent;
-    -fx-border-color: transparent;
-    -fx-background-radius: 0em;
+
+
+.scroll-pane .scroll-bar:horizontal .thumb {
+    -fx-background-color: #BDC3C7;
+    -fx-background-radius: 10px;
 }
-.scroll-bar:horizontal .thumb, .scroll-bar:vertical .thumb {
-    -fx-background-color: #D0D0D0;
-    -fx-background-radius: 5em;
+
+
+.scroll-pane .scroll-bar:horizontal .increment-button,
+.scroll-pane .scroll-bar:horizontal .decrement-button {
+    -fx-shape: "";
+    -fx-padding: 0;
+}
+.scroll-pane, .scroll-pane:focused {
+    -fx-background-insets: 5;
+    -fx-padding: 5;
+
 }
 
 .btn-checkin { -fx-background-color: #4CAF50; -fx-text-fill: white; -fx-background-radius: 5; }

@@ -60,8 +60,8 @@ public class CashierController implements Initializable {
     @FXML
     private Spinner<Integer> spinnerQty;
 
-    private ObservableList<CartItem> cartList = FXCollections.observableArrayList();
-    private CashierDAO cashierDAO = new CashierDAO();
+    private final ObservableList<CartItem> cartList = FXCollections.observableArrayList();
+    private final CashierDAO cashierDAO = new CashierDAO();
     private int currentOrderId = 123;
 
     private List<Product> allProductsMaster = new ArrayList<>();
@@ -79,6 +79,7 @@ public class CashierController implements Initializable {
         loadDataFromDB("");
 
         txtInputId.textProperty().addListener((obs, oldV, newV) -> loadDataFromDB(newV));
+        
     }
 
     public void setEmployeeID(int id) {
@@ -134,6 +135,7 @@ public class CashierController implements Initializable {
         Button btnAll = new Button("All Menu");
         btnAll.getStyleClass().add("cat-btn");
         btnAll.getStyleClass().add("active");
+        btnAll.setMinWidth(Region.USE_PREF_SIZE);
         btnAll.setOnAction(e -> {
             setActiveCategory(btnAll);
             renderProductGrid(allProductsMaster);
@@ -144,7 +146,7 @@ public class CashierController implements Initializable {
         for (Category cat : cats) {
             Button btn = new Button(cat.getName());
             btn.getStyleClass().add("cat-btn");
-
+            btn.setMinWidth(Region.USE_PREF_SIZE);
             btn.setOnAction(e -> {
                 setActiveCategory(btn);
                 filterProductsByCategory(cat.getId());
