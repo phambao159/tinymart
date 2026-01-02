@@ -59,8 +59,8 @@
                 <VBox spacing="10.0" styleClass="shift-box">
                     <Label styleClass="shift-text" text="Shift: Ca Sáng" />
                     <HBox spacing="10.0">
-                        <Button maxWidth="1.7976931348623157E308" onAction="#handleCheckIn" styleClass="btn-checkin" text="Check In" HBox.hgrow="ALWAYS" />
-                        <Button maxWidth="1.7976931348623157E308" onAction="#handleCheckOut" styleClass="btn-checkout" text="Out" HBox.hgrow="ALWAYS" />
+                        <Button maxWidth="1.7976931348623157E308" onAction="#CheckIn" styleClass="btn-checkin" text="Check In" HBox.hgrow="ALWAYS" />
+                        <Button maxWidth="1.7976931348623157E308" onAction="#ShiftEnd" styleClass="btn-checkout" text="Out" HBox.hgrow="ALWAYS" />
                     </HBox>
                 </VBox>
                 
@@ -149,27 +149,52 @@
                 <Insets bottom="20.0" left="15.0" right="15.0" top="20.0" />
             </padding>
             <children>
+
+                <Label text="Customer Info">
+                    <font>
+                        <Font name="System Bold" size="16.0" />
+                    </font>
+                </Label>
+
+                <HBox spacing="10.0">
+                    <children>
+                        <TextField fx:id="txtCustomerPhone" promptText="Enter Phone No." styleClass="search-field" HBox.hgrow="ALWAYS" />
+                        <Button onAction="#SearchCustomer" style="-fx-background-color: #2E7D32; -fx-text-fill: white; -fx-cursor: hand;" text="🔍" />
+                    </children>
+                </HBox>
+
+                <VBox fx:id="boxCustomerInfo" managed="false" spacing="5.0" style="-fx-background-color: #E8F5E9; -fx-padding: 10; -fx-background-radius: 10; -fx-border-color: #C8E6C9; -fx-border-radius: 10;" visible="false">
+                    <children>
+                        <Label fx:id="lblCustomerName" style="-fx-font-weight: bold; -fx-font-size: 14px;" text="Name: -" />
+                        <Label fx:id="lblCustomerPoints" style="-fx-text-fill: #2E7D32; -fx-font-weight: bold;" text="Points: 0" />
+                    </children>
+                </VBox>
+
+                <Separator />
+                
                 <Label text="Order Details">
                     <font>
                         <Font name="System Bold" size="18.0" />
                     </font>
                 </Label>
+                
                 <HBox>
                     <Label text="Order ID:" textFill="#777" />
                     <Region HBox.hgrow="ALWAYS" />
                     <Label fx:id="lblOrderId" style="-fx-font-weight: bold;" text="#0000" />
                 </HBox>
+                
                 <Separator />
+                
                 <TableView fx:id="tblCart" VBox.vgrow="ALWAYS">
                     <columns>
-                        <TableColumn fx:id="colName" editable="false" prefWidth="140.0" sortable="false" text="Item" /> 
+                        <TableColumn fx:id="colName" editable="false" prefWidth="140.0" sortable="false" text="Item" />
                         <TableColumn fx:id="colQty" editable="false" prefWidth="40.0" sortable="false" style="-fx-alignment: CENTER;" text="Qty" />
                         <TableColumn fx:id="colTotal" editable="false" prefWidth="90.0" sortable="false" style="-fx-alignment: CENTER-RIGHT;" text="Total" />
                     </columns>
-                    <columnResizePolicy>
-                        <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
-                    </columnResizePolicy>
+                    
                 </TableView>
+
                 <VBox spacing="5.0">
                     <HBox>
                         <Label prefHeight="15.0" prefWidth="230" text="Subtotal" />
@@ -188,8 +213,10 @@
                         <Label fx:id="lblGrandTotal" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #2E7D32;" text="0 VND" />
                     </HBox>
                 </VBox>
-                <Button maxWidth="1.7976931348623157E308" onAction="#handleCheckout" prefHeight="50.0" styleClass="btn-process" text="Process Transaction" />
-                <Button maxWidth="1.7976931348623157E308" onAction="#handleRemoveItem" style="-fx-background-color: transparent; -fx-text-fill: red; -fx-underline: true;" text="Remove Selected" />
+
+                <Button maxWidth="1.7976931348623157E308" onAction="#Payment" prefHeight="50.0" styleClass="btn-process" text="Process Transaction" />
+                <Button maxWidth="1.7976931348623157E308" onAction="#RemoveItem" style="-fx-background-color: transparent; -fx-text-fill: red; -fx-underline: true;" text="Remove Selected" />
+            
             </children>
         </VBox>
     </right>

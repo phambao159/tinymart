@@ -105,8 +105,78 @@
 
 .btn-checkin { -fx-background-color: #4CAF50; -fx-text-fill: white; -fx-background-radius: 5; }
 .btn-checkout { -fx-background-color: #FF9800; -fx-text-fill: white; -fx-background-radius: 5; }
-.search-field { -fx-background-color: white; -fx-background-radius: 20; -fx-border-color: #EEE; -fx-padding: 8 15; }
+.search-field { -fx-background-color: white; -fx-background-radius: 20; -fx-border-color: #EEE; -fx-padding: 8; }
 .product-card { -fx-background-color: white; -fx-background-radius: 15; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 8, 0, 0, 2); }
 .product-card:hover { -fx-effect: dropshadow(three-pass-box, rgba(46, 125, 50, 0.2), 10, 0, 0, 4); -fx-translate-y: -2; }
 .bill-panel { -fx-background-color: white; }
 .btn-process { -fx-background-color: -fx-primary-green; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 20; }
+
+
+.my-dialog {
+    -fx-background-color: white;
+    -fx-background-radius: 10;
+    -fx-border-radius: 10;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.3), 10, 0, 0, 4);
+}
+
+.my-dialog > .header-panel {
+    -fx-background-color: -fx-primary-green;
+    -fx-padding: 15px;
+    -fx-background-radius: 10 10 0 0; 
+}
+
+.my-dialog > .header-panel > .label {
+    -fx-text-fill: white;
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-effect: dropshadow(one-pass-box, rgba(0,0,0,0.3), 0, 0, 0, 1);
+}
+
+.my-dialog > .content {
+    -fx-background-color: white;
+    -fx-padding: 20px;
+    -fx-background-radius: 0 0 10 10;
+}
+
+.my-dialog .label {
+    -fx-text-fill: #333;
+    -fx-font-size: 14px;
+}
+
+.my-dialog .text-field {
+    -fx-background-color: #F9F9F9;
+    -fx-border-color: #DDD;
+    -fx-border-radius: 5;
+    -fx-background-radius: 5;
+    -fx-padding: 10;
+    -fx-font-size: 14px;
+}
+.my-dialog .text-field:focused {
+    -fx-border-color: -fx-primary-green;
+    -fx-background-color: white;
+    -fx-effect: dropshadow(three-pass-box, rgba(46, 125, 50, 0.2), 5, 0, 0, 0);
+}
+
+.my-dialog .button-bar .button {
+    -fx-background-radius: 20;
+    -fx-font-weight: bold;
+    -fx-padding: 10 25;
+    -fx-cursor: hand;
+    -fx-font-size: 13px;
+}
+
+.btn-green {
+    -fx-background-color: -fx-primary-green;
+    -fx-text-fill: white;
+}
+.btn-green:hover {
+    -fx-background-color: #1B5E20; 
+}
+
+.btn-orange {
+    -fx-background-color: #FF9800; 
+    -fx-text-fill: white;
+}
+.btn-orange:hover {
+    -fx-background-color: #F57C00;
+}

@@ -3,20 +3,25 @@ package model.cashier;
 public class CartItem {
 
     private String productId;
+    private int sizeId;
     private String productName;
     private int quantity;
     private double price;
     private double total;
 
-    public CartItem(String productId, String productName, int quantity, double price) {
+    public CartItem(String productId, int sizeId, String productName, int quantity, double price) {
         this.productId = productId;
+        this.sizeId = sizeId;
         this.productName = productName;
         this.quantity = quantity;
         this.price = price;
         this.total = price * quantity;
     }
 
-    // Getters
+    public int getSizeId() {
+        return sizeId;
+    }
+
     public String getProductId() {
         return productId;
     }
@@ -37,7 +42,6 @@ public class CartItem {
         return total;
     }
 
-    // Setter số lượng (tự cập nhật tổng tiền)
     public void setQuantity(int quantity) {
         this.quantity = quantity;
         this.total = this.price * this.quantity;
