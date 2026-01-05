@@ -5,6 +5,5 @@ open module project.group3.tinymart {
     requires javafx.base;
     requires java.base;
 
-
     exports main;
 }
