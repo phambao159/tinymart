@@ -54,6 +54,7 @@
 
                 <Button graphicTextGap="15.0" maxWidth="1.7976931348623157E308" styleClass="menu-btn, active" text="Home / Order">
                 </Button>
+            <Button graphicTextGap="15.0" maxWidth="1.7976931348623157E308" styleClass="menu-btn, active" text="History Order" />
                 <Region VBox.vgrow="ALWAYS" />
             
                 <VBox spacing="10.0" styleClass="shift-box">
@@ -77,39 +78,29 @@
                 <children>
                     <HBox alignment="CENTER_LEFT" spacing="15.0">
                         <children>
-                            <TextField fx:id="txtInputId" prefHeight="40.0" prefWidth="400.0" promptText="🔍 Tìm kiếm món..." styleClass="search-field" />
+                            <TextField fx:id="txtInputId" prefHeight="40.0" prefWidth="400.0" promptText="🔍 Searching Item . . ." styleClass="search-field" />
                         </children>
                     </HBox>
    
-                    <ScrollPane fitToWidth="true"
-                                vbarPolicy="AS_NEEDED"
-                                hbarPolicy="NEVER"
-                                VBox.vgrow="ALWAYS"
-                                style="-fx-background-color: transparent;">
+                    <ScrollPane fitToWidth="true" hbarPolicy="NEVER" style="-fx-background-color: transparent;" vbarPolicy="AS_NEEDED" VBox.vgrow="ALWAYS">
 
                         <content>
                             <VBox spacing="15">
 
-                                <ScrollPane hbarPolicy="AS_NEEDED" vbarPolicy="NEVER" style="-fx-background-color: transparent;">
+                                <ScrollPane hbarPolicy="AS_NEEDED" style="-fx-background-color: transparent;" vbarPolicy="NEVER">
                                     <content>
-                                        <HBox fx:id="categoryContainer" 
-                                              spacing="15" 
-                                              alignment="CENTER_LEFT" 
-                                              style="-fx-padding: 10 10 20 10;" /> 
+                                        <HBox fx:id="categoryContainer" alignment="CENTER_LEFT" spacing="15" style="-fx-padding: 10 10 20 10;" /> 
                                     </content>
                                 </ScrollPane>
                                 
 
                                 <Label text="Select Menu">
                                     <font>
-                                        <Font name="System Bold" size="16.0"/>
+                                        <Font name="System Bold" size="16.0" />
                                     </font>
                                 </Label>
 
-                                <TilePane fx:id="productGrid"
-                                          hgap="15"
-                                          vgap="15"
-                                          prefColumns="3"/>
+                                <TilePane fx:id="productGrid" hgap="15" prefColumns="3" vgap="15" />
                             </VBox>
                         </content>
                     </ScrollPane>
