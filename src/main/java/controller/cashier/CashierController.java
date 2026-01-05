@@ -50,7 +50,7 @@ public class CashierController implements Initializable {
     private TableColumn<CartItem, Double> colTotal;
 
     @FXML
-    private Label lblSubTotal, lblTax, lblGrandTotal, lblOrderId;
+    private Label lblSubTotal, lblGrandTotal, lblOrderId;
 
     @FXML
     private StackPane overlayPane;
@@ -82,6 +82,8 @@ public class CashierController implements Initializable {
     private ToggleGroup sizeGroup;
     private int currentEmployeeID;
     private Customer currentCustomer = null;
+    @FXML
+    private Label lblDiscount;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -230,9 +232,9 @@ public class CashierController implements Initializable {
     }
 
     private void setProductImage(ImageView view, String dbImageName) {
-        String defaultImg = "/image/coca.png";
+        String defaultImg = "/image/manager/coca.png";
         String targetImg = (dbImageName == null || dbImageName.isEmpty()) ? defaultImg : dbImageName;
-        URL url = getClass().getResource("/image/" + targetImg);
+        URL url = getClass().getResource("/image/manager/" + targetImg);
 
         if (url == null) {
             url = getClass().getResource(defaultImg);

@@ -20,6 +20,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import main.App;
 
 public class LayoutController implements Initializable {
 
@@ -84,7 +85,8 @@ public class LayoutController implements Initializable {
     }
 
     @FXML
-    private void onLogout(ActionEvent event) {
+    private void onLogout(ActionEvent event) throws IOException {
+        App.setRoot("ui", "login");
 
     }
 

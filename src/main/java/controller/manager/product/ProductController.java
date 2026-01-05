@@ -45,13 +45,10 @@ public class ProductController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        // 1. Tải dữ liệu vào các ComboBox lọc
         loadFilterOptions();
-
-        // 2. Tải danh sách sản phẩm mặc định
         applyFilters();
 
-        // 3. Sự kiện lọc thời gian thực cho ô tìm kiếm
+        // 1. Listener cho ô tìm kiếm (Bạn đã có)
         txtSearch.textProperty().addListener((obs, oldVal, newVal) -> {
             if (searchTimer != null) {
                 searchTimer.stop();
@@ -59,6 +56,11 @@ public class ProductController implements Initializable {
             searchTimer = new Timeline(new KeyFrame(Duration.millis(300), e -> applyFilters()));
             searchTimer.play();
         });
+
+        // 2. THÊM MỚI: Listener cho các ComboBox
+        cbCategory.valueProperty().addListener((obs, oldVal, newVal) -> applyFilters());
+        cbSize.valueProperty().addListener((obs, oldVal, newVal) -> applyFilters());
+        cbPromotion.valueProperty().addListener((obs, oldVal, newVal) -> applyFilters());
     }
 
     private void loadFilterOptions() {
@@ -87,7 +89,6 @@ public class ProductController implements Initializable {
 
         for (ProductSummary product : products) {
             try {
-                // Đảm bảo đường dẫn FXML đến file thẻ sản phẩm chính xác
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("/manager/product/productcard.fxml"));
                 VBox productCard = loader.load();
 

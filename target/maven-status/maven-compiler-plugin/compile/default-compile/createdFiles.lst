@@ -11,6 +11,7 @@ dao/manager/employee/EmployeeShiftDAO.class
 controller/manager/notification/CreateNotiController.class
 model/manager/employee/Shift.class
 model/manager/supplier/Supplier.class
+dao/cashier/CashierDAO.class
 controller/manager/supplier/EditImportController.class
 controller/manager/supplier/AddSupplierController.class
 model/manager/supplier/ImportDetail.class
@@ -20,6 +21,7 @@ controller/manager/product/AddCategoryController.class
 dao/manager/employee/EmployeeDAO.class
 controller/manager/product/ProductController.class
 dao/manager/product/CategoryDAO.class
+dao/manager/EmployeeDAO.class
 controller/manager/supplier/ProductCardController.class
 controller/manager/notification/NotificationController.class
 controller/manager/product/EditProductController$1.class
@@ -36,6 +38,7 @@ model/manager/report/Report.class
 controller/manager/supplier/AddImportController$2.class
 controller/manager/notification/SentNotiController.class
 model/manager/notification/Notification.class
+model/cashier/Customer.class
 controller/manager/supplier/AddImportController.class
 controller/manager/supplier/ImportController$5.class
 util/DBConnection.class
@@ -58,6 +61,7 @@ controller/manager/product/AddProductController.class
 controller/manager/supplier/ImportController.class
 controller/manager/supplier/EditImportController$3.class
 controller/manager/supplier/AddImportController$1.class
+model/cashier/ProductSizeInfo.class
 main/App.class
 model/manager/customer/Customer.class
 model/manager/employee/EmployeeShift.class
@@ -71,6 +75,7 @@ controller/manager/employee/EditEmployeeShiftController$2.class
 controller/manager/supplier/LayoutSupplierController.class
 controller/manager/employee/AddEmployeeShiftController$2.class
 controller/manager/report/TopsellingController.class
+model/cashier/CartItem.class
 model/manager/product/ProductSummary.class
 dao/manager/order/OrderDetailDAO.class
 controller/manager/notification/DetailNotiController.class
@@ -81,6 +86,8 @@ controller/manager/supplier/AddImportController$4.class
 dao/manager/product/PromotionDAO.class
 controller/manager/report/CardOrderController.class
 controller/manager/employee/EditEmployeeShiftController.class
+model/cashier/Category.class
+controller/cashier/CashierController.class
 controller/manager/customer/EditCustomerController.class
 controller/manager/employee/ShiftController.class
 dao/manager/supplier/ImportDAO.class
@@ -92,6 +99,7 @@ controller/manager/employee/AddEmployeeController.class
 controller/manager/supplier/EditImportDetailController.class
 controller/manager/product/EditProductController.class
 controller/manager/employee/EditEmployeeController.class
+model/cashier/Product.class
 controller/manager/product/LayoutProductController.class
 controller/manager/product/SizeController.class
 dao/manager/product/ProductDAO.class

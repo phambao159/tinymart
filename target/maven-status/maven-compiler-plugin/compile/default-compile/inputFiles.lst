@@ -5,6 +5,7 @@
 /Users/user/NetBeansProjects/tinymart/src/main/java/model/manager/product/ProductSummary.java
 /Users/user/NetBeansProjects/tinymart/src/main/java/controller/manager/product/EditPromotionController.java
 /Users/user/NetBeansProjects/tinymart/src/main/java/dao/manager/supplier/SupplierDAO.java
+/Users/user/NetBeansProjects/tinymart/src/main/java/model/cashier/Category.java
 /Users/user/NetBeansProjects/tinymart/src/main/java/dao/manager/employee/EmployeeDAO.java
 /Users/user/NetBeansProjects/tinymart/src/main/java/controller/manager/product/EditProductController.java
 /Users/user/NetBeansProjects/tinymart/src/main/java/controller/manager/employee/EmployeeController.java
@@ -14,6 +15,7 @@
 /Users/user/NetBeansProjects/tinymart/src/main/java/dao/manager/customer/CustomerDAO.java
 /Users/user/NetBeansProjects/tinymart/src/main/java/dao/manager/product/ProductDAO.java
 /Users/user/NetBeansProjects/tinymart/src/main/java/model/manager/product/Size.java
+/Users/user/NetBeansProjects/tinymart/src/main/java/model/cashier/CartItem.java
 /Users/user/NetBeansProjects/tinymart/src/main/java/controller/manager/product/SizeController.java
 /Users/user/NetBeansProjects/tinymart/src/main/java/controller/manager/employee/ShiftController.java
 /Users/user/NetBeansProjects/tinymart/src/main/java/controller/manager/supplier/SupplierController.java
@@ -27,6 +29,8 @@
 /Users/user/NetBeansProjects/tinymart/src/main/java/controller/manager/employee/AddShiftController.java
 /Users/user/NetBeansProjects/tinymart/src/main/java/controller/manager/notification/CreateNotiController.java
 /Users/user/NetBeansProjects/tinymart/src/main/java/dao/manager/order/OrderDAO.java
+/Users/user/NetBeansProjects/tinymart/src/main/java/model/cashier/Customer.java
+/Users/user/NetBeansProjects/tinymart/src/main/java/controller/cashier/CashierController.java
 /Users/user/NetBeansProjects/tinymart/src/main/java/dao/manager/product/PromotionDAO.java
 /Users/user/NetBeansProjects/tinymart/src/main/java/controller/manager/notification/NotiCardController.java
 /Users/user/NetBeansProjects/tinymart/src/main/java/dao/manager/order/OrderDetailDAO.java
@@ -44,6 +48,7 @@
 /Users/user/NetBeansProjects/tinymart/src/main/java/controller/manager/product/ProductCardController.java
 /Users/user/NetBeansProjects/tinymart/src/main/java/controller/manager/employee/EmployeeShiftController.java
 /Users/user/NetBeansProjects/tinymart/src/main/java/controller/manager/product/ProductdetailController.java
+/Users/user/NetBeansProjects/tinymart/src/main/java/model/cashier/Product.java
 /Users/user/NetBeansProjects/tinymart/src/main/java/controller/manager/product/ProductController.java
 /Users/user/NetBeansProjects/tinymart/src/main/java/dao/manager/employee/ShiftDAO.java
 /Users/user/NetBeansProjects/tinymart/src/main/java/controller/manager/supplier/EditImportDetailController.java
@@ -56,6 +61,7 @@
 /Users/user/NetBeansProjects/tinymart/src/main/java/controller/manager/customer/CustomerController.java
 /Users/user/NetBeansProjects/tinymart/src/main/java/controller/manager/employee/AddEmployeeShiftController.java
 /Users/user/NetBeansProjects/tinymart/src/main/java/model/manager/notification/Notification.java
+/Users/user/NetBeansProjects/tinymart/src/main/java/dao/manager/EmployeeDAO.java
 /Users/user/NetBeansProjects/tinymart/src/main/java/controller/manager/employee/EditEmployeeShiftController.java
 /Users/user/NetBeansProjects/tinymart/src/main/java/model/manager/employee/Shift.java
 /Users/user/NetBeansProjects/tinymart/src/main/java/dao/manager/supplier/ImportDAO.java
@@ -68,6 +74,7 @@
 /Users/user/NetBeansProjects/tinymart/src/main/java/controller/manager/product/PromotionController.java
 /Users/user/NetBeansProjects/tinymart/src/main/java/controller/manager/notification/NotificationController.java
 /Users/user/NetBeansProjects/tinymart/src/main/java/main/App.java
+/Users/user/NetBeansProjects/tinymart/src/main/java/model/cashier/ProductSizeInfo.java
 /Users/user/NetBeansProjects/tinymart/src/main/java/controller/manager/product/AddPromotionController.java
 /Users/user/NetBeansProjects/tinymart/src/main/java/controller/manager/supplier/ProductCardController.java
 /Users/user/NetBeansProjects/tinymart/src/main/java/controller/manager/LoginController.java
@@ -77,6 +84,7 @@
 /Users/user/NetBeansProjects/tinymart/src/main/java/controller/manager/product/CategoryController.java
 /Users/user/NetBeansProjects/tinymart/src/main/java/controller/manager/product/EditCategoryController.java
 /Users/user/NetBeansProjects/tinymart/src/main/java/controller/manager/supplier/EditSupplierController.java
+/Users/user/NetBeansProjects/tinymart/src/main/java/dao/cashier/CashierDAO.java
 /Users/user/NetBeansProjects/tinymart/src/main/java/dao/manager/report/ReportDAO.java
 /Users/user/NetBeansProjects/tinymart/src/main/java/controller/manager/supplier/LayoutSupplierController.java
 /Users/user/NetBeansProjects/tinymart/src/main/java/model/manager/report/Report.java
