@@ -1,8 +1,8 @@
 package controller.manager;
 
-import dao.manager.EmployeeDAO;
+import dao.manager.employee.EmployeeDAO;
 import main.App; 
-import model.manager.Employee; 
+import model.manager.employee.Employee; 
 
 import java.io.IOException;
 import java.net.URL;
@@ -53,10 +53,14 @@ public class LoginController implements Initializable {
 
         try {
            
-            String employee = employeeDAO.authenticate(username, pwd);
+            Employee employee = employeeDAO.authenticate(username, pwd);
 
             if (employee != null) {
-                App.setRoot("manager","layout"); 
+                if(employee.getRole().toLowerCase().equals("manager")){
+                    App.setRoot("manager","layout"); 
+                } else if (employee.getRole().toLowerCase().equals("cashier")){
+                    App.setRoot("cashier","cashier");
+                }
                         
             } else {
             

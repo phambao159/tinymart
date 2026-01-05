@@ -1,0 +1,80 @@
+/*
+ * Empty Stylesheet file.
+ */
+
+.mainFxmlClass {
+
+}
+
+#productContainer {
+    -fx-background-color: white;
+    -fx-padding: 10px;
+    -fx-vgap: 20px;
+    -fx-hgap: 20px;
+}
+
+
+.product-card {
+    -fx-border-color: #1E8449;
+    -fx-pref-width: 180px;
+    -fx-padding: 10px;
+    -fx-background-color: white;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 10, 0.0, 0.0, 3.0);
+    -fx-cursor: hand; 
+}
+
+.product-card:hover {
+
+    -fx-scale-y: 1.02;
+    -fx-scale-x: 1.02;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 15, 0.0, 0.0, 5.0);
+}
+
+
+.product-card > ImageView {
+    -fx-fit-width: 100%;
+    -fx-fit-height: 120px;
+    -fx-background-color: #eee; 
+    -fx-alignment: center;
+    -fx-margin: 5px 0px;
+}
+
+
+.product-card > Label:nth-child(2) {
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+    -fx-text-fill: #333;
+    -fx-padding: 5px 0 2px 0;
+    -fx-wrap-text: true;
+    -fx-pref-height: 35px; 
+}
+
+
+.product-card > Label:nth-child(3),
+.product-card > Label:nth-child(4) {
+    -fx-font-size: 12px;
+    -fx-text-fill: #666;
+}
+
+
+.product-card > Label:nth-child(4) {
+    -fx-font-weight: bold;
+    -fx-text-fill: #d9534f; 
+}
+
+
+.product-card > Label:last-child {
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-padding: 5px 0 0 0;
+    -fx-text-fill: #5cb85c; 
+}
+
+
+.product-card > Label:nth-child(5) {
+    -fx-font-size: 12px;
+    -fx-text-fill: #337ab7; 
+}

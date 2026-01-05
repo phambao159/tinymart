@@ -1,0 +1,11 @@
+/*
+ * Empty Stylesheet file.
+ */
+
+.mainFxmlClass {
+    -fx-background-color : #ffffff;
+}
+
+#viewNoti{
+    -fx-padding : 15 0 0 0;
+}

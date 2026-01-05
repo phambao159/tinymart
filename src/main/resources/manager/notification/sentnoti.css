@@ -1,0 +1,22 @@
+/* Màu nền cho toàn bộ trang */
+.mainFxmlClass {
+    -fx-background-color: #ffffff;
+}
+
+/* Quan trọng: Khử màu xám và viền của ScrollPane */
+#viewSent {
+    -fx-background-color: #ffffff;
+    -fx-background: #ffffff; /* Thuộc tính này quyết định màu nền thực của vùng chứa */
+    -fx-border-color: transparent; /* Ẩn viền nếu muốn */
+}
+
+/* Khử màu nền xám của lớp phủ bên trong ScrollPane */
+#viewSent .viewport {
+    -fx-background-color: #ffffff;
+}
+
+/* Vùng chứa các card */
+#sentContainer {
+    -fx-background-color: #ffffff;
+    -fx-padding: 15px; /* Thêm khoảng trống ở mép để các card không dính sát viền */
+}

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.net.URL?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane id="AnchorPane" fx:id="cardPane" prefWidth="550.0" styleClass="card-container" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.manager.notification.NotiCardController">
+    <stylesheets>
+        <URL value="@noticard.css" />
+    </stylesheets>
+   <children>
+      <VBox layoutX="15.0" layoutY="10.0" spacing="5.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="15.0" AnchorPane.rightAnchor="15.0" AnchorPane.topAnchor="10.0">
+         <children>
+            <HBox alignment="CENTER_LEFT">
+               <children>
+                  <Label fx:id="lblTitle" styleClass="card-title" text="Tiêu đề thông báo" HBox.hgrow="ALWAYS">
+                     <font>
+                        <Font name="Arial Bold" size="16.0" />
+                     </font>
+                  </Label>
+                  <Region HBox.hgrow="ALWAYS" />
+                  <Label fx:id="lblDate" styleClass="card-date" text="01/01/2026" textFill="#868686" />
+               </children>
+            </HBox>
+            
+            <Label fx:id="lblSender" styleClass="card-sender" text="Người gửi: Nguyễn Văn A" textFill="#2c3e50">
+               <font>
+                  <Font name="System Italic" size="13.0" />
+               </font>
+            </Label>
+            
+            <Separator prefWidth="200.0" />
+            
+            <Label fx:id="lblContent" alignment="TOP_LEFT" prefWidth="520.0" styleClass="card-content" text="Nội dung chi tiết của thông báo sẽ hiển thị ở đây..." wrapText="true" />
+         </children>
+      </VBox>
+   </children>
+</AnchorPane>

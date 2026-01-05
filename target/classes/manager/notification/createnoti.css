@@ -1,0 +1,35 @@
+.mainFxmlClass {
+    -fx-background-color: #ffffff;
+}
+
+.input-field, .combo-box {
+    -fx-background-color: #fcfcfc;
+    -fx-border-color: #dcdcdc;
+    -fx-border-radius: 4;
+    -fx-background-radius: 4;
+}
+
+.input-field:focused, .combo-box:focused {
+    -fx-border-color: #1E8449;
+    -fx-background-color: #ffffff;
+}
+
+.btn-send {
+    -fx-background-color: #1E8449;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-padding: 10 20;
+    -fx-background-radius: 5;
+    -fx-cursor: hand;
+}
+
+.btn-cancel {
+    -fx-background-color: #f1f1f1;
+    -fx-text-fill: #555555;
+    -fx-padding: 10 20;
+    -fx-background-radius: 5;
+    -fx-cursor: hand;
+}
+
+.btn-send:hover { -fx-background-color: #145a32; }
+.btn-cancel:hover { -fx-background-color: #e0e0e0; }

@@ -8,27 +8,33 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 
-
 public class App extends Application {
 
     private static Scene scene;
 
     @Override
     public void start(Stage stage) throws IOException {
-        scene = new Scene(loadFXML("ui","login"), 1024 , 768);
+        // 1. Load FXML gốc
+        Parent root = loadFXML("ui", "login");
+        
+        scene = new Scene(root);
+        
         stage.setScene(scene);
+        stage.setTitle("TinyMart Management System");
+
+        stage.setMaximized(true); 
+
+
         stage.show();
     }
 
-    public static void setRoot(String path,String fxml) throws IOException {
-        scene.setRoot(loadFXML(path,fxml));
+    public static void setRoot(String path, String fxml) throws IOException {
+        scene.setRoot(loadFXML(path, fxml));
+        
     }
 
-
-    private static Parent loadFXML(String path,String fxml) throws IOException {
-
-        String resourcePath = path+ "/" + fxml + ".fxml";
-
+    private static Parent loadFXML(String path, String fxml) throws IOException {
+        String resourcePath = path + "/" + fxml + ".fxml";
         FXMLLoader fxmlLoader = new FXMLLoader(App.class.getClassLoader().getResource(resourcePath));
 
         if (fxmlLoader.getLocation() == null) {
@@ -41,5 +47,4 @@ public class App extends Application {
     public static void main(String[] args) {
         launch();
     }
-
 }
