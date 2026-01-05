@@ -11,6 +11,8 @@ module project.group3.tinymart {
     opens controller.manager to javafx.fxml;
     opens controller.manager.report to javafx.fxml;
     opens model.manager to javafx.base;
+    opens controller.cashier to javafx.fxml;
+    opens model.cashier to javafx.base;
     
     exports main;
     
