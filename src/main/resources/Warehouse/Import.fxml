@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.Circle?>
+<?import javafx.scene.shape.SVGPath?>
+
+<AnchorPane xmlns="http://javafx.com/javafx/25"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="controller.Warehouse.ImportController"
+            styleClass="anchor-pane"
+            stylesheets="@Import.css">
+
+    <children>
+        <!-- VBox co giãn toàn màn hình -->
+        <VBox spacing="15"
+              AnchorPane.topAnchor="0.0"
+              AnchorPane.bottomAnchor="0.0"
+              AnchorPane.leftAnchor="0.0"
+              AnchorPane.rightAnchor="0.0">
+            <padding>
+                <Insets bottom="20" left="20" right="20" top="20" />
+            </padding>
+            <children>
+
+                <!-- Title and notification button -->
+                <HBox alignment="CENTER_LEFT" spacing="10">
+                    <children>
+                        <Label text="IMPORT DETAIL"
+                               styleClass="label-title"
+                               maxWidth="Infinity"
+                               HBox.hgrow="ALWAYS"/>
+                        <StackPane fx:id="notifStack" prefHeight="30.0" prefWidth="45.0">
+                            <SVGPath fx:id="btnNotif"
+                                     content="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"
+                                     styleClass="notif-icon"/>
+                            <Circle fx:id="notifDot" fill="red" radius="5"
+                                    translateX="-2" translateY="2"
+                                    visible="false"
+                                    StackPane.alignment="TOP_RIGHT"/>
+                        </StackPane>
+                    </children>
+                </HBox>
+
+                <!-- Search filters -->
+                <HBox spacing="10">
+                    <children>
+                        <TextField fx:id="txtImportID" promptText="Import ID"/>
+                        <DatePicker fx:id="dpFromDate" promptText="From date"/>
+                        <DatePicker fx:id="dpToDate" promptText="To date"/>
+                        <TextField fx:id="txtStatus" promptText="Status"/>
+                        <Button fx:id="btnSearch" onAction="#onSearch" text="Search"/>
+                    </children>
+                </HBox>
+
+                <!-- Data table -->
+                <TableView fx:id="tbImport" VBox.vgrow="ALWAYS">
+                    <columnResizePolicy>
+                        <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+                    </columnResizePolicy>
+                    <columns>
+                        <TableColumn fx:id="colIndex" prefWidth="50" text="No."/>
+                        <TableColumn fx:id="colImportID" prefWidth="100" text="Import ID"/>
+                        <TableColumn fx:id="colSupplierID" prefWidth="150" text="Supplier"/>
+                        <TableColumn fx:id="colEmployeeID" prefWidth="150" text="Employee"/>
+                        <TableColumn fx:id="colReceiptDate" prefWidth="150" text="Receipt Date"/>
+                        <TableColumn fx:id="colTotalCost" prefWidth="120" text="Total Cost"/>
+                        <TableColumn fx:id="colStatus" prefWidth="120" text="Status"/>
+                    </columns>
+                </TableView>
+
+            </children>
+        </VBox>
+    </children>
+</AnchorPane>

@@ -1,0 +1,42 @@
+/*
+Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+Click nbfs://nbhost/SystemFileSystem/Templates/Other/CascadeStyleSheet.css to edit this template
+*/
+/* 
+    Created on : 6 Jan 2026, 2:43:14 pm
+    Author     : ASUS
+*/
+/* Đặt hình nền cho toàn bộ AnchorPane */
+.anchor-pane {
+    -fx-background-image: url("background.png");     /* đường dẫn ảnh */
+    -fx-background-size: cover;                      /* phủ toàn bộ khung */
+    -fx-background-repeat: no-repeat;                /* không lặp lại */
+    -fx-background-position: center center;          /* căn giữa */
+    -fx-padding: 0;                                   /* xóa viền mặc định */
+}
+
+/* Style cho tiêu đề */
+.label-title {
+    -fx-text-fill: white; /* màu chữ trắng */
+    -fx-font-family: "Brush Script MT", "Lucida Handwriting", "Segoe Script", cursive; /* font nghệ thuật */
+    -fx-font-size: 28px; /* tăng kích thước cho nổi bật */
+    -fx-font-weight: bold;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.5), 4, 0, 0, 2); /* đổ bóng nhẹ */
+}
+.notif-icon {
+    -fx-fill: black; /* màu icon */
+    -fx-stroke: white; /* viền trắng */
+    -fx-stroke-width: 2; /* độ dày viền */
+}
+.button {
+    -fx-background-color: #FF9800;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-background-radius: 12;   /* tăng từ 4 → 12 để bo tròn hơn */
+    -fx-border-radius: 12;
+    -fx-padding: 6 12 6 12;
+}
+/* Hover effect for buttons */
+.button:hover {
+    -fx-background-color: #FB8C00;
+}
