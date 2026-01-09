@@ -116,6 +116,7 @@ model\manager\employee\Employee.class
 dao\manager\EmployeeDAO.class
 controller\manager\notification\CreateNotiController$1.class
 controller\manager\employee\EditEmployeeShiftController$2.class
+controller\Warehouse\notiCardController.class
 controller\manager\notification\NotiCardController.class
 controller\manager\product\EditPromotionController.class
 controller\manager\supplier\ImportController$5.class

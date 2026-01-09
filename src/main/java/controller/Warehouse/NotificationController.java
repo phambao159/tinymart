@@ -5,10 +5,14 @@ import model.Warehouse.Notification;
 import util.DBConnection;
 
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.scene.layout.AnchorPane;
+import javafx.stage.Stage;
 
 import java.sql.Connection;
 import java.time.LocalDate;
@@ -19,53 +23,33 @@ import java.util.stream.Collectors;
 
 public class NotificationController {
 
-    @FXML
-    private TableView<Notification> tbReceived;
-    @FXML
-    private TableView<Notification> tbSent;
+    @FXML private TableView<Notification> tbReceived;
+    @FXML private TableView<Notification> tbSent;
 
-    @FXML
-    private TableColumn<Notification, String> colRecvTitle;
-    @FXML
-    private TableColumn<Notification, String> colRecvContent;
-    @FXML
-    private TableColumn<Notification, LocalDateTime> colRecvDate;
-    @FXML
-    private TableColumn<Notification, String> colRecvStatus;
+    @FXML private TableColumn<Notification, String> colRecvTitle;
+    @FXML private TableColumn<Notification, String> colRecvContent;
+    @FXML private TableColumn<Notification, LocalDateTime> colRecvDate;
+    @FXML private TableColumn<Notification, String> colRecvStatus;
 
-    @FXML
-    private TableColumn<Notification, String> colSentTitle;
-    @FXML
-    private TableColumn<Notification, String> colSentContent;
-    @FXML
-    private TableColumn<Notification, LocalDateTime> colSentDate;
-    @FXML
-    private TableColumn<Notification, String> colSentReceiver;
+    @FXML private TableColumn<Notification, String> colSentTitle;
+    @FXML private TableColumn<Notification, String> colSentContent;
+    @FXML private TableColumn<Notification, LocalDateTime> colSentDate;
+    @FXML private TableColumn<Notification, String> colSentReceiver;
 
-    @FXML
-    private DatePicker dpFromDate;
-    @FXML
-    private DatePicker dpToDate;
-    @FXML
-    private ComboBox<String> cbFilterStatus;
+    @FXML private DatePicker dpFromDate;
+    @FXML private DatePicker dpToDate;
+    @FXML private ComboBox<String> cbFilterStatus;
 
-    @FXML
-    private TextField txtTitle;
-    @FXML
-    private TextArea txtContent;
-    @FXML
-    private ComboBox<String> cbReceiver;
-    @FXML
-    private Button btnSend;
-    @FXML
-    private Button btnFilter;
-    @FXML
-    private BorderPane root;
+    @FXML private TextField txtTitle;
+    @FXML private TextArea txtContent;
+    @FXML private ComboBox<String> cbReceiver;
+    @FXML private Button btnSend;
+    @FXML private Button btnFilter;
+    @FXML private BorderPane root;
 
     private NotificationDAO dao;
     private final int currentEmployeeID = 3; // giả định nhân viên đang đăng nhập
 
-    // Kết nối DB
     private void connectDB() {
         DBConnection db = new DBConnection();
         Connection conn = db.getConnect();
@@ -79,7 +63,6 @@ public class NotificationController {
 
     @FXML
     public void initialize() {
-        // ComboBox
         cbReceiver.getItems().addAll("Manager", "Cashier", "All");
         cbFilterStatus.getItems().addAll("Read", "Unread");
 
@@ -87,8 +70,8 @@ public class NotificationController {
         colRecvTitle.setCellValueFactory(new PropertyValueFactory<>("title"));
         colRecvContent.setCellValueFactory(new PropertyValueFactory<>("content"));
         colRecvDate.setCellValueFactory(new PropertyValueFactory<>("sentDate"));
-        colRecvStatus.setCellValueFactory(cell
-                -> new SimpleStringProperty(cell.getValue().isRead() ? "Read" : "Unread"));
+        colRecvStatus.setCellValueFactory(cell ->
+                new SimpleStringProperty(cell.getValue().isRead() ? "Read" : "Unread"));
 
         // Cột Sent
         colSentTitle.setCellValueFactory(new PropertyValueFactory<>("title"));
@@ -112,14 +95,27 @@ public class NotificationController {
                 setText(empty || item == null ? "" : item.format(fmt));
             }
         });
+
+        // Double-click Received
         tbReceived.setOnMouseClicked(event -> {
-            if (event.getClickCount() == 2) { // double-click để đọc
+            if (event.getClickCount() == 2) {
                 Notification selected = tbReceived.getSelectionModel().getSelectedItem();
-                if (selected != null && !selected.isRead()) {
-                    markAsRead(selected);
+                if (selected != null) {
+                    showNotificationCard(selected, true);
                 }
             }
         });
+
+        // Double-click Sent
+        tbSent.setOnMouseClicked(event -> {
+            if (event.getClickCount() == 2) {
+                Notification selected = tbSent.getSelectionModel().getSelectedItem();
+                if (selected != null) {
+                    showNotificationCard(selected, false);
+                }
+            }
+        });
+
         connectDB();
         onFilter(); // load dữ liệu ban đầu
     }
@@ -131,16 +127,14 @@ public class NotificationController {
 
             LocalDate fromDate = dpFromDate.getValue();
             LocalDate toDate = dpToDate.getValue();
-            String status = cbFilterStatus.getValue(); // "Read" hoặc "Unread"
+            String status = cbFilterStatus.getValue();
 
-            // Sent
             List<Notification> sent = all.stream()
                     .filter(n -> n.getEmployeeID() == currentEmployeeID)
                     .filter(n -> filterByDate(n, fromDate, toDate))
                     .filter(n -> filterByStatus(n, status))
                     .collect(Collectors.toList());
 
-            // Received
             List<Notification> received = all.stream()
                     .filter(n -> n.getReceiverID() != null && n.getReceiverID() == currentEmployeeID)
                     .filter(n -> filterByDate(n, fromDate, toDate))
@@ -167,15 +161,9 @@ public class NotificationController {
     }
 
     private boolean filterByStatus(Notification n, String status) {
-        if (status == null) {
-            return true;
-        }
-        if ("Read".equals(status)) {
-            return n.isRead();
-        }
-        if ("Unread".equals(status)) {
-            return !n.isRead();
-        }
+        if (status == null) return true;
+        if ("Read".equals(status)) return n.isRead();
+        if ("Unread".equals(status)) return !n.isRead();
         return true;
     }
 
@@ -186,7 +174,6 @@ public class NotificationController {
             String content = txtContent.getText();
             String receiver = cbReceiver.getValue();
 
-            // Validation
             if (title == null || title.isBlank()) {
                 new Alert(Alert.AlertType.WARNING, "Please enter a Title!").showAndWait();
                 return;
@@ -200,20 +187,15 @@ public class NotificationController {
                 return;
             }
 
-            // Determine receiverID
             Integer receiverID = null;
-            if ("Manager".equals(receiver)) {
-                receiverID = 1;
-            } else if ("Cashier".equals(receiver)) {
-                receiverID = 2;
-            } // "All" => null
+            if ("Manager".equals(receiver)) receiverID = 1;
+            else if ("Cashier".equals(receiver)) receiverID = 2;
 
-            // Create notification
             Notification n = new Notification(
                     0,
                     currentEmployeeID,
                     receiverID,
-                    null, null,
+                    "Current Employee", receiver,
                     title,
                     content,
                     LocalDateTime.now(),
@@ -223,12 +205,11 @@ public class NotificationController {
             dao.insertNotification(n);
             new Alert(Alert.AlertType.INFORMATION, "Notification sent successfully!").showAndWait();
 
-            // Clear form
             txtTitle.clear();
             txtContent.clear();
             cbReceiver.getSelectionModel().clearSelection();
 
-            onFilter(); // refresh table
+            onFilter();
         } catch (Exception e) {
             e.printStackTrace();
             new Alert(Alert.AlertType.ERROR, "Error while sending notification!").showAndWait();
@@ -237,18 +218,38 @@ public class NotificationController {
 
     private void markAsRead(Notification notification) {
         try {
-            // Change status in object
             notification.setRead(true);
-
-            // Update DB using the correct ID field
             dao.updateNotificationStatus((int) notification.getNotificationID(), true);
-
-            // Refresh table view
             onFilter();
         } catch (Exception e) {
             e.printStackTrace();
             new Alert(Alert.AlertType.ERROR,
                     "Error while marking notification as read!").showAndWait();
+        }
+    }
+
+    // Hàm mở notiCard.fxml và truyền dữ liệu
+    private void showNotificationCard(Notification n, boolean isReceived) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass()
+                    .getResource("/Warehouse/notiCard.fxml"));
+            AnchorPane pane = loader.load();
+
+            controller.Warehouse.notiCardController cardController = loader.getController();
+            cardController.setData(n, isReceived);
+
+            Stage stage = new Stage();
+            stage.setTitle("Notification Detail");
+            stage.setScene(new Scene(pane));
+            stage.show();
+
+            // Nếu là Received và chưa đọc thì đánh dấu đã đọc
+            if (isReceived && !n.isRead()) {
+                markAsRead(n);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            new Alert(Alert.AlertType.ERROR, "Error while opening notification card!").showAndWait();
         }
     }
 }
