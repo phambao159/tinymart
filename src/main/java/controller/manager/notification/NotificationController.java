@@ -1,5 +1,7 @@
 package controller.manager.notification;
 
+import controller.manager.LayoutController;
+import dao.manager.employee.EmployeeDAO;
 import dao.manager.notification.NotificationDAO;
 import java.io.IOException;
 import java.net.URL;
@@ -18,8 +20,10 @@ import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import model.manager.employee.Employee;
 import model.manager.notification.Notification;
 
 public class NotificationController implements Initializable {
@@ -27,7 +31,7 @@ public class NotificationController implements Initializable {
     @FXML
     private HBox NotiTool;
     @FXML
-    private FlowPane notiContainer;
+    private VBox notiContainer;
     @FXML
     private ScrollPane viewNoti;
     @FXML
@@ -40,6 +44,22 @@ public class NotificationController implements Initializable {
     private TextField tfSearch;
 
     private final NotificationDAO dao = new NotificationDAO();
+    private final EmployeeDAO edao = new EmployeeDAO();
+    
+    public LayoutController mainLayoutController;
+    
+    public void setMainLayoutController(LayoutController controller) {
+        this.mainLayoutController = controller;
+    }
+    private void refreshUI() {
+        // Cập nhật số lượng tại trang hiện tại
+        updateCountLabels();
+        
+        // Cập nhật con số trên thanh Menu chính thông qua tham chiếu đã truyền
+        if (mainLayoutController != null) {
+            mainLayoutController.updateNotificationBadge();
+        }
+    }
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -69,9 +89,9 @@ public class NotificationController implements Initializable {
             for (Notification n : list) {
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("/manager/notification/notiCard.fxml"));
                 Parent card = loader.load();
-
+                Employee e = edao.getEmployeeById(n.getEmployeeID());
                 NotiCardController cardController = loader.getController();
-                String senderName = (n.getEmployeeID() == 1) ? "Manager" : "Staff " + n.getEmployeeID();
+                String senderName = (n.getEmployeeID() == 1) ? "Manager" : "From " + e.getRole() + " " + e.getFullName();
                 cardController.setData(n, senderName);
 
                 // Gán sự kiện click trực tiếp vào Parent (card)
@@ -100,6 +120,7 @@ public class NotificationController implements Initializable {
                 n.setIsRead(true);
                 dao.update(n);
                 updateCountLabels();
+                mainLayoutController.updateNotificationBadge();
             }
 
             // 2. Load Popup
@@ -123,6 +144,7 @@ public class NotificationController implements Initializable {
             stage.setOnHiding(event -> {
                 String currentFilter = lbUnread.isSelected() ? "unread" : "all";
                 loadDataAndRender(currentFilter);
+                refreshUI();
             });
 
             stage.show();
@@ -142,6 +164,7 @@ public class NotificationController implements Initializable {
                 }
             }
             loadDataAndRender("all");
+            refreshUI();
         } catch (Exception e) {
             e.printStackTrace();
         }

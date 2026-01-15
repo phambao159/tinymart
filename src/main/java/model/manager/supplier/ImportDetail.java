@@ -4,39 +4,114 @@ import java.time.LocalDate;
 
 /**
  * Model class cho bảng ImportDetail (Chi tiết phiếu nhập hàng)
+ * Đã bổ sung shelfQuantity và promotionName
  */
 public class ImportDetail {
 
-    private int productID;
-    private int importDetailID;   // ImportDetailID int (Primary Key)
-    private int importID;         // ImportID int (Foreign Key)
-    private int productSizeID;    // ProductSizeID int (Foreign Key)
-    private long quantity;        // Quantity bigint
-    private double importPrice;   // ImportPrice decimal(15,2)
-    private LocalDate expiryDate; // ExpiryDate date
+    private int importDetailID;   // Primary Key
+    private int importID;         // Foreign Key từ bảng Import
+    private int productID;        // ID của sản phẩm (dùng để truy vấn)
+    private int productSizeID;    // Foreign Key từ bảng ProductSize
+    private long quantity;        // Số lượng nhập kho (bigint)
+    private int shelfQuantity;    // Số lượng trưng bày/bán trên kệ (Mới thêm)
+    private double importPrice;   // Giá nhập (decimal)
+    private LocalDate expiryDate; // Ngày hết hạn
+    
+    // Các trường bổ trợ dùng để hiển thị lên TableView (JOIN từ bảng khác)
     private String productName;
     private String sizeName;
+    private String promotionName; 
 
-    // Constructor mặc định
+    // 1. Constructor không đối số
     public ImportDetail() {
     }
 
-    // Constructor đầy đủ (Dùng khi lấy dữ liệu từ database)
-    public ImportDetail(int importDetailID, int importID, int productSizeID, long quantity, double importPrice, LocalDate expiryDate) {
+    // 2. Constructor đầy đủ (Dùng khi lấy dữ liệu từ Database)
+    public ImportDetail(int importDetailID, int importID, int productSizeID, long quantity, 
+                        int shelfQuantity, double importPrice, LocalDate expiryDate) {
         this.importDetailID = importDetailID;
         this.importID = importID;
         this.productSizeID = productSizeID;
         this.quantity = quantity;
+        this.shelfQuantity = shelfQuantity;
         this.importPrice = importPrice;
         this.expiryDate = expiryDate;
     }
 
-    // Constructor không có ID (Dùng khi tạo mới chi tiết để lưu vào DB)
-    public ImportDetail(int importID, int productSizeID, long quantity, double importPrice, LocalDate expiryDate) {
+    // 3. Constructor để tạo mới (Không cần ID tự tăng)
+    public ImportDetail(int importID, int productSizeID, long quantity, 
+                        int shelfQuantity, double importPrice, LocalDate expiryDate) {
         this.importID = importID;
         this.productSizeID = productSizeID;
         this.quantity = quantity;
+        this.shelfQuantity = shelfQuantity;
         this.importPrice = importPrice;
+        this.expiryDate = expiryDate;
+    }
+
+    // --- GETTER VÀ SETTER ---
+
+    public int getImportDetailID() {
+        return importDetailID;
+    }
+
+    public void setImportDetailID(int importDetailID) {
+        this.importDetailID = importDetailID;
+    }
+
+    public int getImportID() {
+        return importID;
+    }
+
+    public void setImportID(int importID) {
+        this.importID = importID;
+    }
+
+    public int getProductID() {
+        return productID;
+    }
+
+    public void setProductID(int productID) {
+        this.productID = productID;
+    }
+
+    public int getProductSizeID() {
+        return productSizeID;
+    }
+
+    public void setProductSizeID(int productSizeID) {
+        this.productSizeID = productSizeID;
+    }
+
+    public long getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(long quantity) {
+        this.quantity = quantity;
+    }
+
+    public int getShelfQuantity() {
+        return shelfQuantity;
+    }
+
+    public void setShelfQuantity(int shelfQuantity) {
+        this.shelfQuantity = shelfQuantity;
+    }
+
+    public double getImportPrice() {
+        return importPrice;
+    }
+
+    public void setImportPrice(double importPrice) {
+        this.importPrice = importPrice;
+    }
+
+    public LocalDate getExpiryDate() {
+        return expiryDate;
+    }
+
+    public void setExpiryDate(LocalDate expiryDate) {
         this.expiryDate = expiryDate;
     }
 
@@ -56,72 +131,25 @@ public class ImportDetail {
         this.sizeName = sizeName;
     }
 
-    // Getter và Setter
-    public int getImportDetailID() {
-        return importDetailID;
+    public String getPromotionName() {
+        return promotionName;
     }
 
-    public void setImportDetailID(int importDetailID) {
-        this.importDetailID = importDetailID;
+    public void setPromotionName(String promotionName) {
+        this.promotionName = promotionName;
     }
 
-    public int getImportID() {
-        return importID;
-    }
-
-    public void setImportID(int importID) {
-        this.importID = importID;
-    }
-
-    public int getProductSizeID() {
-        return productSizeID;
-    }
-
-    public void setProductSizeID(int productSizeID) {
-        this.productSizeID = productSizeID;
-    }
-
-    public long getQuantity() {
-        return quantity;
-    }
-
-    public void setQuantity(long quantity) {
-        this.quantity = quantity;
-    }
-
-    public double getImportPrice() {
-        return importPrice;
-    }
-
-    public void setImportPrice(double importPrice) {
-        this.importPrice = importPrice;
-    }
-
-    public LocalDate getExpiryDate() {
-        return expiryDate;
-    }
-
-    public void setExpiryDate(LocalDate expiryDate) {
-        this.expiryDate = expiryDate;
-    }
-
-    public int getProductID() {
-        return productID;
-    }
-
-    public void setProductID(int productID) {
-        this.productID = productID;
-    }
-    
-
+    // --- TO STRING ---
     @Override
     public String toString() {
-        return "ImportDetail{"
-                + "importDetailID=" + importDetailID
-                + ", productSizeID=" + productSizeID
-                + ", quantity=" + quantity
-                + ", importPrice=" + importPrice
-                + ", expiryDate=" + expiryDate
-                + '}';
+        return "ImportDetail{" +
+                "importDetailID=" + importDetailID +
+                ", productSizeID=" + productSizeID +
+                ", productName='" + productName + '\'' +
+                ", quantity=" + quantity +
+                ", shelfQuantity=" + shelfQuantity +
+                ", importPrice=" + importPrice +
+                ", expiryDate=" + expiryDate +
+                '}';
     }
 }

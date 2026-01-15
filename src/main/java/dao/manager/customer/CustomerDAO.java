@@ -60,18 +60,7 @@ public class CustomerDAO {
         }
     }
 
-    // 4. Xóa khách hàng
-    public boolean deleteCustomer(int customerID) {
-        String sql = "DELETE FROM Customer WHERE CustomerID = ?";
-        try (Connection conn = dc.getConnect();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setInt(1, customerID);
-            return pstmt.executeUpdate() > 0;
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
+
 
     // 5. Tìm kiếm khách hàng (Dùng cho chức năng Search nâng cao nếu không muốn dùng Filter list)
     public List<Customer> searchCustomers(String keyword) {

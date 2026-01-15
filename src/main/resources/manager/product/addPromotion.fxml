@@ -12,7 +12,7 @@
    <children>
       <VBox layoutX="30.0" layoutY="20.0" spacing="15.0" AnchorPane.leftAnchor="30.0" AnchorPane.rightAnchor="30.0">
          <children>
-            <Label text="Add New Promotion" textFill="#2c3e50">
+            <Label fx:id= "title" text="Add New Promotion" textFill="#2c3e50">
                <font>
                   <Font name="System Bold" size="22.0" />
                </font>

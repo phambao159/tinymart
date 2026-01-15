@@ -1,46 +1,42 @@
 package model.manager.product;
 
-import java.math.BigDecimal;
-
+/**
+ * Lớp Model đại diện cho thông tin sản phẩm (Product)
+ * Đã loại bỏ promotionID vì thuộc tính này đã chuyển sang bảng ProductSize.
+ */
 public class Product {
 
     private int productID;
     private String name;
-
-    private int promotionID;
     private int categoryID;
     private String unit;
-
     private String status;
     private String image;
 
-
-    public Product(String name, int promotionID, int categoryID, String unit, String status, String image) {
-        this.name = name;
-        this.promotionID = promotionID;
-        this.categoryID = categoryID;
-        this.unit = unit;
-        this.status = status;
-        this.image = image;
-    }
-
-
-    public Product(int productID, String name, int promotionID, String unit, String status, String image) {
-        this.productID = productID;
-        this.name = name;
-        this.promotionID = promotionID;
-        this.categoryID = categoryID;
-        this.unit = unit;
-        this.status = status;
-        this.image = image;
-    }
-
-
+    // Constructor mặc định
     public Product() {
     }
 
+    // Constructor dùng khi thêm mới (không cần productID vì thường là tự tăng)
+    public Product(String name, int categoryID, String unit, String status, String image) {
+        this.name = name;
+        this.categoryID = categoryID;
+        this.unit = unit;
+        this.status = status;
+        this.image = image;
+    }
 
+    // Constructor dùng khi lấy dữ liệu từ DB (có đầy đủ productID)
+    public Product(int productID, String name, int categoryID, String unit, String status, String image) {
+        this.productID = productID;
+        this.name = name;
+        this.categoryID = categoryID;
+        this.unit = unit;
+        this.status = status;
+        this.image = image;
+    }
 
+    // Getter và Setter
     public int getProductID() {
         return productID;
     }
@@ -55,16 +51,6 @@ public class Product {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-
-
-    public int getPromotionID() {
-        return promotionID;
-    }
-
-    public void setPromotionID(int promotionID) {
-        this.promotionID = promotionID;
     }
 
     public int getCategoryID() {

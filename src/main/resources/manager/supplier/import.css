@@ -1,7 +1,134 @@
-/*
- * Empty Stylesheet file.
- */
-
+/* 1. Tổng thể nền */
 .mainFxmlClass {
+    -fx-background-color: #ffffff;
+}
 
+/* 2. Tiêu đề lớn */
+.vbox > .label {
+    -fx-text-fill: #1E8449; /* Sử dụng màu xanh chủ đạo */
+    -fx-font-family: "Segoe UI", Arial;
+    -fx-padding: 0 0 5 0;
+}
+
+/* 3. Thanh công cụ tìm kiếm (HBox) */
+#hSearch {
+    -fx-background-color: #F4F7F6; /* Xanh cực nhạt */
+    -fx-border-color: #D5DBDB;
+    -fx-border-radius: 5;
+    -fx-background-radius: 5;
+    -fx-padding: 10;
+}
+
+/* Ô nhập liệu tìm kiếm */
+.text-field {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #D5DBDB;
+    -fx-border-radius: 4;
+    -fx-padding: 0 10 0 10;
+    -fx-font-size: 13px;
+}
+
+.text-field:focused {
+    -fx-border-color: #1E8449;
+    -fx-border-width: 1.5;
+}
+
+/* Nút New Import */
+.button {
+    -fx-background-color: #1E8449;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+    -fx-background-radius: 4;
+    -fx-transition: 0.2s;
+}
+
+.button:hover {
+    -fx-background-color: #145A32; /* Màu hover xanh đậm */
+    -fx-translate-y: -1;
+}
+
+/* 4. Định dạng Bảng (TableView) */
+.table-view {
+    -fx-background-color: transparent;
+    -fx-border-color: #D5DBDB;
+    -fx-border-radius: 4;
+}
+
+/* Tiêu đề cột của bảng */
+.table-view .column-header {
+    -fx-background-color: #EAECEE;
+    -fx-border-color: #D5DBDB;
+    -fx-padding: 12 0 12 0;
+}
+
+.table-view .column-header .label {
+    -fx-text-fill: #2C3E50;
+    -fx-font-weight: bold;
+    -fx-font-size: 13px;
+}
+
+/* Định dạng dòng dữ liệu */
+.table-row-cell {
+    -fx-cell-size: 40px;
+    -fx-border-color: transparent transparent #f1f1f1 transparent;
+}
+
+.table-row-cell:hover {
+    -fx-background-color: #E8F5E9; /* Màu xanh nhạt khi hover dòng */
+}
+
+/* Khi chọn dòng (Highlight Cam) */
+.table-row-cell:selected {
+    -fx-background-color: #E8F5E9;
+    -fx-text-fill : black!important;
+}
+
+/* 5. Định dạng dữ liệu các cột cụ thể */
+.table-cell {
+    -fx-alignment: CENTER_LEFT;
+    -fx-padding: 0 10 0 10;
+}
+
+/* Các cột cần căn giữa */
+#colID, #colTotal, #colStatus, #colDate {
+    -fx-alignment: CENTER;
+}
+
+/* Làm nổi bật cột Tổng tiền */
+#colTotal {
+    -fx-text-fill: #1E8449;
+    -fx-font-weight: bold;
+}
+
+/* Cột trạng thái (Status) - Mặc định */
+#colStatus {
+    -fx-font-weight: bold;
+}
+/* 1. Xóa vệt xanh lục ở 2 đầu dòng khi chọn */
+.table-row-cell:filled:selected {
+    -fx-background-color: #E8F5E9; /* Màu nền bạn muốn */
+    -fx-background-insets: 0; /* Quan trọng: Xóa khoảng cách gây ra vệt màu lạ */
+    -fx-background-radius: 0;
+}
+
+/* 2. Xóa đường viền xanh mặc định của JavaFX khi Focus vào dòng */
+.table-row-cell:filled:focused:selected {
+    -fx-background-color: #E8F5E9;
+    -fx-background-insets: 0;
+}
+
+/* 3. Đảm bảo các ô (cell) bên trong không có viền xanh */
+.table-view:focused .table-row-cell:filled:selected .table-cell {
+    -fx-text-fill: #2C3E50;
+    -fx-border-color: transparent; /* Xóa viền của từng ô */
+}
+
+/* 4. Xóa đường viền xanh bao quanh toàn bộ TableView khi click vào */
+.table-view:focused {
+    -fx-background-color: transparent;
+    -fx-background-insets: -1.4, 0, 1;
+    /* Nếu vẫn còn vệt xanh quanh bảng, dùng dòng dưới */
+    -fx-faint-focus-color: transparent;
+    -fx-focus-color: transparent;
 }

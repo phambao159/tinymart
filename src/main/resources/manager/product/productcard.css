@@ -1,0 +1,91 @@
+/* Khung ngoài của thẻ sản phẩm */
+.product-card {
+    -fx-background-color: white;
+    -fx-background-radius: 12;
+    -fx-padding: 15;
+    -fx-pref-width: 200; /* Độ rộng cố định để đồng đều trong FlowPane */
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 4);
+    -fx-cursor: hand;
+    -fx-transition: all 0.3s ease;
+    -fx-border-color: #1E8449;
+    -fx-border-radius : 10;
+}
+
+/* Hiệu ứng khi di chuột vào thẻ */
+.product-card:hover {
+    -fx-effect: dropshadow(three-pass-box, rgba(30, 132, 73, 0.2), 15, 0, 0, 6);
+    -fx-translate-y: -5; /* Thẻ nhấc lên một chút */
+}
+
+/* Hình ảnh sản phẩm */
+#imgProduct {
+    -fx-preserve-ratio: true;
+    -fx-fit-width: 160px;
+}
+
+/* Tên sản phẩm */
+#lbName {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #2C3E50;
+    -fx-padding: 0 0 8 0;
+    -fx-wrap-text: true;
+}
+
+/* Định dạng chung cho các nhãn thông số */
+.label {
+    -fx-font-size: 13px;
+    -fx-text-fill: #7F8C8D;
+    -fx-padding: 2 0;
+}
+
+/* Giá bán (Selling Price) nổi bật hơn */
+#lbSelling {
+    -fx-text-fill: #1E8449; /* Màu xanh chủ đạo */
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+}
+
+/* Trạng thái tồn kho (Available/Out of Stock) */
+#lbStatus {
+    -fx-font-weight: bold;
+    -fx-font-size: 12px;
+    -fx-text-fill: #27AE60; /* Mặc định màu xanh lá */
+    -fx-background-color: #E8F5E9;
+    -fx-padding: 3 8;
+    -fx-background-radius: 5;
+}
+
+/* Hàng chứa nút bấm */
+.hbox {
+    -fx-padding: 15 0 0 0;
+}
+
+/* Nút bấm Edit & Details */
+.product-card .button {
+    -fx-background-color: #F2F4F4;
+    -fx-text-fill: #2C3E50;
+    -fx-font-weight: bold;
+    -fx-background-radius: 5;
+    -fx-pref-width: 90;
+    -fx-cursor: hand;
+}
+
+/* Nút Edit màu đặc trưng */
+.product-card .button:first-child {
+    -fx-background-color: #1E8449;
+    -fx-text-fill: white;
+}
+
+.product-card .button:first-child:hover {
+    -fx-background-color: #145A32;
+}
+
+/* Nút Details */
+.product-card .button:last-child {
+    -fx-text-fill : white;
+    -fx-background-color: #FF9800;
+}
+.product-card .button:last-child:hover {
+    -fx-background-color: #E58B04;
+}

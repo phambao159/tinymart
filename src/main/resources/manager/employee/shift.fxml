@@ -22,7 +22,7 @@
               <HBox alignment="CENTER_LEFT" prefHeight="85.0" prefWidth="685.0" spacing="10.0">
                   <children>
                       <TextField fx:id="txtSearch" onAction="#onSearch" promptText="Search Shift" />
-                  <Button mnemonicParsing="false" onAction="#onAdd" text="Add New Shift" />
+                  <Button mnemonicParsing="false" onAction="#onAdd" text="+ New Shift" />
                   </children>
               </HBox>
             <HBox alignment="CENTER_LEFT" VBox.vgrow="ALWAYS" spacing="10.0">

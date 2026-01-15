@@ -2,9 +2,9 @@ package controller.manager.product;
 
 import dao.manager.product.ProductSizeDAO;
 import dao.manager.product.SizeDAO;
+import dao.manager.product.PromotionDAO;
 import java.net.URL;
-import java.util.List;
-import java.util.Optional;
+import java.util.List; // FIX LỖI 1: Thêm import List
 import java.util.ResourceBundle;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -19,6 +19,7 @@ import javafx.util.StringConverter;
 import model.manager.product.ProductSize;
 import model.manager.product.ProductSummary;
 import model.manager.product.Size;
+import model.manager.product.Promotion;
 
 public class ProductdetailController implements Initializable {
 
@@ -35,38 +36,42 @@ public class ProductdetailController implements Initializable {
     @FXML
     private TableColumn<ProductSize, Integer> colStock;
 
+    // FIX LỖI 3: Để TableColumn là Integer (trùng với kiểu của promotionID)
+    @FXML
+    private TableColumn<ProductSize, Integer> colPromotion;
+
     @FXML
     private ComboBox<Size> cbSize;
     @FXML
+    private ComboBox<Promotion> cbPromotion;
+    @FXML
     private TextField txtCost, txtSelling, txtStock;
-    private Button btnSave; // Bạn nên đặt fx:id cho nút Add/Save để đổi tên nút nếu muốn
+    private Button btnSave;
 
-    private ProductSizeDAO productSizeDAO = new ProductSizeDAO();
-    private SizeDAO sizeDAO = new SizeDAO();
+    private final ProductSizeDAO productSizeDAO = new ProductSizeDAO();
+    private final SizeDAO sizeDAO = new SizeDAO();
+    private final PromotionDAO promotionDAO = new PromotionDAO();
+
+    // FIX LỖI 2: Khai báo biến allPromotions để dùng cho CellFactory
+    private List<Promotion> allPromotions = promotionDAO.getProActive();
+
     private ProductSummary currentProduct;
-    private ObservableList<ProductSize> tableData = FXCollections.observableArrayList();
-
-    // BIẾN QUAN TRỌNG: Lưu đối tượng đang được chọn để sửa
+    private final ObservableList<ProductSize> tableData = FXCollections.observableArrayList();
     private ProductSize editingProductSize = null;
     private Runnable refreshCallback;
 
-    public void setOnSave(Runnable callback) {
-        this.refreshCallback = callback;
-    }
-
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        // 1. Cấu hình bảng
-        colSize.setCellValueFactory(new PropertyValueFactory<>("sizeType"));
-        colCost.setCellValueFactory(new PropertyValueFactory<>("costPrice"));
-        colSelling.setCellValueFactory(new PropertyValueFactory<>("sellingPrice"));
-        colStock.setCellValueFactory(new PropertyValueFactory<>("stockQuantity"));
-        tableSizes.setItems(tableData);
+        // Load danh sách khuyến mãi vào bộ nhớ trước
+        allPromotions = promotionDAO.getData();
 
-        // 2. Nạp dữ liệu ComboBox
-        loadSizeList();
+        setupTableView();
+        setupComboBoxes();
 
-        // 3. THIẾT LẬP DOUBLE CLICK CHO BẢNG
+        txtStock.setEditable(false);
+        txtStock.setDisable(true);
+        txtStock.setStyle("-fx-opacity: 1; -fx-background-color: #eeeeee;");
+
         tableSizes.setRowFactory(tv -> {
             TableRow<ProductSize> row = new TableRow<>();
             row.setOnMouseClicked(event -> {
@@ -78,28 +83,47 @@ public class ProductdetailController implements Initializable {
         });
     }
 
-    // Hàm đưa dữ liệu từ dòng được chọn xuống Form để sửa
-    private void loadRowToForm(ProductSize ps) {
-        this.editingProductSize = ps;
+    private void setupTableView() {
+        colSize.setCellValueFactory(new PropertyValueFactory<>("sizeType"));
+        colCost.setCellValueFactory(new PropertyValueFactory<>("costPrice"));
+        colSelling.setCellValueFactory(new PropertyValueFactory<>("sellingPrice"));
+        colStock.setCellValueFactory(new PropertyValueFactory<>("stockQuantity"));
 
-        // Chọn đúng Size trong ComboBox
-        for (Size s : cbSize.getItems()) {
-            if (s.getSizeID() == ps.getSizeID()) {
-                cbSize.setValue(s);
-                break;
+        // Trỏ vào promotionID trong Model ProductSize
+        colPromotion.setCellValueFactory(new PropertyValueFactory<>("promotionID"));
+
+        // Cập nhật CellFactory để xử lý hiển thị có điều kiện
+        colPromotion.setCellFactory(column -> new TableCell<ProductSize, Integer>() {
+            @Override
+            protected void updateItem(Integer promoID, boolean empty) {
+                super.updateItem(promoID, empty);
+
+                // Nếu dòng trống (không có đối tượng ProductSize)
+                if (empty || getTableRow() == null || getTableRow().getItem() == null) {
+                    setText(null);
+                    setGraphic(null);
+                } else {
+                    // Dòng có dữ liệu nhưng promoID là 0 hoặc null
+                    if (promoID == null || promoID == 0) {
+                        setText("No Promotion");
+                    } else {
+                        // Tìm tên từ danh sách allPromotions
+                        String name = allPromotions.stream()
+                                .filter(p -> p.getPromotionID() == promoID)
+                                .map(Promotion::getName)
+                                .findFirst()
+                                .orElse("ID: " + promoID);
+                        setText(name);
+                    }
+                }
             }
-        }
+        });
 
-        txtCost.setText(String.valueOf(ps.getCostPrice()));
-        txtSelling.setText(String.valueOf(ps.getSellingPrice()));
-        txtStock.setText(String.valueOf(ps.getStockQuantity()));
-
-        if (btnSave != null) {
-            btnSave.setText("Update");
-        }
+        tableSizes.setItems(tableData);
     }
 
-    private void loadSizeList() {
+    private void setupComboBoxes() {
+        // 1. Setup Size ComboBox
         cbSize.setItems(FXCollections.observableArrayList(sizeDAO.getData()));
         cbSize.setConverter(new StringConverter<Size>() {
             @Override
@@ -112,17 +136,60 @@ public class ProductdetailController implements Initializable {
                 return null;
             }
         });
+
+        // 2. Setup Promotion ComboBox với lựa chọn "No Promotion"
+        ObservableList<Promotion> promoOptions = FXCollections.observableArrayList();
+
+        // Tạo một đối tượng giả đại diện cho việc không có khuyến mãi
+        Promotion noPromo = new Promotion();
+        noPromo.setPromotionID(0);
+        noPromo.setName("No Promotion");
+
+        promoOptions.add(noPromo); // Thêm "No Promotion" lên đầu
+        if (allPromotions != null) {
+            promoOptions.addAll(allPromotions);
+        }
+
+        cbPromotion.setItems(promoOptions);
+        cbPromotion.setConverter(new StringConverter<Promotion>() {
+            @Override
+            public String toString(Promotion p) {
+                return (p == null) ? "No Promotion" : p.getName();
+            }
+
+            @Override
+            public Promotion fromString(String string) {
+                return null;
+            }
+        });
+
+        // Mặc định chọn No Promotion
+        cbPromotion.setValue(noPromo);
+    }
+
+    // Các hàm initData, onAddEntry, onClear... giữ nguyên như bài trước
+    // Lưu ý: Đảm bảo trong FXML, fx:id="colPromotion" được khai báo đúng
+    public void setOnSave(Runnable callback) {
+        this.refreshCallback = callback;
     }
 
     public void initData(ProductSummary summary) {
         this.currentProduct = summary;
-        String path = "/image/manager/" + summary.getImage();
-        try {
-            imageProduct.setImage(new Image(getClass().getResourceAsStream(path)));
-        } catch (Exception e) {
-            imageProduct.setImage(new Image(getClass().getResourceAsStream("/image/manager/coca.png")));
+        if (summary != null && summary.getImage() != null) {
+            loadProductImage(summary.getImage());
         }
         refreshTable();
+    }
+
+    private void loadProductImage(String imageName) {
+        try {
+            String path = "/image/manager/" + imageName;
+            URL imageUrl = getClass().getResource(path);
+            imageProduct.setImage(new Image((imageUrl != null) ? imageUrl.toExternalForm()
+                    : getClass().getResource("/image/manager/default.png").toExternalForm()));
+        } catch (Exception e) {
+            System.err.println("Error loading image: " + e.getMessage());
+        }
     }
 
     private void refreshTable() {
@@ -131,89 +198,71 @@ public class ProductdetailController implements Initializable {
         }
     }
 
+    private void loadRowToForm(ProductSize ps) {
+        if (ps == null) {
+            return;
+        }
+        this.editingProductSize = ps;
+        cbSize.getItems().stream().filter(s -> s.getSizeID() == ps.getSizeID()).findFirst().ifPresent(cbSize::setValue);
+        cbPromotion.getItems().stream().filter(p -> p.getPromotionID() == ps.getPromotionID()).findFirst().ifPresent(cbPromotion::setValue);
+        txtCost.setText(String.valueOf(ps.getCostPrice()));
+        txtSelling.setText(String.valueOf(ps.getSellingPrice()));
+        txtStock.setText(String.valueOf(ps.getStockQuantity()));
+        if (btnSave != null) {
+            btnSave.setText("Update");
+        }
+    }
+
     @FXML
     private void onAddEntry(ActionEvent event) {
         try {
             Size selectedSize = cbSize.getValue();
-            if (selectedSize == null || txtCost.getText().isEmpty()) {
-                showAlert(Alert.AlertType.WARNING, "Warning", "Please fill all fields!");
+            Promotion selectedPromo = cbPromotion.getValue();
+            if (selectedSize == null || txtCost.getText().isEmpty() || txtSelling.getText().isEmpty()) {
+                showAlert(Alert.AlertType.WARNING, "Warning", "Fill required fields.");
                 return;
             }
-
             double cost = Double.parseDouble(txtCost.getText());
             double selling = Double.parseDouble(txtSelling.getText());
-            int stock = Integer.parseInt(txtStock.getText());
+            int promoID = (selectedPromo != null) ? selectedPromo.getPromotionID() : 0;
 
             if (editingProductSize == null) {
-
                 ProductSize ps = new ProductSize();
                 ps.setProductID(currentProduct.getProductID());
                 ps.setSizeID(selectedSize.getSizeID());
                 ps.setCostPrice(cost);
                 ps.setSellingPrice(selling);
-                ps.setStockQuantity(stock);
-
+                ps.setPromotionID(promoID);
                 if (productSizeDAO.insert(ps)) {
-                    refreshTable();
-                    if (refreshCallback != null) {
-                        refreshCallback.run();
-                    }
-                    onClear(null);
-                } else {
-                    showAlert(Alert.AlertType.ERROR, "Error", "Add failed! Size may already exist.");
+                    showSuccess("Added successfully.");
                 }
             } else {
-
                 editingProductSize.setSizeID(selectedSize.getSizeID());
                 editingProductSize.setCostPrice(cost);
                 editingProductSize.setSellingPrice(selling);
-                editingProductSize.setStockQuantity(stock);
-
+                editingProductSize.setPromotionID(promoID);
                 if (productSizeDAO.update(editingProductSize)) {
-                    showAlert(Alert.AlertType.INFORMATION, "Success", "Updated successfully!");
-                    if (refreshCallback != null) {
-                        refreshCallback.run();
-                    }
-                    refreshTable();
-                    onClear(null);
-                } else {
-                    showAlert(Alert.AlertType.ERROR, "Error", "Update failed!");
+                    showSuccess("Updated successfully.");
                 }
             }
-        } catch (NumberFormatException e) {
-            showAlert(Alert.AlertType.ERROR, "Error", "Invalid number format!");
+        } catch (Exception e) {
+            showAlert(Alert.AlertType.ERROR, "Error", "Invalid data.");
         }
     }
 
-    @FXML
-    private void onDelete(ActionEvent event) {
-        ProductSize selected = tableSizes.getSelectionModel().getSelectedItem();
-        if (selected == null) {
-            showAlert(Alert.AlertType.WARNING, "Warning", "Please select a row to delete!");
-            return;
+    private void showSuccess(String message) {
+        showAlert(Alert.AlertType.INFORMATION, "Success", message);
+        refreshTable();
+        if (refreshCallback != null) {
+            refreshCallback.run();
         }
-
-        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
-        confirm.setTitle("Confirm Delete");
-        confirm.setContentText("Are you sure you want to delete size: " + selected.getSizeType() + "?");
-
-        Optional<ButtonType> result = confirm.showAndWait();
-        if (result.isPresent() && result.get() == ButtonType.OK) {
-            if (productSizeDAO.delete(selected.getProductSizeID())) {
-                refreshTable();
-                if (refreshCallback != null) {
-                    refreshCallback.run();
-                }
-                onClear(null);
-            } else {
-                showAlert(Alert.AlertType.ERROR, "Error", "Delete failed!");
-            }
-        }
+        onClear(null);
     }
 
     private void onClear(ActionEvent event) {
-        editingProductSize = null; // Quan trọng: Reset trạng thái sửa về thêm mới
+        editingProductSize = null;
         cbSize.getSelectionModel().clearSelection();
+        cbPromotion.getSelectionModel().clearSelection();
         txtCost.clear();
         txtSelling.clear();
         txtStock.clear();
@@ -223,10 +272,13 @@ public class ProductdetailController implements Initializable {
     }
 
     private void showAlert(Alert.AlertType type, String title, String content) {
-        Alert alert = new Alert(type);
+        Alert alert = new Alert(type, content);
         alert.setTitle(title);
         alert.setHeaderText(null);
-        alert.setContentText(content);
         alert.show();
+    }
+
+    @FXML
+    private void onDelete(ActionEvent event) {
     }
 }

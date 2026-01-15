@@ -4,6 +4,8 @@
  */
 package controller.manager;
 
+import controller.manager.notification.LayoutNotificationController;
+import controller.manager.report.DashboardController;
 import dao.manager.notification.NotificationDAO;
 import java.io.IOException;
 import java.net.URL;
@@ -40,23 +42,59 @@ public class LayoutController implements Initializable {
     private ToggleGroup toggleMenu;
     @FXML
     private ToggleButton lbNoti;
-    
+
     NotificationDAO nDAO = new NotificationDAO();
+    @FXML
+    private ToggleButton lbOrder;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        loadView("/manager/report/layout.fxml");
-        try{
-            int count = nDAO.countNoti("unread");
-            lbNoti.setText(String.format("Notification (%d)", count));
-        } catch(Exception e){
-            e.printStackTrace();
+
+        try {
+            updateNotificationBadge();
+
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/manager/report/layout.fxml"));
+            Node node = loader.load();
+
+            // Truyền MainLayout cho Dashboard để nó có thể gọi ngược lại
+            DashboardController dc = loader.getController();
+            dc.setMainController(this);
+
+            view.getChildren().setAll(node);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    public void updateNotificationBadge() {
+        try {
+            int unreadCount = nDAO.countNoti("Unread");
+
+            if (unreadCount > 0) {
+                lbNoti.setText("Notification (" + unreadCount + ")");
+            } else {
+                lbNoti.setText("Notification");
+                lbNoti.setStyle("");
+            }
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
         }
     }
 
     @FXML
     private void onDashboard(ActionEvent event) {
-        loadView("/manager/report/layout.fxml");
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/manager/report/layout.fxml"));
+            Node node = loader.load();
+
+            // Truyền MainLayout cho Dashboard để nó có thể gọi ngược lại
+            DashboardController dc = loader.getController();
+            dc.setMainController(this);
+
+            view.getChildren().setAll(node);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
     }
 
     @FXML
@@ -81,7 +119,19 @@ public class LayoutController implements Initializable {
 
     @FXML
     private void onNotification(ActionEvent event) {
-        loadView("/manager/notification/layoutNotification.fxml");
+        try {
+
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/manager/notification/layoutNotification.fxml"));
+            Node node = loader.load();
+
+            // Truyền MainLayout cho Dashboard để nó có thể gọi ngược lại
+            LayoutNotificationController dc = loader.getController();
+            dc.setMainLayoutController(this);
+
+            view.getChildren().setAll(node);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
     }
 
     @FXML
@@ -106,6 +156,11 @@ public class LayoutController implements Initializable {
             view.getChildren().clear();
             view.getChildren().add(new Label("Không thể tải trang. Lỗi: " + e.getMessage()));
         }
+    }
+
+    @FXML
+    public void onOrder(ActionEvent event) {
+        loadView("/manager/order/order.fxml");
     }
 
 }

@@ -23,6 +23,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.HBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
@@ -53,6 +54,8 @@ public class ImportController implements Initializable {
     private final ImportDetailDAO detailDAO = new ImportDetailDAO();
 
     private ObservableList<Import> allImports = FXCollections.observableArrayList();
+    @FXML
+    private HBox hSearch;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -134,6 +137,7 @@ public class ImportController implements Initializable {
         });
 
         // 4. Status Column (SỬA ĐỔI CHÍNH Ở ĐÂY)
+        // 4. Status Column (Cập nhật màu sắc: Completed - Xanh, Pending - Vàng)
         colStatus.setCellValueFactory(new PropertyValueFactory<>("status"));
         colStatus.setCellFactory(tc -> new TableCell<>() {
             @Override
@@ -141,9 +145,30 @@ public class ImportController implements Initializable {
                 super.updateItem(status, empty);
                 if (empty || status == null) {
                     setText(null);
-                    setStyle("");
+                    setGraphic(null);
                 } else {
-                    setText(status.toUpperCase());
+                    // Tạo một Label để làm Badge (nhãn)
+                    Label statusLabel = new Label(status.toUpperCase());
+
+                    // Cấu hình Style chung: Chữ trắng, bo góc, khoảng cách đệm
+                    String baseStyle = "-fx-text-fill: white; "
+                            + "-fx-font-weight: bold; "
+                            + "-fx-padding: 5 10 5 10; "
+                            + "-fx-background-radius: 5; ";
+
+                    if (status.equalsIgnoreCase("Completed")) {
+                        // Background màu xanh #1E8449
+                        statusLabel.setStyle(baseStyle + "-fx-background-color: #1E8449;");
+                    } else if (status.equalsIgnoreCase("Pending")) {
+                        // Background màu vàng (Gold/Orange)
+                        statusLabel.setStyle(baseStyle + "-fx-background-color: #FF9800;");
+                    } else {
+                        // Màu mặc định cho các trạng thái khác (nếu có)
+                        statusLabel.setStyle(baseStyle + "-fx-background-color: #BDC3C7;");
+                    }
+
+                    setGraphic(statusLabel); // Hiển thị Label vào trong ô
+                    setText(null); // Xóa text mặc định của Cell để không bị trùng
                 }
             }
         });

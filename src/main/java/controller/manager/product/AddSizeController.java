@@ -25,7 +25,7 @@ public class AddSizeController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         // Initialization logic if needed
-    }    
+    }
 
     /**
      * Handles Save button action
@@ -41,7 +41,7 @@ public class AddSizeController implements Initializable {
         }
 
         // 2. Create Model object (SizeID is 0 as it's auto-incremented in DB)
-        Size newSize = new Size(0, type);
+        Size newSize = new Size(0, type, "Active");
 
         // 3. Call DAO to perform database insertion
         if (sizeDAO.insert(newSize)) {

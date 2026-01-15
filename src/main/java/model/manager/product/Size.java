@@ -11,15 +11,27 @@ package model.manager.product;
 public class Size {
     private int SizeID;
     private String Type;
+    private String Status;
 
-    public Size(int SizeID, String Type) {
+    public Size(int SizeID, String Type,String Status) {
         this.SizeID = SizeID;
         this.Type = Type;
+        this.Status = Status;
     }
 
-    public Size(String Type) {
+    public Size(String Type,String Status) {
         this.Type = Type;
+        this.Status = Status;
     }
+
+    public String getStatus() {
+        return Status;
+    }
+
+    public void setStatus(String Status) {
+        this.Status = Status;
+    }
+    
     
     public Size(){
         

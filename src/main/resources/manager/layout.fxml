@@ -50,6 +50,11 @@
                         </ToggleButton>
                      </children>
                   </HBox>
+                  <HBox alignment="CENTER" prefHeight="60.0" prefWidth="168.0">
+                     <children>
+                        <ToggleButton fx:id="lbOrder" mnemonicParsing="false" onAction="#onOrder" prefHeight="40.0" prefWidth="171.0" text="Order" toggleGroup="$toggleMenu" />
+                     </children>
+                  </HBox>
                       <HBox alignment="CENTER" prefHeight="60.0" prefWidth="168.0">
                           <children>
                               <ToggleButton mnemonicParsing="false" onAction="#onProduct" prefHeight="40.0" prefWidth="171.0" text="Product" toggleGroup="$toggleMenu" />

@@ -24,27 +24,24 @@ public class AddCustomerController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        // Mặc định ngày đăng ký là ngày hiện tại
-        dpRegistration.setValue(LocalDate.now());
+ 
+        
     }
 
     @FXML
     private void onSave(ActionEvent event) {
         try {
-            // 1. Thu thập dữ liệu
+            int points = 0;
+            LocalDate regDate = LocalDate.now();
             String name = txtName.getText().trim();
             String phone = txtPhone.getText().trim();
             String email = txtEmail.getText().trim();
-            int points = Integer.parseInt(txtPoints.getText().trim());
-            LocalDate regDate = dpRegistration.getValue();
 
-            // 2. Kiểm tra tính hợp lệ
-            if (name.isEmpty() || phone.isEmpty()) {
-                showAlert(Alert.AlertType.ERROR, "Error", "Name and Phone are required!");
+            if (phone.isEmpty()) {
+                showAlert(Alert.AlertType.ERROR, "Error", "Phone are required!");
                 return;
             }
 
-            // 3. Tạo model và lưu
             Customer customer = new Customer(0, name, phone, points, email, regDate);
             if (customerDAO.addCustomer(customer)) {
                 showAlert(Alert.AlertType.INFORMATION, "Success", "Customer added successfully!");

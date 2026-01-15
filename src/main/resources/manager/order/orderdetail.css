@@ -1,0 +1,96 @@
+/* Tổng thể container */
+.vbox-container {
+    -fx-background-color: #ffffff;
+}
+
+/* Tiêu đề chính */
+.label-title {
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #2c3e50; /* Màu xanh đen sang trọng */
+    -fx-padding: 0 0 10 0;
+}
+
+/* Khung chứa thông tin chung (GridPane) */
+.info-pane {
+    -fx-background-color: #f8f9fa; /* Màu xám cực nhạt */
+    -fx-background-radius: 10;
+    -fx-border-color: #dee2e6;
+    -fx-border-radius: 10;
+    -fx-border-width: 1;
+}
+
+/* Label tiêu đề trong GridPane (Mã ĐH, Ngày...) */
+.label-header {
+    -fx-text-fill: #7f8c8d;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+}
+
+/* Label giá trị trong GridPane */
+.label-value {
+    -fx-text-fill: #2d3436;
+    -fx-font-size: 14px;
+}
+
+/* Style cho TableView */
+.table-view {
+    -fx-background-color: transparent;
+    -fx-border-color: #EAECEE;
+    -fx-border-radius: 4;
+}
+
+/* Tiêu đề cột */
+.table-view .column-header {
+    -fx-background-color: #F2F4F4; /* Màu xám nhẹ cho header */
+    -fx-border-color: #EAECEE;
+    -fx-padding: 8 0 8 0;
+}
+
+.table-view .column-header .label {
+    -fx-text-fill: #2C3E50;
+    -fx-font-weight: bold;
+    -fx-font-size: 13px;
+}
+
+/* Dòng trong bảng */
+.table-row-cell {
+    -fx-cell-size: 45px;
+}
+
+.table-row-cell:hover {
+    -fx-background-color: #F4F6F7;
+}
+
+.table-row-cell:selected {
+    -fx-background-color: #D6EAF8; /* Xanh dương nhạt khi chọn dòng */
+    -fx-text-fill: #212121;
+}
+
+.table-cell {
+    -fx-text-fill: #34495E;
+    -fx-alignment: CENTER;
+}
+
+/* Phần tổng tiền (Total) */
+.label-total-title {
+    -fx-font-size: 16px;
+    -fx-text-fill: #636e72;
+}
+
+.label-total-value {
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #e74c3c; /* Màu đỏ nổi bật cho tiền */
+}
+
+/* Tùy chỉnh thanh cuộn (ScrollBar) cho hiện đại */
+.table-view .scroll-bar:vertical {
+    -fx-background-color: transparent;
+    -fx-pref-width: 8;
+}
+
+.table-view .scroll-bar:vertical .thumb {
+    -fx-background-color: #ced4da;
+    -fx-background-radius: 10;
+}

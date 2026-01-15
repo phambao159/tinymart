@@ -37,6 +37,7 @@ public class EditProductController implements Initializable {
 
     private final ProductDAO productDAO = new ProductDAO();
     private final CategoryDAO categoryDAO = new CategoryDAO();
+
     private File selectedFile;
     private String currentImageName;
     private Runnable refreshCallback;
@@ -47,11 +48,11 @@ public class EditProductController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        setupComboBoxes();
+        // Initialization handled in initData hoặc setupComboBoxes
     }
 
     private void setupComboBoxes() {
-        // 1. Cài đặt cách hiển thị chữ cho Category
+        // 1. Setup Category Converter
         cbCategory.setConverter(new StringConverter<Category>() {
             @Override
             public String toString(Category c) {
@@ -64,131 +65,149 @@ public class EditProductController implements Initializable {
             }
         });
 
-        // 2. Load dữ liệu
+        // 2. Load Data from DB
+        loadCategoryData();
+
+        // 3. Load Status
+        cbStatus.setItems(FXCollections.observableArrayList("Active", "Inactive"));
+    }
+
+    private void loadCategoryData() {
         try {
             List<Category> list = categoryDAO.getData();
             if (list != null) {
                 cbCategory.setItems(FXCollections.observableArrayList(list));
             }
         } catch (Exception e) {
-            System.err.println("Lỗi load danh mục: " + e.getMessage());
+            System.err.println("Error loading categories: " + e.getMessage());
         }
-
-        cbStatus.setItems(FXCollections.observableArrayList("Active", "Inactive"));
     }
 
+    /**
+     * Nhận dữ liệu từ màn hình danh sách truyền sang
+     */
     public void initData(ProductSummary summary) {
+        setupComboBoxes(); // Khởi tạo các ComboBox trước khi set value
+
         txtID.setText(String.valueOf(summary.getProductID()));
         txtName.setText(summary.getName());
         txtUnit.setText(summary.getUnit());
         cbStatus.setValue(summary.getStatus());
         currentImageName = summary.getImage();
 
-        for (Category c : cbCategory.getItems()) {
-            if (c.getCategoryID() == summary.getCategoryID()) {
-                cbCategory.setValue(c);
-                break;
-            }
-        }
-
-        // --- SỬA PHẦN LOAD IMAGE TẠI ĐÂY ---
-        try {
-            String imagePath = "/image/manager/" + currentImageName;
-            java.io.InputStream stream = getClass().getResourceAsStream(imagePath);
-
-            if (stream != null) {
-                imgPreview.setImage(new Image(stream));
-            } else {
-                // Nếu không tìm thấy, load ảnh mặc định
-                System.err.println("Không thấy ảnh: " + imagePath);
-                java.io.InputStream defaultStream = getClass().getResourceAsStream("/image/manager/coca.jpg");
-                if (defaultStream != null) {
-                    imgPreview.setImage(new Image(defaultStream));
+        // Set default Category dựa trên ID
+        if (cbCategory.getItems() != null) {
+            for (Category cat : cbCategory.getItems()) {
+                if (cat.getCategoryID() == summary.getCategoryID()) {
+                    cbCategory.setValue(cat);
+                    break;
                 }
             }
-        } catch (Exception e) {
-            System.err.println("Lỗi load ảnh: " + e.getMessage());
         }
-    }
 
-    @FXML
-    private void onChooseImage(ActionEvent event) {
-        FileChooser fc = new FileChooser();
-        selectedFile = fc.showOpenDialog(((Node) event.getSource()).getScene().getWindow());
-        if (selectedFile != null) {
-            imgPreview.setImage(new Image(selectedFile.toURI().toString()));
-        }
+        loadProductImage(currentImageName);
     }
 
     @FXML
     private void onUpdate(ActionEvent event) {
-        String fileName = currentImageName;
-        if (selectedFile != null) {
-            fileName = saveImageToProject(selectedFile);
+        String name = txtName.getText().trim();
+        String unit = txtUnit.getText().trim();
+        Category selectedCat = cbCategory.getValue();
+        String status = cbStatus.getValue();
+
+        if (name.isEmpty() || unit.isEmpty() || selectedCat == null || status == null) {
+            showAlert(Alert.AlertType.WARNING, "Validation Error", "Please fill in all information!");
+            return;
         }
 
+        // Xử lý tên file ảnh: Nếu có chọn mới thì lưu file mới, nếu không giữ lại tên cũ
+        String fileName = (selectedFile != null) ? saveImageToProject(selectedFile) : currentImageName;
+
+        // Tạo object Product (Sử dụng constructor 6 tham số: ID, Name, CatID, Unit, Status, Image)
         Product p = new Product(
                 Integer.parseInt(txtID.getText()),
-                txtName.getText(),
-                cbCategory.getValue().getCategoryID(),
-                txtUnit.getText(),
-                cbStatus.getValue(),
+                name,
+                selectedCat.getCategoryID(),
+                unit,
+                status,
                 fileName
         );
 
         if (productDAO.update(p)) {
-            showAlert("Success", "Product updated successfully!");
+            showAlert(Alert.AlertType.INFORMATION, "Success", "Product updated successfully!");
             if (refreshCallback != null) {
                 refreshCallback.run();
             }
             closeWindow(event);
+        } else {
+            showAlert(Alert.AlertType.ERROR, "Update Failed", "Check database connection.");
+        }
+    }
+
+    private void loadProductImage(String imageName) {
+        try {
+            // Đảm bảo đường dẫn chính xác tới thư mục tài nguyên
+            String imagePath = "/image/manager/" + imageName;
+            URL imgUrl = getClass().getResource(imagePath);
+            
+            if (imgUrl != null) {
+                imgPreview.setImage(new Image(imgUrl.toExternalForm()));
+            } else {
+                // Fallback nếu không tìm thấy ảnh
+                URL defaultUrl = getClass().getResource("/image/manager/default-product.png");
+                if (defaultUrl != null) imgPreview.setImage(new Image(defaultUrl.toExternalForm()));
+            }
+        } catch (Exception e) {
+            System.err.println("Error loading image: " + e.getMessage());
         }
     }
 
     private String saveImageToProject(File file) {
         try {
             String fileName = System.currentTimeMillis() + "_" + file.getName();
-            String projectPath = System.getProperty("user.dir");
-
-            // 1. Lưu vào thư mục SOURCE (để file không bị mất khi bạn tắt code)
-            File srcDir = new File(projectPath + "/src/main/resources/image/manager");
+            File srcDir = new File(System.getProperty("user.dir") + "/src/main/resources/image/manager");
             if (!srcDir.exists()) {
                 srcDir.mkdirs();
             }
-            File srcFile = new File(srcDir, fileName);
-            Files.copy(file.toPath(), srcFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-
-            // 2. Lưu vào thư mục TARGET/BUILD (để JavaFX thấy ảnh ngay lập tức)
-            try {
-                URL resourceUrl = getClass().getResource("/image/manager/");
-                if (resourceUrl != null) {
-                    File targetDir = new File(resourceUrl.toURI());
-                    File targetFile = new File(targetDir, fileName);
-                    Files.copy(file.toPath(), targetFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-                    System.out.println("✅ Đã đồng bộ ảnh sang Target (Runtime).");
-                }
-            } catch (Exception ex) {
-                System.err.println("⚠️ Không thể copy sang Target: " + ex.getMessage());
-            }
-
+            Files.copy(file.toPath(), new File(srcDir, fileName).toPath(), StandardCopyOption.REPLACE_EXISTING);
             return fileName;
         } catch (IOException e) {
-            System.err.println("❌ Lỗi lưu ảnh: " + e.getMessage());
+            System.err.println("Save image error: " + e.getMessage());
             return currentImageName;
         }
     }
 
     @FXML
+    private void onChooseImage(ActionEvent event) {
+        FileChooser fc = new FileChooser();
+        fc.setTitle("Select Product Image");
+        fc.getExtensionFilters().add(new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.jpeg"));
+
+        File file = fc.showOpenDialog(((Node) event.getSource()).getScene().getWindow());
+        if (file != null) {
+            selectedFile = file;
+            imgPreview.setImage(new Image(selectedFile.toURI().toString()));
+        }
+    }
+
+    @FXML
     private void onDelete(ActionEvent event) {
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Delete this product?", ButtonType.YES, ButtonType.NO);
-        alert.showAndWait().ifPresent(response -> {
+        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION,
+                "Are you sure you want to disable this product?", ButtonType.YES, ButtonType.NO);
+        confirm.setTitle("Confirm Disable");
+        confirm.setHeaderText(null);
+
+        confirm.showAndWait().ifPresent(response -> {
             if (response == ButtonType.YES) {
-                if (productDAO.delete(Integer.parseInt(txtID.getText()))) {
-                    // Gọi lệnh làm mới trước khi đóng cửa sổ
+                int id = Integer.parseInt(txtID.getText());
+                // Logic soft delete: Cập nhật status thành Inactive
+                if (productDAO.delete(id)) { 
                     if (refreshCallback != null) {
                         refreshCallback.run();
                     }
                     closeWindow(event);
+                } else {
+                    showAlert(Alert.AlertType.ERROR, "Error", "Failed to disable the product.");
                 }
             }
         });
@@ -203,7 +222,10 @@ public class EditProductController implements Initializable {
         ((Stage) ((Node) e.getSource()).getScene().getWindow()).close();
     }
 
-    private void showAlert(String title, String content) {
-        new Alert(Alert.AlertType.INFORMATION, content).showAndWait();
+    private void showAlert(Alert.AlertType type, String title, String content) {
+        Alert alert = new Alert(type, content);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.showAndWait();
     }
 }

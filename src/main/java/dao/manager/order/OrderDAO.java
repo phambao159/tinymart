@@ -3,6 +3,7 @@ package dao.manager.order;
 import model.manager.order.Order;
 import util.DBConnection;
 import java.sql.*;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,12 +16,22 @@ public class OrderDAO {
      */
     public List<Order> getAllOrders() {
         List<Order> orders = new ArrayList<>();
-        String sql = "SELECT * FROM `Order` ORDER BY OrderDateTime DESC";
+        // JOIN để lấy FullName của Nhân viên và Khách hàng
+        String sql = "SELECT o.*, c.FullName as CustomerName, e.FullName as EmployeeName "
+            + "FROM `Order` o "
+            + "LEFT JOIN Customer c ON o.CustomerID = c.CustomerID "
+            + "JOIN Employee e ON o.EmployeeID = e.EmployeeID "
+            + "WHERE DATE(o.OrderDateTime) <= CURDATE() " // WHERE phải đứng trước ORDER BY
+            + "ORDER BY o.OrderDateTime DESC";
 
         try (Connection conn = dc.getConnect(); PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
-                orders.add(mapResultSetToOrder(rs));
+                Order order = mapResultSetToOrder(rs);
+                // Gán thêm tên vào object
+                order.setCustomerName(rs.getString("CustomerName") != null ? rs.getString("CustomerName") : "Guest");
+                order.setEmployeeName(rs.getString("EmployeeName"));
+                orders.add(order);
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -68,21 +79,58 @@ public class OrderDAO {
     /**
      * Tìm kiếm hóa đơn theo ID hoặc tên khách hàng (cần JOIN)
      */
-    public List<Order> searchOrders(String keyword) {
+    public List<Order> searchOrdersAdvanced(String keyword, Integer employeeID, LocalDate fromDate, LocalDate toDate) {
         List<Order> orders = new ArrayList<>();
-        String sql = "SELECT o.* FROM `Order` o "
+
+        // Base SQL với JOIN để lấy tên thay vì ID
+        StringBuilder sql = new StringBuilder(
+                "SELECT o.*, c.FullName as CustomerName, e.FullName as EmployeeName "
+                + "FROM `Order` o "
                 + "LEFT JOIN Customer c ON o.CustomerID = c.CustomerID "
-                + "WHERE o.OrderID LIKE ? OR c.FullName LIKE ? "
-                + "ORDER BY o.OrderDateTime DESC";
+                + "JOIN Employee e ON o.EmployeeID = e.EmployeeID "
+                + "WHERE 1=1 "
+        );
 
-        try (Connection conn = dc.getConnect(); PreparedStatement ps = conn.prepareStatement(sql)) {
+        // Cộng dồn điều kiện filter
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            sql.append("AND (o.OrderID LIKE ? OR c.FullName LIKE ?) ");
+        }
+        if (employeeID != null) {
+            sql.append("AND o.EmployeeID = ? ");
+        }
+        if (fromDate != null) {
+            sql.append("AND DATE(o.OrderDateTime) >= ? ");
+        }
+        if (toDate != null) {
+            sql.append("AND DATE(o.OrderDateTime) <= ? ");
+        }
 
-            ps.setString(1, "%" + keyword + "%");
-            ps.setString(2, "%" + keyword + "%");
+        sql.append("ORDER BY o.OrderDateTime DESC");
+
+        try (Connection conn = dc.getConnect(); PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+
+            int index = 1;
+            if (keyword != null && !keyword.trim().isEmpty()) {
+                ps.setString(index++, "%" + keyword + "%");
+                ps.setString(index++, "%" + keyword + "%");
+            }
+            if (employeeID != null) {
+                ps.setInt(index++, employeeID);
+            }
+            if (fromDate != null) {
+                ps.setDate(index++, Date.valueOf(fromDate));
+            }
+            if (toDate != null) {
+                ps.setDate(index++, Date.valueOf(toDate));
+            }
 
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
-                    orders.add(mapResultSetToOrder(rs));
+                    Order order = mapResultSetToOrder(rs);
+                    // Gán thêm thông tin tên từ kết quả JOIN
+                    order.setCustomerName(rs.getString("CustomerName") != null ? rs.getString("CustomerName") : "Guest");
+                    order.setEmployeeName(rs.getString("EmployeeName"));
+                    orders.add(order);
                 }
             }
         } catch (SQLException e) {

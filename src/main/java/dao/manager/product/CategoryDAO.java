@@ -13,24 +13,23 @@ public class CategoryDAO {
 
     DBConnection dc = new DBConnection();
 
+    // 1. GET ALL: Chỉ lấy những Category đang hoạt động
     public List<Category> getData() {
-
         List<Category> categories = new ArrayList<>();
-
-        String sql = "SELECT CategoryID, Name, Description FROM Category";
-
-        try (Connection conn = dc.getConnect(); PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
+        String sql = "SELECT CategoryID, Name, Description, Status FROM Category WHERE Status = 'Active'";
+        
+        try (Connection conn = dc.getConnect(); 
+             PreparedStatement ps = conn.prepareStatement(sql); 
+             ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
-
-                Category category = new Category(
+                categories.add(new Category(
                         rs.getInt("CategoryID"),
                         rs.getString("Name"),
-                        rs.getString("Description")
-                );
-                categories.add(category);
+                        rs.getString("Description"),
+                        rs.getString("Status")
+                ));
             }
-
         } catch (SQLException e) {
             System.err.println("SQL Error when fetching categories: " + e.getMessage());
             e.printStackTrace();
@@ -38,9 +37,11 @@ public class CategoryDAO {
         return categories;
     }
 
+    // 2. INSERT: Mặc định Status trong Database nên là 'Active'
     public boolean insert(Category category) {
-        String sql = "INSERT INTO Category (Name, Description) VALUES (?, ?)";
-        try (Connection conn = dc.getConnect(); PreparedStatement ps = conn.prepareStatement(sql)) {
+        String sql = "INSERT INTO Category (Name, Description, Status) VALUES (?, ?, 'Active')";
+        try (Connection conn = dc.getConnect(); 
+             PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, category.getName());
             ps.setString(2, category.getDescription());
             return ps.executeUpdate() > 0;
@@ -50,10 +51,11 @@ public class CategoryDAO {
         }
     }
 
-    // 3. UPDATE: Cập nhật thông tin category
+    // 3. UPDATE: Cập nhật thông tin
     public boolean update(Category category) {
         String sql = "UPDATE Category SET Name = ?, Description = ? WHERE CategoryID = ?";
-        try (Connection conn = dc.getConnect(); PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = dc.getConnect(); 
+             PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, category.getName());
             ps.setString(2, category.getDescription());
             ps.setInt(3, category.getCategoryID());
@@ -64,10 +66,11 @@ public class CategoryDAO {
         }
     }
 
-    // 4. DELETE: Xóa category theo ID
+    // 4. DELETE (SOFT DELETE): Chuyển trạng thái thành Inactive
     public boolean delete(int categoryID) {
-        String sql = "DELETE FROM Category WHERE CategoryID = ?";
-        try (Connection conn = dc.getConnect(); PreparedStatement ps = conn.prepareStatement(sql)) {
+        String sql = "UPDATE Category SET Status = 'Inactive' WHERE CategoryID = ?";
+        try (Connection conn = dc.getConnect(); 
+             PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, categoryID);
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
@@ -76,18 +79,20 @@ public class CategoryDAO {
         }
     }
 
-    // 5. SEARCH: Tìm kiếm category theo tên (gần đúng)
+    // 5. SEARCH: Chỉ tìm trong các Category 'Active'
     public List<Category> searchByName(String keyword) {
         List<Category> categories = new ArrayList<>();
-        String sql = "SELECT CategoryID, Name, Description FROM Category WHERE Name LIKE ?";
-        try (Connection conn = dc.getConnect(); PreparedStatement ps = conn.prepareStatement(sql)) {
+        String sql = "SELECT CategoryID, Name, Description, Status FROM Category WHERE Name LIKE ? AND Status = 'Active'";
+        try (Connection conn = dc.getConnect(); 
+             PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, "%" + keyword + "%");
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     categories.add(new Category(
                             rs.getInt("CategoryID"),
                             rs.getString("Name"),
-                            rs.getString("Description")
+                            rs.getString("Description"),
+                            rs.getString("Status")
                     ));
                 }
             }
@@ -97,17 +102,19 @@ public class CategoryDAO {
         return categories;
     }
 
-    // 6. GET BY ID: Lấy một category cụ thể (hữu ích cho việc đổ dữ liệu vào form edit)
+    // 6. GET BY ID
     public Category getByID(int categoryID) {
-        String sql = "SELECT * FROM Category WHERE CategoryID = ?";
-        try (Connection conn = dc.getConnect(); PreparedStatement ps = conn.prepareStatement(sql)) {
+        String sql = "SELECT * FROM Category WHERE CategoryID = ? AND Status = 'Active'";
+        try (Connection conn = dc.getConnect(); 
+             PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, categoryID);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     return new Category(
                             rs.getInt("CategoryID"),
                             rs.getString("Name"),
-                            rs.getString("Description")
+                            rs.getString("Description"),
+                            rs.getString("Status")
                     );
                 }
             }

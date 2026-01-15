@@ -22,7 +22,7 @@
             </HBox>
             <ScrollPane fx:id="viewSent" fitToWidth="true" VBox.vgrow="ALWAYS">
                <content>
-                  <FlowPane fx:id="sentContainer" prefHeight="64.0" prefWidth="570.0" vgap="15.0" />
+                  <VBox fx:id="sentContainer" prefHeight="64.0" prefWidth="570.0" />
                </content>
             </ScrollPane>
          </children>

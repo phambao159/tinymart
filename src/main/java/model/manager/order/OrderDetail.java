@@ -10,7 +10,7 @@ public class OrderDetail {
     // Các trường mở rộng để hiển thị (Lấy qua JOIN)
     private String productName;
     private String typeName;
-    private double priceAtCurrent; // Giá lấy từ bảng ProductSize lúc JOIN
+    private double unitPrice;
 
     public OrderDetail() {
     }
@@ -71,16 +71,18 @@ public class OrderDetail {
         this.typeName = typeName;
     }
 
-    public double getPriceAtCurrent() {
-        return priceAtCurrent;
-    }
-
-    public void setPriceAtCurrent(double priceAtCurrent) {
-        this.priceAtCurrent = priceAtCurrent;
-    }
 
     // Tính thành tiền dựa trên giá JOIN được từ bảng ProductSize
-    public double getTotalPrice() {
-        return this.quantity * this.priceAtCurrent;
+    public double getSubTotal() {
+        return unitPrice * quantity;
     }
+
+    public double getUnitPrice() {
+        return unitPrice;
+    }
+
+    public void setUnitPrice(double unitPrice) {
+        this.unitPrice = unitPrice;
+    }
+    
 }

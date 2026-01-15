@@ -28,7 +28,7 @@ public class AddPromotionController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        cbStatus.setItems(FXCollections.observableArrayList("Active", "Inactive"));
+        cbStatus.setItems(FXCollections.observableArrayList("Active", "Inactive", "Expired"));
         cbStatus.getSelectionModel().selectFirst();
         dpStart.setValue(LocalDate.now());
     }
