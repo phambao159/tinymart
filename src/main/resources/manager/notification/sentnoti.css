@@ -1,22 +1,90 @@
-/* Màu nền cho toàn bộ trang */
+/* Tổng thể nền */
 .mainFxmlClass {
-    -fx-background-color: #ffffff;
+    -fx-background-color: white;
 }
 
-/* Quan trọng: Khử màu xám và viền của ScrollPane */
-#viewSent {
-    -fx-background-color: #ffffff;
-    -fx-background: #ffffff; /* Thuộc tính này quyết định màu nền thực của vùng chứa */
-    -fx-border-color: transparent; /* Ẩn viền nếu muốn */
+/* Thanh công cụ tìm kiếm và tạo mới */
+#NotiTool {
+    -fx-padding: 15 0;
+    -fx-background-color: white;
+    -fx-spacing: 15;
+    -fx-alignment: CENTER_LEFT;
 }
 
-/* Khử màu nền xám của lớp phủ bên trong ScrollPane */
-#viewSent .viewport {
+/* Ô tìm kiếm */
+.text-field {
     -fx-background-color: #ffffff;
+    -fx-border-color: #dcdde1;
+    -fx-border-radius: 20;
+    -fx-background-radius: 20;
+    -fx-padding: 7 15;
+    -fx-pref-width: 250;
 }
 
-/* Vùng chứa các card */
+.text-field:focused {
+    -fx-border-color: #1E8449;
+    -fx-effect: dropshadow(three-pass-box, rgba(30, 132, 73, 0.1), 5, 0, 0, 0);
+}
+
+/* Nút tạo mới thông báo (+ New Notification) */
+.button {
+    -fx-background-color: #1E8449;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-padding: 8 20;
+    -fx-background-radius: 5;
+    -fx-cursor: hand;
+}
+
+.button:hover {
+    -fx-background-color: #145A32; /* Màu xanh đậm hơn khi hover */
+}
+
+/* Vùng cuộn ScrollPane */
+.scroll-pane {
+    -fx-background-color: transparent;
+    -fx-padding: 15 0;
+}
+
+.scroll-pane .viewport {
+    -fx-background-color: transparent;
+}
+
+/* Container chứa các thẻ thông báo (FlowPane) */
 #sentContainer {
-    -fx-background-color: #ffffff;
-    -fx-padding: 15px; /* Thêm khoảng trống ở mép để các card không dính sát viền */
+    -fx-padding: 10;
+    -fx-spacing: 10;
+}
+
+/* --- Style cho thẻ thông báo (Card) mà bạn sẽ add bằng code --- */
+.sent-item-card {
+    -fx-background-color: white;
+    -fx-background-radius: 8;
+    -fx-padding: 15;
+    -fx-pref-width: 300; /* Độ rộng cố định cho mỗi card trong FlowPane */
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.08), 8, 0, 0, 2);
+    -fx-border-color: #eee;
+    -fx-border-width: 1;
+}
+
+.sent-item-card:hover {
+    -fx-border-color: #1E8449;
+    -fx-translate-y: -3; /* Hiệu ứng nổi lên khi hover */
+}
+
+.card-title {
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #2c3e50;
+}
+
+.card-recipient {
+    -fx-font-size: 12px;
+    -fx-text-fill: #1E8449;
+    -fx-font-style: italic;
+}
+
+.card-time {
+    -fx-font-size: 11px;
+    -fx-text-fill: #95a5a6;
 }

@@ -17,7 +17,7 @@ public class NotificationDAO {
     // 1. Lấy tất cả thông báo
     public List<Notification> getData() throws Exception {
         List<Notification> list = new ArrayList<>();
-        String sql = "SELECT * FROM Notification WHERE ReceiverID = 1 ORDER BY SentDate DESC";
+        String sql = "SELECT * FROM Notification WHERE ReceiverID = 1 AND SentDate <= NOW() ORDER BY SentDate DESC";
 
         try (Connection conn = dc.getConnect(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
             try (ResultSet rs = pstmt.executeQuery()) {
@@ -137,7 +137,7 @@ public class NotificationDAO {
     }
     public List<Notification> getSentNoti() throws Exception {
         List<Notification> list = new ArrayList<>();
-        String sql = "SELECT * FROM Notification WHERE EmployeeID = 1 ORDER BY SentDate DESC";
+        String sql = "SELECT * FROM Notification WHERE EmployeeID = 1 AND SentDate <= NOW() ORDER BY SentDate DESC";
 
         try (Connection conn = dc.getConnect(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
             try (ResultSet rs = pstmt.executeQuery()) {

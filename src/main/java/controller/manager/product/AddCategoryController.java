@@ -29,7 +29,7 @@ public class AddCategoryController {
         }
 
         // CategoryID tự tăng trong SQL nên ta để tạm là 0
-        Category newCat = new Category(0, name, description);
+        Category newCat = new Category(0, name, description,"Active");
         
         if (categoryDAO.insert(newCat)) {
             showAlert("Success", "Category added successfully!");

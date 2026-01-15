@@ -15,7 +15,7 @@ public class App extends Application {
     @Override
     public void start(Stage stage) throws IOException {
         // 1. Load FXML gốc
-        Parent root = loadFXML("ui", "login");
+        Parent root = loadFXML("manager", "layout");
         
         scene = new Scene(root);
         

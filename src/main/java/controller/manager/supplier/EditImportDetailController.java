@@ -23,16 +23,16 @@ import model.manager.supplier.ImportDetail;
 public class EditImportDetailController implements Initializable {
 
     @FXML private Label lbProductName;
-    @FXML private Label lbPrice; // Đã đổi thành Label
+    @FXML private Label lbPrice; 
     @FXML private ComboBox<String> cbSize;
     @FXML private TextField txtQuantity;
+    @FXML private TextField txtShelfQuantity; // Trường mới thêm
+    @FXML private DatePicker dpExpiryDate;
 
     private ImportDetail currentDetail;
     private Consumer<ImportDetail> onUpdateCallback;
     private Consumer<ImportDetail> onDeleteCallback;
     private List<ProductSize> fullSizeList;
-    @FXML
-    private DatePicker dpExpiryDate;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -51,8 +51,13 @@ public class EditImportDetailController implements Initializable {
 
         this.lbProductName.setText(detail.getProductName());
         this.txtQuantity.setText(String.valueOf(detail.getQuantity()));
+        
+        // --- CẬP NHẬT: Hiển thị Shelf Quantity ---
+        this.txtShelfQuantity.setText(String.valueOf(detail.getShelfQuantity()));
+        
         this.dpExpiryDate.setValue(detail.getExpiryDate());
-        // Load danh sách size trước khi set giá trị cho Label/ComboBox
+        
+        // Load danh sách size dựa trên ProductID
         loadSize(productID, detail.getSizeName());
         
         // Hiển thị giá ban đầu
@@ -73,7 +78,6 @@ public class EditImportDetailController implements Initializable {
         }
     }
 
-    // Hàm cập nhật Label giá khi chọn Size khác
     private void updatePriceLabel(String sizeName) {
         if (fullSizeList != null) {
             fullSizeList.stream()
@@ -87,27 +91,42 @@ public class EditImportDetailController implements Initializable {
     private void onUpdate(ActionEvent event) {
         String selectedSize = cbSize.getValue();
         String qtyStr = txtQuantity.getText().trim();
+        String shelfQtyStr = txtShelfQuantity.getText().trim();
 
-        if (selectedSize == null || qtyStr.isEmpty()) {
-            showAlert("Please enter quantity.");
+        // Kiểm tra đầu vào trống
+        if (selectedSize == null || qtyStr.isEmpty() || shelfQtyStr.isEmpty()) {
+            showAlert("Please fill in all fields (Quantity and Shelf Quantity).");
             return;
         }
 
         try {
-            int qty = Integer.parseInt(qtyStr);
-            if (qty <= 0) throw new NumberFormatException();
+            long qty = Long.parseLong(qtyStr);
+            int shelfQty = Integer.parseInt(shelfQtyStr);
 
-            // Lấy đối tượng Size được chọn để lấy ID và Giá mới
+            // Ràng buộc số lượng dương
+            if (qty <= 0 || shelfQty < 0) {
+                showAlert("Quantity must be positive and Shelf Quantity cannot be negative.");
+                return;
+            }
+
+            // --- QUAN TRỌNG: Kiểm tra Shelf Quantity không được vượt quá Total Quantity ---
+            if (shelfQty > qty) {
+                showAlert("Shelf Quantity (" + shelfQty + ") cannot exceed Total Quantity (" + qty + ").");
+                return;
+            }
+
+            // Tìm đối tượng Size được chọn
             ProductSize selectedObj = fullSizeList.stream()
                     .filter(s -> s.getSizeType().equals(selectedSize))
                     .findFirst()
                     .orElse(null);
 
             if (selectedObj != null && onUpdateCallback != null) {
+                // Cập nhật dữ liệu vào đối tượng model
                 currentDetail.setProductSizeID(selectedObj.getProductSizeID());
                 currentDetail.setSizeName(selectedObj.getSizeType());
                 currentDetail.setQuantity(qty);
-                // Cập nhật lại giá nhập theo Size mới (lấy từ costPrice của ProductSize)
+                currentDetail.setShelfQuantity(shelfQty); // Lưu giá trị mới
                 currentDetail.setImportPrice(selectedObj.getCostPrice());
                 currentDetail.setExpiryDate(dpExpiryDate.getValue());
 
@@ -115,13 +134,14 @@ public class EditImportDetailController implements Initializable {
                 onCancel(event);
             }
         } catch (NumberFormatException e) {
-            showAlert("Invalid quantity. Please enter a positive integer.");
+            showAlert("Invalid number format. Please check your Quantity or Shelf Quantity.");
         }
     }
 
     @FXML
     private void onDelete(ActionEvent event) {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Remove this item from list?");
+        alert.setHeaderText(null);
         alert.showAndWait().ifPresent(response -> {
             if (response == ButtonType.OK) {
                 if (onDeleteCallback != null) onDeleteCallback.accept(currentDetail);
@@ -137,6 +157,8 @@ public class EditImportDetailController implements Initializable {
 
     private void showAlert(String msg) {
         Alert alert = new Alert(Alert.AlertType.WARNING);
+        alert.setTitle("Validation Warning");
+        alert.setHeaderText(null);
         alert.setContentText(msg);
         alert.show();
     }

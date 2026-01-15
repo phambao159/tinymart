@@ -8,44 +8,42 @@ import util.DBConnection;
 
 public class EmployeeDAO {
 
-    DBConnection dc = new DBConnection();
+    private final DBConnection dc = new DBConnection();
 
     /**
-     * Kiểm tra đăng nhập Trả về EmployeeID dưới dạng String nếu thành công,
-     * null nếu thất bại
+     * Helper để map dữ liệu từ ResultSet sang Object Employee
+     */
+    private Employee mapResultSetToEmployee(ResultSet rs) throws SQLException {
+        Employee emp = new Employee();
+        emp.setEmployeeID(rs.getInt("EmployeeID"));
+        emp.setFullName(rs.getString("FullName"));
+        if (rs.getDate("DateOfBirth") != null) {
+            emp.setDateOfBirth(rs.getDate("DateOfBirth").toLocalDate());
+        }
+        emp.setPhoneNumber(rs.getString("PhoneNumber"));
+        emp.setAddress(rs.getString("Address"));
+        emp.setRole(rs.getString("Role"));
+        if (rs.getDate("HireDate") != null) {
+            emp.setHireDate(rs.getDate("HireDate").toLocalDate());
+        }
+        emp.setBaseSalary(rs.getLong("BaseSalary"));
+        emp.setUser(rs.getString("User"));
+        emp.setPassword(rs.getString("Password"));
+        emp.setStatus(rs.getString("Status"));
+        return emp;
+    }
+
+    /**
+     * Kiểm tra đăng nhập: Chỉ cho phép nhân viên đang 'Active' đăng nhập
      */
     public Employee authenticate(String username, String password) throws Exception {
-        String sql = "SELECT * FROM Employee WHERE User = ? AND Password = ?";
-
+        String sql = "SELECT * FROM Employee WHERE User = ? AND Password = ? AND Status = 'Active'";
         try (Connection conn = dc.getConnect(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
-
             pstmt.setString(1, username);
             pstmt.setString(2, password);
-
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
-                    Employee emp = new Employee();
-                    emp.setEmployeeID(rs.getInt("EmployeeID"));
-                    emp.setFullName(rs.getString("FullName"));
-
-                    // Chuyển đổi SQL Date sang LocalDate an toàn
-                    if (rs.getDate("DateOfBirth") != null) {
-                        emp.setDateOfBirth(rs.getDate("DateOfBirth").toLocalDate());
-                    }
-
-                    emp.setPhoneNumber(rs.getString("PhoneNumber"));
-                    emp.setAddress(rs.getString("Address"));
-                    emp.setRole(rs.getString("Role"));
-
-                    if (rs.getDate("HireDate") != null) {
-                        emp.setHireDate(rs.getDate("HireDate").toLocalDate());
-                    }
-
-                    emp.setBaseSalary(rs.getLong("BaseSalary"));
-                    emp.setUser(rs.getString("User"));
-                    emp.setPassword(rs.getString("Password"));
-
-                    return emp;
+                    return mapResultSetToEmployee(rs);
                 }
             }
         } catch (SQLException e) {
@@ -55,36 +53,14 @@ public class EmployeeDAO {
     }
 
     /**
-     * Lấy toàn bộ danh sách nhân viên từ Database
+     * Lấy toàn bộ danh sách nhân viên chưa bị xóa (Status != 'Inactive')
      */
     public List<Employee> getData() {
         List<Employee> list = new ArrayList<>();
-        String sql = "SELECT * FROM Employee";
+        String sql = "SELECT * FROM Employee WHERE Status != 'Inactive' ORDER BY EmployeeID DESC";
         try (Connection conn = dc.getConnect(); PreparedStatement pstmt = conn.prepareStatement(sql); ResultSet rs = pstmt.executeQuery()) {
-
             while (rs.next()) {
-                Employee emp = new Employee();
-                emp.setEmployeeID(rs.getInt("EmployeeID"));
-                emp.setFullName(rs.getString("FullName"));
-
-                // Chuyển đổi SQL Date sang LocalDate an toàn
-                if (rs.getDate("DateOfBirth") != null) {
-                    emp.setDateOfBirth(rs.getDate("DateOfBirth").toLocalDate());
-                }
-
-                emp.setPhoneNumber(rs.getString("PhoneNumber"));
-                emp.setAddress(rs.getString("Address"));
-                emp.setRole(rs.getString("Role"));
-
-                if (rs.getDate("HireDate") != null) {
-                    emp.setHireDate(rs.getDate("HireDate").toLocalDate());
-                }
-
-                emp.setBaseSalary(rs.getLong("BaseSalary"));
-                emp.setUser(rs.getString("User"));
-                emp.setPassword(rs.getString("Password"));
-
-                list.add(emp);
+                list.add(mapResultSetToEmployee(rs));
             }
         } catch (SQLException e) {
             System.err.println("Lỗi getData Employee: " + e.getMessage());
@@ -93,37 +69,21 @@ public class EmployeeDAO {
     }
 
     /**
-     * Thêm mới nhân viên Phù hợp với AddEmployeeController
+     * Thêm mới nhân viên: Mặc định gán Status là 'Active'
      */
     public boolean insert(Employee emp) {
-        String sql = "INSERT INTO Employee (FullName, DateOfBirth, PhoneNumber, Address, Role, HireDate, BaseSalary, User, Password) "
-                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
-
+        String sql = "INSERT INTO Employee (FullName, DateOfBirth, PhoneNumber, Address, Role, HireDate, BaseSalary, User, Password, Status) "
+                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'Active')";
         try (Connection conn = dc.getConnect(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
-
             pstmt.setString(1, emp.getFullName());
-
-            // Xử lý LocalDate sang SQL Date (tránh NullPointerException)
-            if (emp.getDateOfBirth() != null) {
-                pstmt.setDate(2, Date.valueOf(emp.getDateOfBirth()));
-            } else {
-                pstmt.setNull(2, Types.DATE);
-            }
-
+            pstmt.setDate(2, emp.getDateOfBirth() != null ? Date.valueOf(emp.getDateOfBirth()) : null);
             pstmt.setString(3, emp.getPhoneNumber());
             pstmt.setString(4, emp.getAddress());
             pstmt.setString(5, emp.getRole());
-
-            if (emp.getHireDate() != null) {
-                pstmt.setDate(6, Date.valueOf(emp.getHireDate()));
-            } else {
-                pstmt.setNull(6, Types.DATE);
-            }
-
+            pstmt.setDate(6, emp.getHireDate() != null ? Date.valueOf(emp.getHireDate()) : null);
             pstmt.setLong(7, emp.getBaseSalary());
             pstmt.setString(8, emp.getUser());
             pstmt.setString(9, emp.getPassword());
-
             return pstmt.executeUpdate() > 0;
         } catch (SQLException e) {
             System.err.println("Lỗi insert Employee: " + e.getMessage());
@@ -132,38 +92,37 @@ public class EmployeeDAO {
     }
 
     /**
-     * Xóa nhân viên theo ID
+     * Xóa mềm nhân viên: Cập nhật Status thành 'Inactive'
      */
     public boolean delete(int employeeID) {
-        String sql = "DELETE FROM Employee WHERE EmployeeID = ?";
+        String sql = "UPDATE Employee SET Status = 'Inactive' WHERE EmployeeID = ?";
         try (Connection conn = dc.getConnect(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, employeeID);
             return pstmt.executeUpdate() > 0;
         } catch (SQLException e) {
-            System.err.println("Lỗi delete Employee: " + e.getMessage());
+            System.err.println("Lỗi delete (soft) Employee: " + e.getMessage());
             return false;
         }
     }
 
     /**
-     * Cập nhật thông tin nhân viên (Gợi ý thêm cho chức năng Edit)
+     * Cập nhật thông tin nhân viên
      */
     public boolean update(Employee emp) {
-        String sql = "UPDATE Employee SET FullName=?, DateOfBirth=?, PhoneNumber=?, Address=?, Role=?, HireDate=?, BaseSalary=?, User=?, Password=? "
+        String sql = "UPDATE Employee SET FullName=?, DateOfBirth=?, PhoneNumber=?, Address=?, Role=?, HireDate=?, BaseSalary=?, User=?, Password=?, Status=? "
                 + "WHERE EmployeeID=?";
         try (Connection conn = dc.getConnect(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
-
             pstmt.setString(1, emp.getFullName());
-            pstmt.setDate(2, Date.valueOf(emp.getDateOfBirth()));
+            pstmt.setDate(2, emp.getDateOfBirth() != null ? Date.valueOf(emp.getDateOfBirth()) : null);
             pstmt.setString(3, emp.getPhoneNumber());
             pstmt.setString(4, emp.getAddress());
             pstmt.setString(5, emp.getRole());
-            pstmt.setDate(6, Date.valueOf(emp.getHireDate()));
+            pstmt.setDate(6, emp.getHireDate() != null ? Date.valueOf(emp.getHireDate()) : null);
             pstmt.setLong(7, emp.getBaseSalary());
             pstmt.setString(8, emp.getUser());
             pstmt.setString(9, emp.getPassword());
-            pstmt.setInt(10, emp.getEmployeeID());
-
+            pstmt.setString(10, emp.getStatus());
+            pstmt.setInt(11, emp.getEmployeeID());
             return pstmt.executeUpdate() > 0;
         } catch (SQLException e) {
             System.err.println("Lỗi update Employee: " + e.getMessage());
@@ -171,42 +130,53 @@ public class EmployeeDAO {
         }
     }
 
-    public Employee getEmployeeById(int employeeID) {
-        String sql = "SELECT * FROM Employee WHERE EmployeeID = ?";
-
+    /**
+     * Tìm kiếm theo Tên hoặc Số điện thoại (Chỉ tìm những người chưa bị xóa)
+     */
+    public List<Employee> search(String keyword) {
+        List<Employee> list = new ArrayList<>();
+        String sql = "SELECT * FROM Employee WHERE (FullName LIKE ? OR PhoneNumber LIKE ?) AND Status != 'Inactive'";
         try (Connection conn = dc.getConnect(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
-
-            pstmt.setInt(1, employeeID);
-
+            String pattern = "%" + keyword + "%";
+            pstmt.setString(1, pattern);
+            pstmt.setString(2, pattern);
             try (ResultSet rs = pstmt.executeQuery()) {
-                if (rs.next()) {
-                    Employee emp = new Employee();
-                    emp.setEmployeeID(rs.getInt("EmployeeID"));
-                    emp.setFullName(rs.getString("FullName"));
-
-                    // Chuyển đổi Date an toàn
-                    if (rs.getDate("DateOfBirth") != null) {
-                        emp.setDateOfBirth(rs.getDate("DateOfBirth").toLocalDate());
-                    }
-
-                    emp.setPhoneNumber(rs.getString("PhoneNumber"));
-                    emp.setAddress(rs.getString("Address"));
-                    emp.setRole(rs.getString("Role"));
-
-                    if (rs.getDate("HireDate") != null) {
-                        emp.setHireDate(rs.getDate("HireDate").toLocalDate());
-                    }
-
-                    emp.setBaseSalary(rs.getLong("BaseSalary"));
-                    emp.setUser(rs.getString("User"));
-                    emp.setPassword(rs.getString("Password"));
-
-                    return emp;
+                while (rs.next()) {
+                    list.add(mapResultSetToEmployee(rs));
                 }
             }
         } catch (SQLException e) {
-            System.err.println("Lỗi khi lấy đối tượng Employee theo ID: " + e.getMessage());
+            System.err.println("Lỗi search Employee: " + e.getMessage());
+        }
+        return list;
+    }
+
+    public Employee getEmployeeById(int employeeID) {
+        String sql = "SELECT * FROM Employee WHERE EmployeeID = ?";
+        try (Connection conn = dc.getConnect(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, employeeID);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    return mapResultSetToEmployee(rs);
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Lỗi getEmployeeById: " + e.getMessage());
         }
         return null;
+    }
+
+    public List<Employee> getCashiersOnly() {
+        List<Employee> list = new ArrayList<>();
+        // Giả sử bảng Employee có cột Role
+        String sql = "SELECT * FROM Employee WHERE Role = 'Cashier' AND Status = 'Active'";
+        try (Connection conn = dc.getConnect(); PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+               list.add(mapResultSetToEmployee(rs));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
     }
 }

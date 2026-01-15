@@ -1,137 +1,89 @@
-
+/* Tổng thể khung chứa */
 .mainFxmlClass {
-    -fx-background-color: white;
+    -fx-background-color: #F8F9FA;
 }
 
+/* Thanh công cụ (Bộ lọc & Nút bấm) */
+#hSearch {
+    -fx-padding: 10 0; /* Chỉ padding trên dưới */
+    -fx-background-color: transparent;
+}
+#hAdd{
+    -fx-padding: 10 0; /* Chỉ padding trên dưới */
+    -fx-background-color: transparent;
+}
 
-
-
+/* Kiểu cho TextField tìm kiếm */
 .text-field {
-    -fx-pref-width: 200px;
-    -fx-font-size: 14px;
-    -fx-border-color: #ccd;
-    -fx-border-radius: 5px;
-    -fx-background-radius: 5px;
-}
-
-
-.combo-box-base {
-    -fx-background-color: white; 
-    -fx-border-color: #ccd;    
-    -fx-border-width: 1px;      
-    -fx-border-radius: 5px; 
-    -fx-background-radius: 5px; 
-    
-
-    -fx-background-insets: 0;
-}
-
-
-.combo-box-base .arrow-button {
     -fx-background-color: white;
-
-    -fx-background-radius: 0 5px 5px 0; 
-    -fx-background-insets: 0;
-    -fx-padding: 3 8 3 8;
+    -fx-border-color: #DCDDE1;
+    -fx-border-radius: 5;
+    -fx-background-radius: 5;
+    -fx-padding: 7 12;
+    -fx-font-size: 13px;
+    -fx-pref-width: 200;
 }
 
-
-.combo-box:focused .combo-box-base {
-    -fx-border-color: #1E8449; 
-    -fx-border-width: 1.5px;
-}
-
-
-/* --- PRODUCT CARD STYLES --- */
-
-
-#productContainer {
-    -fx-background-color: white;
-    -fx-padding: 10px;
-    -fx-vgap: 20px;
-    -fx-hgap: 20px;
-}
-
-
-.product-card {
+.text-field:focused {
     -fx-border-color: #1E8449;
-    -fx-pref-width: 180px;
-    -fx-padding: 10px;
+    -fx-effect: dropshadow(three-pass-box, rgba(30, 132, 73, 0.1), 5, 0, 0, 0);
+}
+
+/* Kiểu cho ComboBox bộ lọc */
+.combo-box {
     -fx-background-color: white;
-    -fx-border-radius: 8px;
-    -fx-background-radius: 8px;
-
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 10, 0.0, 0.0, 3.0);
-    -fx-cursor: hand; 
+    -fx-border-color: #DCDDE1;
+    -fx-border-radius: 5;
+    -fx-background-radius: 5;
 }
 
-.product-card:hover {
-
-    -fx-scale-y: 1.02;
-    -fx-scale-x: 1.02;
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 15, 0.0, 0.0, 5.0);
+.combo-box:hover {
+    -fx-border-color: #1E8449;
 }
 
-
-.product-card > ImageView {
-    -fx-fit-width: 100%;
-    -fx-fit-height: 120px;
-    -fx-background-color: #eee; 
-    -fx-alignment: center;
-    -fx-margin: 5px 0px;
+.combo-box:focused {
+    -fx-border-color: #1E8449;
+    -fx-border-width: 1.5;
 }
 
-
-.product-card > Label:nth-child(2) {
+/* Nút "Add New Product" */
+.button {
+    -fx-background-color: #1E8449;
+    -fx-text-fill: white;
     -fx-font-weight: bold;
-    -fx-font-size: 14px;
-    -fx-text-fill: #333;
-    -fx-padding: 5px 0 2px 0;
-    -fx-wrap-text: true;
-    -fx-pref-height: 35px; 
+    -fx-padding: 8 20;
+    -fx-background-radius: 5;
+    -fx-cursor: hand;
 }
 
-
-.product-card > Label:nth-child(3),
-.product-card > Label:nth-child(4) {
-    -fx-font-size: 12px;
-    -fx-text-fill: #666;
+.button:hover {
+    -fx-background-color: #145A32; /* Xanh đậm hơn khi di chuột */
 }
 
-
-.product-card > Label:nth-child(4) {
-    -fx-font-weight: bold;
-    -fx-text-fill: #d9534f; 
+/* Kiểu cho ScrollPane */
+.scroll-pane {
+    -fx-background-color: transparent;
+    -fx-padding: 10 0 0 0; /* Padding trên để tách biệt với nút bấm */
 }
 
-
-.product-card > Label:last-child {
-    -fx-font-size: 12px;
-    -fx-font-weight: bold;
-    -fx-padding: 5px 0 0 0;
-    -fx-text-fill: #5cb85c; 
+.scroll-pane .viewport {
+    -fx-background-color: transparent;
 }
 
-
-.product-card > Label:nth-child(5) {
-    -fx-font-size: 12px;
-    -fx-text-fill: #337ab7; 
+/* Container chứa các card sản phẩm (FlowPane) */
+.productContainer {
+    -fx-padding: 10;
+    -fx-background-color: transparent;
+    -fx-alignment: TOP_LEFT;
 }
 
-/* Quan trọng: Khử màu xám và viền của ScrollPane */
-#viewProduct {
-    -fx-background-color: #ffffff;
-    -fx-background: #ffffff; /* Thuộc tính này quyết định màu nền thực của vùng chứa */
-    -fx-border-color: transparent; /* Ẩn viền nếu muốn */
+/* Tùy chỉnh thanh cuộn cho mượt mà */
+.scroll-pane .scroll-bar:vertical {
+    -fx-background-color: transparent;
+    -fx-pref-width: 8;
 }
 
-/* Khử màu nền xám của lớp phủ bên trong ScrollPane */
-#viewProduct .viewport {
-    -fx-background-color: #ffffff;
-}
-
-/* Vùng chứa các card */
-#productContainer {
-    -fx-background-color: #ffffff;
-    -fx-padding: 15px; /* Thêm khoảng trống ở mép để các card không dính sát viền */
+.scroll-pane .scroll-bar:vertical .thumb {
+    -fx-background-color: #BDC3C7;
+    -fx-background-radius: 5;
 }

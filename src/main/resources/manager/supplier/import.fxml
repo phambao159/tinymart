@@ -24,10 +24,10 @@
                </font>
             </Label>
 
-            <HBox alignment="CENTER_LEFT" prefHeight="60.0" spacing="15.0" style="-fx-background-color: #f8f9fa; -fx-padding: 10; -fx-border-color: #dee2e6; -fx-border-radius: 5;">
+            <HBox fx:id="hSearch" alignment="CENTER_LEFT" prefHeight="60.0" spacing="15.0" style="-fx-background-color: #f8f9fa; -fx-padding: 10; -fx-border-color: #dee2e6; -fx-border-radius: 5;">
                <children>
                   <TextField fx:id="txtSearch" onAction="#onSearch" prefHeight="35.0" prefWidth="350.0" promptText="Search by ID, Supplier ID or Staff ID..." />
-                  <Button mnemonicParsing="false" onAction="#onAdd" prefHeight="35.0" style="-fx-background-color: #27ae60; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand;" text="+ Create New Import" />
+                  <Button mnemonicParsing="false" onAction="#onAdd" prefHeight="35.0" style="-fx-background-color: #27ae60; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand;" text="+ New Import" />
                </children>
             </HBox>
             

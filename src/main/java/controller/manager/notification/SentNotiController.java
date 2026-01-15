@@ -1,5 +1,6 @@
 package controller.manager.notification;
 
+import dao.manager.employee.EmployeeDAO;
 import dao.manager.notification.NotificationDAO;
 import java.io.IOException;
 import java.net.URL;
@@ -14,17 +15,20 @@ import javafx.scene.Scene;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import model.manager.employee.Employee;
 import model.manager.notification.Notification;
 
 public class SentNotiController implements Initializable {
 
     @FXML private HBox NotiTool;
     @FXML private ScrollPane viewSent;
-    @FXML private FlowPane sentContainer;
+    @FXML private VBox sentContainer;
     
     private final NotificationDAO nDAO = new NotificationDAO();
+    private final EmployeeDAO edao = new EmployeeDAO();
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -64,9 +68,9 @@ public class SentNotiController implements Initializable {
                 Parent card = loader.load();
 
                 NotiCardController cardController = loader.getController();
-
+                Employee e = edao.getEmployeeById(n.getReceiverID());
                 // logic lấy tên người nhận (vì đây là mục Sent)
-                String receiverName = "Staff ID: " + n.getReceiverID();
+                String receiverName = "To " +e.getRole()+ " " + e.getFullName();
                 
                 cardController.setData(n, receiverName);
                 

@@ -2,10 +2,8 @@ package controller.manager.product;
 
 import dao.manager.product.CategoryDAO;
 import dao.manager.product.ProductDAO;
-import dao.manager.product.PromotionDAO;
 import model.manager.product.Category;
 import model.manager.product.Product;
-import model.manager.product.Promotion;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -13,7 +11,6 @@ import java.nio.file.StandardCopyOption;
 import java.net.URL;
 import java.util.ResourceBundle;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -32,18 +29,20 @@ public class AddProductController implements Initializable {
     @FXML
     private ComboBox<Category> cbCategory;
     @FXML
-    private ComboBox<Promotion> cbPromotion;
-    @FXML
     private ComboBox<String> cbStatus;
     @FXML
     private ImageView imgPreview;
 
     private final ProductDAO productDAO = new ProductDAO();
     private final CategoryDAO categoryDAO = new CategoryDAO();
-    private final PromotionDAO promotionDAO = new PromotionDAO();
 
     private File selectedFile;
     private final String DEFAULT_IMAGE = "default-product.png";
+    private Runnable refreshCallback;
+
+    public void setOnSave(Runnable callback) {
+        this.refreshCallback = callback;
+    }
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -51,35 +50,21 @@ public class AddProductController implements Initializable {
     }
 
     private void setupComboBoxes() {
-        // Categories
+        // 1. Setup Categories
         cbCategory.setItems(FXCollections.observableArrayList(categoryDAO.getData()));
         cbCategory.setConverter(new StringConverter<Category>() {
             @Override
-            public String toString(Category c) {
-                return c == null ? "" : c.getName();
+            public String toString(Category c) { 
+                return (c == null) ? "" : c.getName(); 
             }
-
+            
             @Override
-            public Category fromString(String s) {
-                return null;
+            public Category fromString(String s) { // ĐÃ SỬA LỖI TYPO TẠI ĐÂY
+                return null; 
             }
         });
 
-        // Promotions
-        cbPromotion.setItems(FXCollections.observableArrayList(promotionDAO.getData()));
-        cbPromotion.setConverter(new StringConverter<Promotion>() {
-            @Override
-            public String toString(Promotion p) {
-                return p == null ? "No Promotion" : p.getName();
-            }
-
-            @Override
-            public Promotion fromString(String s) {
-                return null;
-            }
-        });
-
-        // Status
+        // 2. Status
         cbStatus.setItems(FXCollections.observableArrayList("Active", "Inactive"));
         cbStatus.getSelectionModel().selectFirst();
     }
@@ -87,6 +72,7 @@ public class AddProductController implements Initializable {
     @FXML
     private void onChooseImage(ActionEvent event) {
         FileChooser fc = new FileChooser();
+        fc.setTitle("Select Product Image");
         fc.getExtensionFilters().add(new FileChooser.ExtensionFilter("Images", "*.png", "*.jpg", "*.jpeg"));
         selectedFile = fc.showOpenDialog(((Node) event.getSource()).getScene().getWindow());
         if (selectedFile != null) {
@@ -99,26 +85,34 @@ public class AddProductController implements Initializable {
         String name = txtName.getText().trim();
         Category cat = cbCategory.getValue();
         String unit = txtUnit.getText().trim();
-        Promotion promo = cbPromotion.getValue();
+        String status = cbStatus.getValue();
 
+        // Validate dữ liệu
         if (name.isEmpty() || cat == null || unit.isEmpty()) {
-            new Alert(Alert.AlertType.ERROR, "Please fill Name, Category and Unit!").show();
+            showAlert(Alert.AlertType.ERROR, "Validation Error", "Please fill Name, Category and Unit!");
             return;
         }
 
-        // Save Image
+        // Xử lý ảnh
         String fileName = DEFAULT_IMAGE;
         if (selectedFile != null) {
             fileName = saveImageToProject(selectedFile);
         }
 
-        // Create Product (Đảm bảo Model Product của bạn có trường PromotionID)
-        Product p = new Product(0, name, cat.getCategoryID(), unit, cbStatus.getValue(), fileName);
-        // Giả sử bạn thêm setPromotionID vào Model:
-        // p.setPromotionID(promo != null ? promo.getPromotionID() : null);
+        // Tạo đối tượng Product (Sử dụng Constructor mới không có PromotionID)
+        Product p = new Product(
+            name, 
+            cat.getCategoryID(), 
+            unit, 
+            status, 
+            fileName
+        );
 
         if (productDAO.insert(p)) {
-            ((Stage) ((Node) event.getSource()).getScene().getWindow()).close();
+            if (refreshCallback != null) refreshCallback.run();
+            closeWindow(event);
+        } else {
+            showAlert(Alert.AlertType.ERROR, "Database Error", "Failed to add product.");
         }
     }
 
@@ -127,36 +121,41 @@ public class AddProductController implements Initializable {
             String fileName = System.currentTimeMillis() + "_" + file.getName();
             String projectPath = System.getProperty("user.dir");
 
-            // 1. Lưu vào thư mục SOURCE (để file không bị mất khi bạn tắt code)
+            // 1. Lưu vào thư mục resources của Source (Để lưu vĩnh viễn)
             File srcDir = new File(projectPath + "/src/main/resources/image/manager");
-            if (!srcDir.exists()) {
-                srcDir.mkdirs();
-            }
-            File srcFile = new File(srcDir, fileName);
-            Files.copy(file.toPath(), srcFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+            if (!srcDir.exists()) srcDir.mkdirs();
+            Files.copy(file.toPath(), new File(srcDir, fileName).toPath(), StandardCopyOption.REPLACE_EXISTING);
 
-            // 2. Lưu vào thư mục TARGET/BUILD (để JavaFX thấy ảnh ngay lập tức)
+            // 2. Đồng bộ sang thư mục Target/Build (Để hiển thị ngay lập tức mà không cần restart)
             try {
                 URL resourceUrl = getClass().getResource("/image/manager/");
                 if (resourceUrl != null) {
-                    File targetDir = new File(resourceUrl.toURI());
-                    File targetFile = new File(targetDir, fileName);
+                    File targetFile = new File(new File(resourceUrl.toURI()), fileName);
                     Files.copy(file.toPath(), targetFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-                    System.out.println("✅ Đã đồng bộ ảnh sang Target (Runtime).");
                 }
             } catch (Exception ex) {
-                System.err.println("⚠️ Không thể copy sang Target: " + ex.getMessage());
+                System.err.println("Note: Target sync skipped, image will appear after rebuild.");
             }
-
             return fileName;
         } catch (IOException e) {
-            System.err.println("❌ Lỗi lưu ảnh: " + e.getMessage());
+            System.err.println("Error saving image: " + e.getMessage());
             return DEFAULT_IMAGE;
         }
     }
 
     @FXML
-    private void onCancel(ActionEvent e) {
+    private void onCancel(ActionEvent e) { 
+        closeWindow(e); 
+    }
+
+    private void closeWindow(ActionEvent e) {
         ((Stage) ((Node) e.getSource()).getScene().getWindow()).close();
+    }
+
+    private void showAlert(Alert.AlertType type, String title, String content) {
+        Alert alert = new Alert(type, content);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.showAndWait();
     }
 }

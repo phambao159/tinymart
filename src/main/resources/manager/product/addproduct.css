@@ -1,7 +1,91 @@
-/*
- * Empty Stylesheet file.
- */
-
+/* 1. Tổng thể khung nền */
 .mainFxmlClass {
+    -fx-background-color: #ffffff;
+}
 
+/* 2. Tiêu đề lớn "Add New Product" */
+/* Nhắm mục tiêu vào Label đầu tiên bên trong VBox chính */
+.mainFxmlClass > VBox > Label:first-child {
+    -fx-text-fill: #1E8449; /* Màu xanh chủ đạo */
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+    -fx-font-family: "Segoe UI", Arial;
+    -fx-padding: 0 0 5 0;
+}
+
+/* 3. Kiểu cho các nhãn (Labels) */
+.label {
+    -fx-font-family: "Segoe UI", Arial;
+    -fx-text-fill: #2C3E50;
+    -fx-font-size: 14px;
+}
+
+/* 4. Ô nhập liệu (TextField & ComboBox) */
+.text-field, .combo-box {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #D5DBDB;
+    -fx-border-radius: 4;
+    -fx-background-radius: 4;
+    -fx-font-size: 13px;
+}
+
+/* Hiệu ứng khi Focus (Người dùng đang nhập liệu) */
+.text-field:focused, .combo-box:focused {
+    -fx-border-color: #FF9800; /* Màu cam Highlight */
+    -fx-border-width: 1.5;
+}
+
+/* 5. Khung xem trước ảnh (ImageView) */
+#imgPreview {
+    -fx-border-color: #EAECEE;
+    -fx-border-width: 2;
+    -fx-border-radius: 8;
+}
+
+/* 6. Nút bấm chung */
+.button {
+    -fx-cursor: hand;
+    -fx-font-weight: bold;
+    -fx-padding: 8 15;
+    -fx-background-radius: 5;
+    -fx-font-family: "Segoe UI", Arial;
+}
+
+/* Nút Choose Image & Cancel (Màu xám trung tính) */
+.button:not([style*="background-color"]) {
+    -fx-background-color: #ECF0F1;
+    -fx-text-fill: #2C3E50;
+    -fx-border-color: transparent;
+}
+
+.button:not([style*="background-color"]):hover {
+    -fx-background-color: #D5DBDB;
+}
+
+/* Nút Save Product (Màu xanh chủ đạo) */
+/* Selector dựa trên onAction để đảm bảo chọn đúng nút Save */
+.button[onAction="#onSave"] {
+    -fx-background-color: #1E8449 !important;
+    -fx-text-fill: white !important;
+}
+
+.button[onAction="#onSave"]:hover {
+    -fx-background-color: #145A32 !important;
+    -fx-effect: dropshadow(three-pass-box, rgba(30, 132, 73, 0.3), 10, 0, 0, 0);
+}
+
+/* 7. Tùy chỉnh ComboBox danh sách sổ xuống */
+.combo-box .list-cell {
+    -fx-padding: 5 10;
+    -fx-text-fill: #2C3E50;
+}
+
+.combo-box .list-view {
+    -fx-background-color: white;
+    -fx-border-color: #D5DBDB;
+}
+
+.combo-box .list-cell:filled:hover {
+    -fx-background-color: #F2F4F4;
+    -fx-text-fill: #1E8449;
 }

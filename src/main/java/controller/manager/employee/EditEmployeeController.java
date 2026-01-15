@@ -32,7 +32,7 @@ public class EditEmployeeController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        cbRole.setItems(FXCollections.observableArrayList("Manager", "Staff", "Warehouse"));
+        cbRole.setItems(FXCollections.observableArrayList("Manager", "Cashier", "Warehouse"));
     }
 
     public void initData(Employee emp) {

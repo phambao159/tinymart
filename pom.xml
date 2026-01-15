@@ -27,6 +27,18 @@
         </dependency>
     </dependencies>
     <build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <includes>
+                    <include>**/*.fxml</include>
+                    <include>**/*.properties</include>
+                    <include>**/*.png</include>
+                    <include>**/*.jpg</include>
+                    <include>**/*.css</include>
+                </includes>
+            </resource>
+        </resources>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -42,6 +54,9 @@
                 <version>0.0.4</version>
                 <configuration>
                     <mainClass>main.App</mainClass>
+                    <options>
+                        <option>-Dprism.order=sw</option>
+                    </options>
                 </configuration>
                 <executions>
                     <execution>

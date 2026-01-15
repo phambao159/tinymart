@@ -1,22 +1,87 @@
-/* Màu nền cho toàn bộ trang */
+/* Tổng thể nền */
 .mainFxmlClass {
-    -fx-background-color: #ffffff;
+    -fx-background-color: white;
 }
 
-/* Quan trọng: Khử màu xám và viền của ScrollPane */
-#viewNoti {
-    -fx-background-color: #ffffff;
-    -fx-background: #ffffff; /* Thuộc tính này quyết định màu nền thực của vùng chứa */
-    -fx-border-color: transparent; /* Ẩn viền nếu muốn */
+/* Thanh công cụ chứa Button, Toggle và Search */
+#NotiTool {
+    -fx-padding: 10 0;
+    -fx-background-color: white;
+    -fx-border-color: #eeeeee;
+    -fx-border-width: 0 0 1 0; /* Chỉ kẻ đường gạch chân */
+    -fx-alignment: CENTER_LEFT;
 }
 
-/* Khử màu nền xám của lớp phủ bên trong ScrollPane */
-#viewNoti .viewport {
-    -fx-background-color: #ffffff;
+/* Kiểu cho nút "Mark all as read" */
+.button {
+    -fx-background-color: white;
+    -fx-border-color: #1E8449;
+    -fx-border-radius: 4;
+    -fx-text-fill: #1E8449;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
 }
 
-/* Vùng chứa các card */
+.button:hover {
+    -fx-background-color: #1E8449;
+    -fx-text-fill: white;
+}
+
+/* Kiểu cho các nút All/Unread (ToggleButton) */
+.toggle-button {
+    -fx-background-color: #e9ecef;
+    -fx-text-fill: #495057;
+    -fx-background-radius: 20; /* Bo tròn kiểu viên thuốc */
+    -fx-padding: 5 15;
+    -fx-cursor: hand;
+    -fx-border-width: 0 0 0 0;
+}
+
+.toggle-button:selected {
+    -fx-background-color: #1E8449;
+    -fx-text-fill: white;
+}
+
+/* Kiểu cho ô tìm kiếm (TextField) */
+.text-field {
+    -fx-background-color: white;
+    -fx-border-color: #ced4da;
+    -fx-border-radius: 15;
+    -fx-background-radius: 15;
+    -fx-padding: 5 10;
+}
+
+.text-field:focused {
+    -fx-border-color: #1E8449;
+    
+}
+
+/* Kiểu cho vùng cuộn ScrollPane */
+.scroll-pane {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-padding: 5 0;
+}
+
+.scroll-pane .viewport {
+    -fx-background-color: transparent;
+
+}
+
+/* Thanh cuộn (Scrollbar) tinh tế hơn */
+.scroll-pane .scroll-bar:vertical {
+    -fx-background-color: transparent;
+    -fx-pref-width: 8;
+}
+
+.scroll-pane .scroll-bar:vertical .thumb {
+    -fx-background-color: #bdc3c7;
+    -fx-background-radius: 5;
+}
+
+/* Container chứa các item thông báo */
 #notiContainer {
-    -fx-background-color: #ffffff;
-    -fx-padding: 15px; /* Thêm khoảng trống ở mép để các card không dính sát viền */
+    -fx-spacing: 10;
+    -fx-padding: 10 0;
+    -fx-background-color: white;
 }

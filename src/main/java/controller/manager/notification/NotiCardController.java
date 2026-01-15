@@ -44,7 +44,7 @@ public class NotiCardController implements Initializable {
     public void setData(Notification noti, String senderName) {
         lblTitle.setText(noti.getTitle());
         lblContent.setText(noti.getContent());
-        lblSender.setText("From: " + senderName);
+        lblSender.setText(senderName);
 
         // Kiểm tra và hiển thị ngày gửi
         if (noti.getSentDate() != null) {

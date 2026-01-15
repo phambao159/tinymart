@@ -22,9 +22,12 @@ import model.manager.notification.Notification;
 
 public class CreateNotiController implements Initializable {
 
-    @FXML private TextField txtTitle;
-    @FXML private TextArea txtContent;
-    @FXML private ComboBox<Employee> cbReceiver;
+    @FXML
+    private TextField txtTitle;
+    @FXML
+    private TextArea txtContent;
+    @FXML
+    private ComboBox<Employee> cbReceiver;
 
     private final NotificationDAO dao = new NotificationDAO();
     private final EmployeeDAO eDAO = new EmployeeDAO();
@@ -77,22 +80,35 @@ public class CreateNotiController implements Initializable {
 
     private void loadReceiver() {
         try {
+            // 1. Lấy dữ liệu từ database
             List<Employee> empList = eDAO.getData();
-            ObservableList<Employee> options = FXCollections.observableArrayList(empList);
-            cbReceiver.setItems(options);
 
-            // Thiết lập cách hiển thị trong ComboBox
+            // 2. Tạo danh sách mới để lọc (Bỏ Manager có ID = 1)
+            ObservableList<Employee> filteredList = FXCollections.observableArrayList();
+            for (Employee emp : empList) {
+                // Loại bỏ ID = 1 (Người gửi) khỏi danh sách chọn
+                if (emp.getEmployeeID() != 1) {
+                    filteredList.add(emp);
+                }
+            }
+
+            // 3. Đưa danh sách đã lọc vào ComboBox
+            cbReceiver.setItems(filteredList);
+
+            // 4. Thiết lập cách hiển thị (StringConverter chỉ làm nhiệm vụ hiển thị)
             cbReceiver.setConverter(new StringConverter<Employee>() {
                 @Override
                 public String toString(Employee emp) {
-                    if (emp == null) return "";
-                    // Hiển thị: Tên (Chức vụ)
+                    if (emp == null) {
+                        return "";
+                    }
+                    // Trả về định dạng: Tên (Chức vụ)
                     return emp.getFullName() + " (" + emp.getRole() + ")";
                 }
 
                 @Override
                 public Employee fromString(String string) {
-                    return null; 
+                    return null;
                 }
             });
 

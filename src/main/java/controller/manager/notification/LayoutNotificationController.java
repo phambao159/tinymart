@@ -4,6 +4,7 @@
  */
 package controller.manager.notification;
 
+import controller.manager.LayoutController;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -27,18 +28,51 @@ public class LayoutNotificationController implements Initializable {
     private ToggleGroup toggleNoti;
     @FXML
     private StackPane viewNoti;
-
+    
     /**
      * Initializes the controller class.
      */
+    
+    public LayoutController mainLayoutController;
+    
+    public void setMainLayoutController(LayoutController controller) {
+        this.mainLayoutController = controller;
+        try {
+
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/manager/notification/notification.fxml"));
+            Node node = loader.load();
+
+            // Truyền MainLayout cho Dashboard để nó có thể gọi ngược lại
+            NotificationController dc = loader.getController();
+            dc.setMainLayoutController(mainLayoutController);
+
+            viewNoti.getChildren().setAll(node);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+    }
+    
+    
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        loadView("/manager/notification/notification.fxml");
+        
     }
 
     @FXML
     private void onNoti(ActionEvent event) {
-        loadView("/manager/notification/notification.fxml");
+        try {
+
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/manager/notification/notification.fxml"));
+            Node node = loader.load();
+
+            // Truyền MainLayout cho Dashboard để nó có thể gọi ngược lại
+            NotificationController dc = loader.getController();
+            dc.setMainLayoutController(mainLayoutController);
+
+            viewNoti.getChildren().setAll(node);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
     }
 
     @FXML

@@ -24,7 +24,7 @@ public class AddEmployeeController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         // Cấu hình ComboBox Role
-        cbRole.setItems(FXCollections.observableArrayList("Manager", "Staff", "Warehouse"));
+        cbRole.setItems(FXCollections.observableArrayList("Manager", "Cashier", "Warehouse"));
         
         // Mặc định ngày thuê là ngày hôm nay
         dpHireDate.setValue(LocalDate.now());
@@ -60,7 +60,8 @@ public class AddEmployeeController implements Initializable {
                 hireDate, 
                 salary, 
                 user, 
-                password
+                password,
+                "Active"
             );
 
             // 4. Gọi DAO lưu vào DB

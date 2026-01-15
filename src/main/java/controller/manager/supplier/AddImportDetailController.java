@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/javafx/FXMLController.java to edit this template
- */
 package controller.manager.supplier;
 
 import dao.manager.product.ProductSizeDAO;
@@ -11,7 +7,6 @@ import java.util.List;
 import java.util.ResourceBundle;
 import java.util.function.Consumer;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -21,13 +16,10 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import model.manager.product.ProductSize;
-import model.manager.product.ProductSummary;
 import model.manager.supplier.ImportDetail;
 
 /**
- * FXML Controller class
- *
- * @author user
+ * FXML Controller class cho việc thêm chi tiết phiếu nhập từ popup
  */
 public class AddImportDetailController implements Initializable {
 
@@ -37,13 +29,11 @@ public class AddImportDetailController implements Initializable {
     private ComboBox<String> cbSize;
     @FXML
     private TextField txtQuantity;
+    
     private int ProductID;
     private Consumer<ImportDetail> onSaveCallback;
     private List<ProductSize> fullSizeList;
 
-    /**
-     * Initializes the controller class.
-     */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
     }
@@ -56,34 +46,49 @@ public class AddImportDetailController implements Initializable {
 
     @FXML
     private void onAdd(ActionEvent event) {
-        String selectedName = cbSize.getValue();
+        String selectedSizeName = cbSize.getValue();
         String qtyStr = txtQuantity.getText().trim();
 
-        if (selectedName != null && !qtyStr.isEmpty()) {
-            try {
-                int qty = Integer.parseInt(qtyStr);
+        if (selectedSizeName == null) {
+            showAlert("Please select a size.");
+            return;
+        }
 
-                // Find the original object to get ID and Price
-                ProductSize selectedObj = fullSizeList.stream()
-                        .filter(s -> s.getSizeType().equals(selectedName))
-                        .findFirst()
-                        .orElse(null);
+        if (qtyStr.isEmpty()) {
+            showAlert("Please enter quantity.");
+            return;
+        }
 
-                if (selectedObj != null && onSaveCallback != null) {
-                    ImportDetail detail = new ImportDetail();
-                    detail.setProductID(this.ProductID);
-                    detail.setProductSizeID(selectedObj.getProductSizeID());
-                    detail.setProductName(this.lbProductName.getText()); // Lấy từ Label trên popup
-                    detail.setSizeName(selectedObj.getSizeType());
-                    detail.setQuantity(qty);
-                    detail.setImportPrice(selectedObj.getCostPrice());
-
-                    onSaveCallback.accept(detail);
-                    onCancel(event);
-                }
-            } catch (NumberFormatException e) {
-                System.err.println("Invalid quantity format");
+        try {
+            int qty = Integer.parseInt(qtyStr);
+            if (qty <= 0) {
+                showAlert("Quantity must be greater than 0.");
+                return;
             }
+
+            // Tìm đối tượng ProductSize tương ứng để lấy ID và Giá gốc (Cost Price)
+            ProductSize selectedObj = fullSizeList.stream()
+                    .filter(s -> s.getSizeType().equals(selectedSizeName))
+                    .findFirst()
+                    .orElse(null);
+
+            if (selectedObj != null && onSaveCallback != null) {
+                ImportDetail detail = new ImportDetail();
+                detail.setProductID(this.ProductID);
+                detail.setProductSizeID(selectedObj.getProductSizeID());
+                detail.setProductName(this.lbProductName.getText());
+                detail.setSizeName(selectedObj.getSizeType());
+                detail.setQuantity(qty);
+                detail.setImportPrice(selectedObj.getCostPrice());
+                
+                // --- CẬP NHẬT TẠI ĐÂY: Tự động set ShelfQuantity là 0 ---
+                detail.setShelfQuantity(0);
+
+                onSaveCallback.accept(detail);
+                onCancel(event);
+            }
+        } catch (NumberFormatException e) {
+            showAlert("Invalid quantity format. Please enter a number.");
         }
     }
 
@@ -94,14 +99,14 @@ public class AddImportDetailController implements Initializable {
         loadSize();
     }
 
-    public void loadSize() {
+    private void loadSize() {
         ProductSizeDAO pDAO = new ProductSizeDAO();
         this.fullSizeList = pDAO.getSizesByProductId(this.ProductID);
 
         if (fullSizeList != null && !fullSizeList.isEmpty()) {
             List<String> names = new ArrayList<>();
             for (ProductSize ps : fullSizeList) {
-                names.add(ps.getSizeType()); // Get S, M, L...
+                names.add(ps.getSizeType());
             }
             cbSize.setItems(FXCollections.observableArrayList(names));
             cbSize.getSelectionModel().selectFirst();
@@ -110,8 +115,9 @@ public class AddImportDetailController implements Initializable {
 
     private void showAlert(String msg) {
         Alert alert = new Alert(Alert.AlertType.WARNING);
+        alert.setTitle("Validation Warning");
+        alert.setHeaderText(null);
         alert.setContentText(msg);
         alert.show();
     }
-
 }

@@ -4,7 +4,6 @@ import java.time.LocalDate;
 
 public class Employee {
 
-
     private int employeeID;
     private String fullName;
     private LocalDate dateOfBirth;
@@ -15,13 +14,14 @@ public class Employee {
     private long baseSalary;
     private String user;
     private String password;
-
+    private String status; // Đã thêm trường status
 
     public Employee() {
     }
 
-
-    public Employee(int employeeID, String fullName, LocalDate dateOfBirth, String phoneNumber, String address, String role, LocalDate hireDate, long baseSalary, String user, String password) {
+    // Constructor dùng khi lấy dữ liệu từ Database (có ID và Status)
+    public Employee(int employeeID, String fullName, LocalDate dateOfBirth, String phoneNumber, String address,
+            String role, LocalDate hireDate, long baseSalary, String user, String password, String status) {
         this.employeeID = employeeID;
         this.fullName = fullName;
         this.dateOfBirth = dateOfBirth;
@@ -32,10 +32,12 @@ public class Employee {
         this.baseSalary = baseSalary;
         this.user = user;
         this.password = password;
+        this.status = status;
     }
 
-
-    public Employee(String fullName, LocalDate dateOfBirth, String phoneNumber, String address, String role, LocalDate hireDate, long baseSalary, String user, String password) {
+    // Constructor dùng khi thêm mới (thường mặc định status là Active trong DAO)
+    public Employee(String fullName, LocalDate dateOfBirth, String phoneNumber, String address,
+            String role, LocalDate hireDate, long baseSalary, String user, String password, String status) {
         this.fullName = fullName;
         this.dateOfBirth = dateOfBirth;
         this.phoneNumber = phoneNumber;
@@ -45,10 +47,19 @@ public class Employee {
         this.baseSalary = baseSalary;
         this.user = user;
         this.password = password;
+        this.status = status;
     }
-    
 
+    // Getter và Setter cho status
+    public String getStatus() {
+        return status;
+    }
 
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    // Các Getter và Setter cũ
     public int getEmployeeID() {
         return employeeID;
     }

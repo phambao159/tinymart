@@ -1,8 +1,10 @@
 package model.manager.product;
 
-
+/**
+ * Lớp đại diện cho tóm tắt thông tin sản phẩm để hiển thị trên TableView/Dashboard.
+ * Đã lược bỏ promotionID trực tiếp từ Product (vì đã chuyển sang bảng ProductSize).
+ */
 public class ProductSummary {
-
 
     private int productID;
     private String name;
@@ -13,8 +15,13 @@ public class ProductSummary {
     private long totalStockQuantity; 
     private String status;
 
+    // Constructor mặc định
+    public ProductSummary() {
+    }
 
-    public ProductSummary(int productID, String name, int categoryID, String unit, String image, double minSellingPrice, long totalStockQuantity, String status) {
+    // Constructor đầy đủ tham số (Đã loại bỏ promotionID)
+    public ProductSummary(int productID, String name, int categoryID, String unit, String image, 
+                          double minSellingPrice, long totalStockQuantity, String status) {
         this.productID = productID;
         this.name = name;
         this.categoryID = categoryID;
@@ -25,11 +32,7 @@ public class ProductSummary {
         this.status = status;
     }
 
-
-
-    public ProductSummary() {
-    }
-
+    // --- Getter và Setter ---
 
     public int getProductID() {
         return productID;
@@ -94,5 +97,4 @@ public class ProductSummary {
     public void setStatus(String status) {
         this.status = status;
     }
-
 }

@@ -11,22 +11,21 @@ public class OrderDetailDAO {
     private final DBConnection dc = new DBConnection();
 
     /**
-     * Lấy danh sách chi tiết của một hóa đơn để hiển thị tên sản phẩm
-     * Đã bỏ SalePrice, chỉ lấy ProductName và TypeName
+     * Lấy danh sách chi tiết của một hóa đơn để hiển thị tên sản phẩm Đã bỏ
+     * SalePrice, chỉ lấy ProductName và TypeName
      */
     public List<OrderDetail> getDetailsByOrderId(int orderId) {
         List<OrderDetail> list = new ArrayList<>();
-        // SQL chỉ JOIN để lấy tên sản phẩm và kích thước
-        String sql = "SELECT od.*, p.Name AS ProductName, s.Type AS TypeName " +
-                     "FROM OrderDetail od " +
-                     "JOIN ProductSize ps ON od.ProductSizeID = ps.ProductSizeID " +
-                     "JOIN Product p ON ps.ProductID = p.ProductID " +
-                     "JOIN Size s ON ps.SizeID = s.SizeID " +
-                     "WHERE od.OrderID = ?";
+        // Thêm ps.SellingPrice vào câu lệnh SELECT
+        String sql = "SELECT od.*, p.Name AS ProductName, s.Type AS TypeName, ps.SellingPrice "
+                + "FROM OrderDetail od "
+                + "JOIN ProductSize ps ON od.ProductSizeID = ps.ProductSizeID "
+                + "JOIN Product p ON ps.ProductID = p.ProductID "
+                + "JOIN Size s ON ps.SizeID = s.SizeID "
+                + "WHERE od.OrderID = ?";
 
-        try (Connection conn = dc.getConnect();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            
+        try (Connection conn = dc.getConnect(); PreparedStatement ps = conn.prepareStatement(sql)) {
+
             ps.setInt(1, orderId);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
@@ -35,11 +34,13 @@ public class OrderDetailDAO {
                     detail.setOrderID(rs.getInt("OrderID"));
                     detail.setProductSizeID(rs.getInt("ProductSizeID"));
                     detail.setQuantity(rs.getInt("Quantity"));
-                    
-                    // Chỉ gán các trường tên để hiển thị lên Card
+
+                    // Lấy SellingPrice từ bảng ProductSize và gán vào field UnitPrice của Model
+                    detail.setUnitPrice(rs.getDouble("SellingPrice"));
+
                     detail.setProductName(rs.getString("ProductName"));
                     detail.setTypeName(rs.getString("TypeName"));
-                    
+
                     list.add(detail);
                 }
             }
@@ -54,14 +55,13 @@ public class OrderDetailDAO {
      */
     public boolean insert(OrderDetail detail) {
         String sql = "INSERT INTO OrderDetail (OrderID, ProductSizeID, Quantity) VALUES (?, ?, ?)";
-        
-        try (Connection conn = dc.getConnect();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            
+
+        try (Connection conn = dc.getConnect(); PreparedStatement ps = conn.prepareStatement(sql)) {
+
             ps.setInt(1, detail.getOrderID());
             ps.setInt(2, detail.getProductSizeID());
             ps.setInt(3, detail.getQuantity());
-            
+
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -77,8 +77,8 @@ public class OrderDetailDAO {
         Connection conn = null;
         try {
             conn = dc.getConnect();
-            conn.setAutoCommit(false); 
-            
+            conn.setAutoCommit(false);
+
             try (PreparedStatement ps = conn.prepareStatement(sql)) {
                 for (OrderDetail detail : details) {
                     ps.setInt(1, detail.getOrderID());
@@ -88,18 +88,27 @@ public class OrderDetailDAO {
                 }
                 ps.executeBatch();
             }
-            
-            conn.commit(); 
+
+            conn.commit();
             return true;
         } catch (SQLException e) {
             if (conn != null) {
-                try { conn.rollback(); } catch (SQLException ex) { ex.printStackTrace(); }
+                try {
+                    conn.rollback();
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                }
             }
             e.printStackTrace();
             return false;
         } finally {
             if (conn != null) {
-                try { conn.setAutoCommit(true); conn.close(); } catch (SQLException e) { e.printStackTrace(); }
+                try {
+                    conn.setAutoCommit(true);
+                    conn.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
             }
         }
     }

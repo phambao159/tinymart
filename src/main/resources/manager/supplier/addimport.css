@@ -1,80 +1,129 @@
-/*
- * Empty Stylesheet file.
- */
-
+/* 1. Tổng thể */
 .mainFxmlClass {
-
+    -fx-background-color: #f1f2f6;
 }
 
-#productContainer {
-    -fx-background-color: white;
-    -fx-padding: 10px;
-    -fx-vgap: 20px;
-    -fx-hgap: 20px;
+/* 2. Tiêu đề các vùng */
+.label {
+    -fx-font-family: "Segoe UI", Arial;
 }
 
+.vbox > .label {
+    -fx-text-fill: #1E8449; /* Xanh lá chủ đạo */
+    -fx-padding: 0 0 5 0;
+}
 
-.product-card {
+/* 3. Định dạng các ô nhập liệu (GridPane) */
+.combo-box, .date-picker, .text-field {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #dcdde1;
+    -fx-border-radius: 4;
+    -fx-background-radius: 4;
+    -fx-min-height: 35;
+}
+
+.combo-box:focused, .date-picker:focused, .text-field:focused {
     -fx-border-color: #1E8449;
-    -fx-pref-width: 180px;
-    -fx-padding: 10px;
-    -fx-background-color: white;
-    -fx-border-radius: 8px;
-    -fx-background-radius: 8px;
+    -fx-border-width: 1.5;
+}
 
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 10, 0.0, 0.0, 3.0);
-    -fx-cursor: hand; 
+/* 4. TableView chi tiết đơn hàng */
+.table-view {
+    -fx-border-color: #dcdde1;
+    -fx-border-radius: 4;
+}
+
+.table-view .column-header {
+    -fx-background-color: #f8f9fa;
+    -fx-border-color: transparent transparent #dcdde1 transparent;
+}
+
+.table-view .column-header .label {
+    -fx-text-fill: #2c3e50;
+    -fx-font-weight: bold;
+}
+
+/* Làm nổi bật cột Total trong bảng */
+#colTotal {
+    -fx-text-fill: #1E8449;
+    -fx-font-weight: bold;
+}
+
+/* 5. Vùng hiển thị Tổng tiền (Total Cost) */
+.hbox {
+    -fx-background-radius: 5;
+}
+
+#lblTotalCost {
+    -fx-text-fill: #1E8449; /* Đổi từ đỏ sang Xanh lá thương hiệu */
+}
+
+/* 6. Nút bấm */
+.button {
+    -fx-cursor: hand;
+    -fx-background-radius: 5;
+    -fx-font-weight: bold;
+    -fx-transition: 0.2s;
+}
+
+/* Nút Save/Create Import */
+.button[text="CREATE IMPORT"] {
+    -fx-background-color: #1E8449;
+    -fx-text-fill: white;
+}
+
+.button[text="CREATE IMPORT"]:hover {
+    -fx-background-color: #145A32;
+    -fx-translate-y: -1;
+}
+
+/* Nút Cancel */
+.button[text="Cancel"] {
+    -fx-background-color: white;
+    -fx-text-fill: #7f8c8d;
+    -fx-border-color: #bdc3c7;
+}
+
+.button[text="Cancel"]:hover {
+    -fx-background-color: #f8f9fa;
+    -fx-border-color: #95a5a6;
+}
+
+/* 7. QUICK SELECT PRODUCT (FlowPane & Card) */
+.scroll-pane {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-padding: 5;
+}
+
+/* Card sản phẩm (Dành cho việc tạo động trong Controller) */
+.product-card {
+    -fx-background-color: #ffffff;
+    -fx-padding: 15;
+    -fx-alignment: center;
+    -fx-border-color: #dcdde1;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-pref-width: 150;
+    -fx-pref-height: 120;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 5, 0, 0, 2);
 }
 
 .product-card:hover {
-
-    -fx-scale-y: 1.02;
-    -fx-scale-x: 1.02;
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 15, 0.0, 0.0, 5.0);
+    -fx-border-color: #FF9800; /* Highlight Cam khi chọn sản phẩm */
+    -fx-border-width: 2;
+    -fx-translate-y: -3;
 }
 
-
-.product-card > ImageView {
-    -fx-fit-width: 100%;
-    -fx-fit-height: 120px;
-    -fx-background-color: #eee; 
-    -fx-alignment: center;
-    -fx-margin: 5px 0px;
-}
-
-
-.product-card > Label:nth-child(2) {
+.product-card .label-name {
     -fx-font-weight: bold;
-    -fx-font-size: 14px;
-    -fx-text-fill: #333;
-    -fx-padding: 5px 0 2px 0;
+    -fx-text-fill: #2c3e50;
     -fx-wrap-text: true;
-    -fx-pref-height: 35px; 
+    -fx-text-alignment: center;
 }
 
-
-.product-card > Label:nth-child(3),
-.product-card > Label:nth-child(4) {
-    -fx-font-size: 12px;
-    -fx-text-fill: #666;
-}
-
-
-.product-card > Label:nth-child(4) {
-    -fx-font-weight: bold;
-    -fx-text-fill: #d9534f; 
-}
-
-
-.product-card > Label:last-child {
-    -fx-font-size: 12px;
-    -fx-font-weight: bold;
-    -fx-padding: 5px 0 0 0;
-    -fx-text-fill: #5cb85c; 
-}
-
-
-.product-card > Label:nth-child(5) {
-    -fx-font-size: 12px;
-    -fx-text-fill: #337ab7; 
+.product-card .label-price {
+    -fx-text-fill: #FF9800; /* Giá tiền màu Cam */
+    -fx-font-size: 14px;
 }

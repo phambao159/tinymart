@@ -1,0 +1,87 @@
+/*
+Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+Click nbfs://nbhost/SystemFileSystem/Templates/Other/CascadeStyleSheet.css to edit this template
+*/
+/* 
+    Created on : 8 Jan 2026, 3:54:37 pm
+    Author     : ASUS
+*/
+/* Background for the whole root */
+#root {
+    -fx-background-image: url("background.png");     /* đường dẫn ảnh */
+    -fx-background-size: cover;                      /* phủ toàn bộ khung */
+    -fx-background-repeat: no-repeat;                /* không lặp lại */
+    -fx-background-position: center center;          /* căn giữa */
+    -fx-padding: 0;                                   /* xóa viền mặc định */
+}
+
+/* Style for labels */
+.label {
+    -fx-text-fill: #333333;
+}
+
+/* Style for text fields and text areas */
+.text-field, .text-area {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #cccccc;
+    -fx-border-radius: 4;
+    -fx-padding: 6;
+}
+
+/* Style for combo boxes */
+.combo-box {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #cccccc;
+    -fx-border-radius: 4;
+}
+
+/* Style for buttons */
+.button {
+    -fx-background-color: #FF9800;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-background-radius: 12;   /* tăng từ 4 → 12 để bo tròn hơn */
+    -fx-border-radius: 12;
+    -fx-padding: 6 12 6 12;
+}
+
+/* Hover effect for buttons */
+.button:hover {
+    -fx-background-color: #FB8C00;
+}
+
+/* TableView styling */
+.table-view {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #dddddd;
+}
+
+.table-column {
+    -fx-alignment: CENTER_LEFT;
+}
+/* Style cho label tiêu đề */
+.create-title {
+    -fx-text-fill: white;                 /* chữ màu trắng */
+    -fx-font-size: 20px;                  /* hơi lớn hơn để nổi bật */
+    -fx-font-weight: bold;                /* chữ đậm */
+    -fx-font-family: "Brush Script MT", "Lucida Handwriting", "Segoe Script", cursive; /* font nghệ thuật */
+    -fx-effect: dropshadow( gaussian , rgba(0,0,0,0.6) , 4,0,0,1 ); /* thêm bóng nhẹ */
+}
+/* Tab mặc định */
+.tab {
+    -fx-background-color: transparent;
+    -fx-text-fill: #333333;
+    -fx-padding: 6 12 6 12;
+    -fx-background-radius: 10;
+    -fx-border-radius: 10;
+    -fx-padding: 6 12 6 12;
+}
+
+.tab:hover {
+    -fx-background-color: #FFA726;   /* Orange 500 */
+    -fx-text-fill: white;
+}
+.tab:selected {
+    -fx-background-color: #FF9800;   /* Orange 600 */
+    -fx-text-fill: white;
+}

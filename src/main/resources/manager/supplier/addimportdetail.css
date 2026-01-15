@@ -1,7 +1,82 @@
-/*
- * Empty Stylesheet file.
- */
+/* 1. Tổng thể Container */
+.vbox {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #dcdde1;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+}
 
-.mainFxmlClass {
+/* 2. Tiêu đề Dialog */
+.label {
+    -fx-font-family: "Segoe UI", Arial;
+}
 
+.vbox > .label {
+    -fx-text-fill: #1E8449; /* Xanh lá chủ đạo */
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+}
+
+/* 3. Tên sản phẩm đang chọn */
+#lbProductName {
+    -fx-text-fill: #FF9800; /* Màu Cam để làm nổi bật sản phẩm đang chọn */
+}
+
+/* 4. Nhãn các trường (Labels in GridPane) */
+.grid-pane .label {
+    -fx-font-weight: bold;
+    -fx-text-fill: #57606f;
+    -fx-font-size: 13px;
+}
+
+/* 5. Input Fields (ComboBox & TextField) */
+.combo-box, .text-field {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #dcdde1;
+    -fx-border-radius: 4;
+    -fx-background-radius: 4;
+    -fx-min-height: 35;
+    -fx-font-size: 13px;
+}
+
+.combo-box:focused, .text-field:focused {
+    -fx-border-color: #1E8449;
+    -fx-border-width: 1.5;
+}
+
+/* 6. Nút bấm */
+.button {
+    -fx-cursor: hand;
+    -fx-background-radius: 5;
+    -fx-font-weight: bold;
+    -fx-transition: 0.2s;
+    -fx-min-height: 35;
+}
+
+/* Nút Add to List (Hành động chính) */
+.button[text="Add to List"] {
+    -fx-background-color: #1E8449;
+    -fx-text-fill: white;
+}
+
+.button[text="Add to List"]:hover {
+    -fx-background-color: #145A32;
+    -fx-translate-y: -1;
+}
+
+/* Nút Cancel */
+.button[text="Cancel"] {
+    -fx-background-color: #ffffff;
+    -fx-text-fill: #7f8c8d;
+    -fx-border-color: #bdc3c7;
+}
+
+.button[text="Cancel"]:hover {
+    -fx-background-color: #f1f2f6;
+    -fx-border-color: #95a5a6;
+}
+
+/* 7. Đường kẻ phân cách */
+.separator {
+    -fx-padding: 5 0 5 0;
 }

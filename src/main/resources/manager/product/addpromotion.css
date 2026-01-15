@@ -1,7 +1,87 @@
-/*
- * Empty Stylesheet file.
- */
-
+/* 1. Cấu trúc nền và Tiêu đề */
 .mainFxmlClass {
+    -fx-background-color: #ffffff;
+}
 
+.label {
+    -fx-font-family: "Segoe UI", Arial;
+    -fx-text-fill: #2C3E50;
+    -fx-font-size: 14px;
+}
+
+/* Tiêu đề chính "Add New Promotion" */
+#title {
+    -fx-text-fill: #1E8449; /* Màu xanh lá cho trang Add */
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
+    -fx-padding: 0 0 5 0;
+}
+
+/* 2. Định dạng các ô nhập liệu chung */
+.text-field, .text-area, .date-picker, .combo-box {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #D5DBDB;
+    -fx-border-radius: 4;
+    -fx-background-radius: 4;
+    -fx-font-size: 13px;
+}
+
+/* Hiệu ứng Highlight màu cam khi tập trung vào ô */
+.text-field:focused, .text-area:focused, .date-picker:focused, .combo-box:focused {
+    -fx-border-color: #FF9800; 
+    -fx-border-width: 1.5;
+}
+
+/* 3. Tùy chỉnh riêng cho DatePicker */
+.date-picker > .arrow-button {
+    -fx-background-color: #1E8449;
+    -fx-background-radius: 0 4 4 0;
+}
+
+.date-picker > .arrow-button > .arrow {
+    -fx-background-color: white;
+}
+
+/* 4. Tùy chỉnh riêng cho ComboBox */
+.combo-box .list-cell {
+    -fx-text-fill: #2C3E50;
+}
+
+.combo-box > .arrow-button {
+    -fx-background-color: transparent;
+}
+
+/* 5. Nút bấm (Buttons) */
+.button {
+    -fx-cursor: hand;
+    -fx-font-weight: bold;
+    -fx-padding: 8 15;
+    -fx-background-radius: 5;
+    -fx-font-family: "Segoe UI", Arial;
+}
+
+/* Nút Cancel (Màu xám nhạt) */
+.button:not([style*="background-color"]) {
+    -fx-background-color: #ECF0F1;
+    -fx-text-fill: #2C3E50;
+}
+
+.button:not([style*="background-color"]):hover {
+    -fx-background-color: #D5DBDB;
+}
+
+/* Nút Save (Xanh lá - Ghi đè inline style) */
+.button[onAction="#onSave"] {
+    -fx-background-color: #27ae60 !important;
+    -fx-text-fill: white !important;
+}
+
+.button[onAction="#onSave"]:hover {
+    -fx-background-color: #219150 !important;
+    -fx-effect: dropshadow(three-pass-box, rgba(39, 174, 96, 0.3), 10, 0, 0, 0);
+}
+
+/* 6. TextArea tinh chỉnh */
+.text-area .content {
+    -fx-background-color: #ffffff;
 }

@@ -13,10 +13,10 @@ public class SizeDAO {
 
     private final DBConnection dc = new DBConnection();
 
-    // 1. READ: Lấy danh sách tất cả Size
+    // 1. READ: Chỉ lấy danh sách các Size đang 'Active'
     public List<Size> getData() {
         List<Size> sizes = new ArrayList<>();
-        String sql = "SELECT SizeID, Type FROM Size";
+        String sql = "SELECT SizeID, Type, Status FROM Size WHERE Status = 'Active'";
 
         try (Connection conn = dc.getConnect();
              PreparedStatement ps = conn.prepareStatement(sql);
@@ -25,7 +25,8 @@ public class SizeDAO {
             while (rs.next()) {
                 Size size = new Size(
                     rs.getInt("SizeID"),
-                    rs.getString("Type")
+                    rs.getString("Type"),
+                    rs.getString("Status") // Giả định Model Size đã thêm field Status
                 );
                 sizes.add(size);
             }
@@ -36,9 +37,9 @@ public class SizeDAO {
         return sizes;
     }
 
-    // 2. CREATE: Thêm mới Size
+    // 2. CREATE: Thêm mới mặc định Status là 'Active'
     public boolean insert(Size size) {
-        String sql = "INSERT INTO Size (Type) VALUES (?)";
+        String sql = "INSERT INTO Size (Type, Status) VALUES (?, 'Active')";
         try (Connection conn = dc.getConnect();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             
@@ -52,7 +53,7 @@ public class SizeDAO {
         }
     }
 
-    // 3. UPDATE: Cập nhật Size
+    // 3. UPDATE: Cập nhật thông tin Type
     public boolean update(Size size) {
         String sql = "UPDATE Size SET Type = ? WHERE SizeID = ?";
         try (Connection conn = dc.getConnect();
@@ -69,9 +70,10 @@ public class SizeDAO {
         }
     }
 
-    // 4. DELETE: Xóa Size
+    // 4. DELETE (SOFT DELETE): Chuyển trạng thái sang 'Inactive'
     public boolean delete(int sizeID) {
-        String sql = "DELETE FROM Size WHERE SizeID = ?";
+        // Thay vì DELETE thực sự, ta UPDATE cột Status
+        String sql = "UPDATE Size SET Status = 'Inactive' WHERE SizeID = ?";
         try (Connection conn = dc.getConnect();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             
@@ -79,16 +81,16 @@ public class SizeDAO {
             return ps.executeUpdate() > 0;
             
         } catch (SQLException e) {
-            // Lưu ý: Có thể lỗi nếu SizeID đang được sử dụng ở bảng ProductSize
-            System.err.println("SQL Error when deleting size: " + e.getMessage());
+            System.err.println("SQL Error when soft deleting size: " + e.getMessage());
+            e.printStackTrace();
             return false;
         }
     }
 
-    // 5. SEARCH: Tìm kiếm theo loại Size (Type)
+    // 5. SEARCH: Tìm kiếm Type trong danh sách 'Active'
     public List<Size> searchByType(String keyword) {
         List<Size> sizes = new ArrayList<>();
-        String sql = "SELECT SizeID, Type FROM Size WHERE Type LIKE ?";
+        String sql = "SELECT SizeID, Type, Status FROM Size WHERE Type LIKE ? AND Status = 'Active'";
         
         try (Connection conn = dc.getConnect();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -98,7 +100,8 @@ public class SizeDAO {
                 while (rs.next()) {
                     sizes.add(new Size(
                         rs.getInt("SizeID"),
-                        rs.getString("Type")
+                        rs.getString("Type"),
+                        rs.getString("Status")
                     ));
                 }
             }

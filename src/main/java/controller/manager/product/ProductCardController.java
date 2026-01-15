@@ -25,9 +25,6 @@ public class ProductCardController {
     private Label lbName;
 
     @FXML
-    private Label lbCost;
-
-    @FXML
     private Label lbSelling;
 
     @FXML
@@ -35,10 +32,14 @@ public class ProductCardController {
 
     @FXML
     private Label lbStatus;
+
     @FXML
     private VBox cardProduct;
+
     private ProductSummary summary;
-    private Runnable refreshCallback; // Lưu lại lệnh làm mới
+
+    // callback used to refresh parent screen
+    private Runnable refreshCallback;
 
     public void setRefreshCallback(Runnable callback) {
         this.refreshCallback = callback;
@@ -48,39 +49,42 @@ public class ProductCardController {
         this.summary = summary;
 
         final String PLACEHOLDER_PATH = "/image/manager/coca.png";
-
         String productImagePath = "/image/manager/" + summary.getImage();
 
         InputStream stream = getClass().getResourceAsStream(productImagePath);
 
+        // fallback to placeholder
         if (stream == null) {
-            System.err.println("⚠️ CẢNH BÁO: Không tìm thấy ảnh tại: " + productImagePath + ". Dùng ảnh mặc định: " + PLACEHOLDER_PATH);
+            System.err.println("⚠️ WARNING: Image not found at: " + productImagePath + ". Using default image: " + PLACEHOLDER_PATH);
             stream = getClass().getResourceAsStream(PLACEHOLDER_PATH);
         }
 
+        // if still null → critical error
         if (stream == null) {
-            System.err.println("❌ LỖI NGHIÊM TRỌNG: Không tìm thấy cả ảnh sản phẩm và ảnh mặc định (" + PLACEHOLDER_PATH + ").");
+            System.err.println("❌ CRITICAL ERROR: Neither product image nor placeholder image could be found (" + PLACEHOLDER_PATH + ").");
             return;
         }
 
         Image image = new Image(stream);
 
         if (imgProduct == null) {
-            System.err.println("❌ LỖI FXML INJECTION: imgProduct đang là NULL.");
+            System.err.println("❌ FXML INJECTION ERROR: imgProduct is NULL.");
             return;
         }
 
         imgProduct.setImage(image);
+
+        // set labels
         lbName.setText(summary.getName());
 
-        lbCost.setText("Cost : N/A");
 
-        lbSelling.setText("Selling : " + String.format("%.2f", summary.getMinSellingPrice()) + "$");
+        lbSelling.setText("Selling: " + String.format("%.2f", summary.getMinSellingPrice()) + "$");
 
-        lbStock.setText("Stock : " + summary.getTotalStockQuantity());
+        lbStock.setText("Stock: " + summary.getTotalStockQuantity());
 
         lbStatus.setText(summary.getStatus());
 
+        // styling based on status
         if ("Active".equals(summary.getStatus())) {
             lbStatus.getStyleClass().add("status-available");
         } else {
@@ -91,7 +95,6 @@ public class ProductCardController {
     @FXML
     private void onDetail(ActionEvent event) {
         try {
-
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/manager/product/ProductDetail.fxml"));
             Parent root = loader.load();
 
@@ -102,18 +105,19 @@ public class ProductCardController {
                     refreshCallback.run();
                 }
             });
+
             Stage stage = new Stage();
             stage.setTitle("Product Detail: " + summary.getName());
             stage.setScene(new Scene(root));
 
-            // Thiết lập chế độ Modal (ngăn tương tác với cửa sổ chính khi đang mở popup)
+            // open as modal popup
             stage.initModality(Modality.APPLICATION_MODAL);
             stage.initOwner(((Node) event.getSource()).getScene().getWindow());
 
             stage.showAndWait();
 
         } catch (IOException e) {
-            System.err.println("Lỗi khi mở popup chi tiết: " + e.getMessage());
+            System.err.println("Error opening product detail popup: " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -121,11 +125,9 @@ public class ProductCardController {
     @FXML
     private void onEdit(ActionEvent event) {
         try {
-            // 1. Tải file FXML của màn hình Edit
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/manager/product/EditProduct.fxml"));
             Parent root = loader.load();
 
-            // 2. Lấy controller của màn hình Edit và truyền dữ liệu sản phẩm sang
             EditProductController editController = loader.getController();
             editController.initData(this.summary);
             editController.setOnSave(() -> {
@@ -134,19 +136,18 @@ public class ProductCardController {
                 }
             });
 
-            // 3. Tạo và hiển thị Stage mới (Cửa sổ Pop-up)
             Stage stage = new Stage();
             stage.setTitle("Edit Product: " + summary.getName());
             stage.setScene(new Scene(root));
 
-            // Thiết lập chế độ Modal để bắt người dùng xử lý xong mới quay lại màn hình chính
+            // open as modal popup
             stage.initModality(Modality.APPLICATION_MODAL);
             stage.initOwner(((Node) event.getSource()).getScene().getWindow());
 
             stage.showAndWait();
 
         } catch (IOException e) {
-            System.err.println("Lỗi khi mở form chỉnh sửa: " + e.getMessage());
+            System.err.println("Error opening edit form: " + e.getMessage());
             e.printStackTrace();
         }
     }

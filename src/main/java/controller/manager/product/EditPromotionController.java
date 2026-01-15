@@ -90,6 +90,7 @@ public class EditPromotionController implements Initializable {
             // 3. Gọi DAO cập nhật database
             if (promotionDAO.update(selectedPromotion)) {
                 showAlert(Alert.AlertType.INFORMATION, "Success", "Promotion updated successfully!");
+                promotionDAO.forceUpdateExpired();
                 closeWindow(event);
             } else {
                 showAlert(Alert.AlertType.ERROR, "Database Error", "Failed to update promotion.");

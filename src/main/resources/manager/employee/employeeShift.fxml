@@ -19,7 +19,7 @@
             <HBox alignment="CENTER_LEFT" spacing="15.0">
                <children>
                   <TextField fx:id="txtSearch" prefWidth="300.0" promptText="Search assignments by employee name..." />
-                  <Button mnemonicParsing="false" onAction="#onAdd" style="-fx-background-color: #28a745; -fx-text-fill: white; -fx-font-weight: bold;" text="+ Assign New Shift" />
+                  <Button mnemonicParsing="false" onAction="#onAdd" style="-fx-background-color: #1E8449; -fx-text-fill: white; -fx-font-weight: bold;" text="+ Assign New Shift" />
                </children>
             </HBox>
 
