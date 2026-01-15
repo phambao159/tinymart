@@ -1,6 +1,7 @@
 package controller.cashier;
 
 import dao.cashier.CashierDAO;
+import java.io.IOException;
 import model.cashier.CartItem;
 import model.cashier.Category;
 import model.cashier.Product;
@@ -18,6 +19,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import java.net.URL;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -25,7 +27,15 @@ import java.util.stream.Collectors;
 import model.cashier.Customer;
 import javafx.scene.layout.GridPane;
 import java.util.Optional;
-
+import javafx.fxml.FXMLLoader;
+import javafx.geometry.Insets;
+import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.stage.Stage;
+import model.cashier.OrderViewModel;
+import javafx.beans.property.*;
+import model.manager.employee.Employee;
 public class CashierController implements Initializable {
 
     @FXML
@@ -73,7 +83,6 @@ public class CashierController implements Initializable {
 
     private final ObservableList<CartItem> cartList = FXCollections.observableArrayList();
     private final CashierDAO cashierDAO = new CashierDAO();
-    private int currentOrderId = 123;
 
     private List<Product> allProductsMaster = new ArrayList<>();
 
@@ -84,18 +93,68 @@ public class CashierController implements Initializable {
     private Customer currentCustomer = null;
     @FXML
     private Label lblDiscount;
+    @FXML
+    private TableView<OrderViewModel> tblHistory;
+    @FXML
+    private TableColumn<OrderViewModel, Integer> colHistId;
+    @FXML
+    private TableColumn<OrderViewModel, String> colHistTime;
+    @FXML
+    private TableColumn<OrderViewModel, String> colHistCashier;
+    @FXML
+    private TableColumn<OrderViewModel, String> colHistCustomer;
+    @FXML
+    private TableColumn<OrderViewModel, Double> colHistTotal;
+    @FXML
+    private TableColumn<OrderViewModel, String> colHistMethod;
+    @FXML
+    private Button btnHome;
+    @FXML
+    private Button btnHistory;
+    @FXML
+    private VBox viewSelling;
+    @FXML
+    private VBox viewHistory;
+    @FXML
+    private DatePicker dpHistoryDate;
+    @FXML
+    private TextField txtSearchHistory;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         setupTable();
+        setupHistoryTable();
         setupUI();
         loadCategories();
         loadDataFromDB("");
+        setSidebarActive(btnHome);
 
+        dpHistoryDate.valueProperty().addListener((obs, oldDate, newDate) -> {
+            filterHistory();
+        });
+
+        txtSearchHistory.textProperty().addListener((obs, oldText, newText) -> {
+            filterHistory();
+        });
         txtInputId.textProperty().addListener((obs, oldV, newV) -> loadDataFromDB(newV));
-
+        
+        if (util.User.getSession() != null) {
+            Employee emp = util.User.getSession().getEmployee();
+            
+            setEmployeeID(emp.getEmployeeID());
+            setEmployeeName(emp.getFullName());
+            
+        } else {
+            setEmployeeID(2); 
+        }
     }
 
+    private void setSidebarActive(Button activeBtn) {
+        btnHome.getStyleClass().remove("active");
+        btnHistory.getStyleClass().remove("active");
+                activeBtn.getStyleClass().add("active");
+    }
+    
     public void setEmployeeID(int id) {
         this.currentEmployeeID = id;
         loadEmployeeName();
@@ -120,7 +179,8 @@ public class CashierController implements Initializable {
     }
 
     private void setupUI() {
-        lblOrderId.setText("#" + currentOrderId);
+        int nextId = cashierDAO.getNextOrderId();
+        lblOrderId.setText("#" + nextId);
         SpinnerValueFactory<Integer> valueFactory = new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 99, 1);
         spinnerQty.setValueFactory(valueFactory);
 
@@ -131,6 +191,7 @@ public class CashierController implements Initializable {
             }
         } catch (Exception e) {
         }
+
     }
 
     public void setEmployeeName(String fullName) {
@@ -332,12 +393,12 @@ public class CashierController implements Initializable {
         tblCart.refresh();
         overlayPane.setVisible(false);
     }
-    
+
     private void resetCart() {
         cartList.clear();
         updateTotals();
-        currentOrderId++;
-        lblOrderId.setText("#" + currentOrderId);
+        int nextId = cashierDAO.getNextOrderId();
+        lblOrderId.setText("#" + nextId);
         currentCustomer = null;
         txtCustomerPhone.clear();
         boxCustomerInfo.setVisible(false);
@@ -346,42 +407,145 @@ public class CashierController implements Initializable {
 
     @FXML
     public void Payment(ActionEvent event) {
-        if (cartList.isEmpty()) return;
+        if (cartList.isEmpty()) {
+            showAlert("Empty Cart", "Please add items before payment.", Alert.AlertType.WARNING);
+            return;
+        }
 
-        double totalAmount = 0;
-        
-        for (CartItem item : cartList) {
-            totalAmount += item.getTotal();
-                        try {
-                int pId = Integer.parseInt(item.getProductId());
-                int sId = item.getSizeId();
-                int qty = item.getQuantity();
-                
-                cashierDAO.reduceStock(pId, sId, qty);
-                
-            } catch (NumberFormatException e) {
-                e.printStackTrace();
+        paymentDialogResult result = showPaymentDialog();
+        if (result == null) return;
+
+        double subTotal = 0;
+        for (CartItem item : cartList) { subTotal += item.getTotal(); }
+        double discount = 0;
+        double finalTotal = subTotal - discount;
+        Integer custId = (currentCustomer != null) ? currentCustomer.getId() : null;
+        int orderId = cashierDAO.createOrder(currentEmployeeID, custId, finalTotal, discount, result.paymentMethod, new ArrayList<>(cartList));
+
+        if (orderId != -1) {            
+            lblOrderId.setText("#" + orderId);
+            for (CartItem item : cartList) {
+                try {
+                    int pId = Integer.parseInt(item.getProductId());
+                    cashierDAO.reduceStock(pId, item.getSizeId(), item.getQuantity());
+                } catch (Exception e) {}
             }
-        }
-        // ---------------------
+            if (currentCustomer != null) {
+                int points = (int) finalTotal;
+                cashierDAO.updateCustomerPoints(currentCustomer.getId(), currentCustomer.getPoints() + points);
+            }
+            if (result.isPrintBill) {
+                printReceipt(orderId, finalTotal, result.paymentMethod, subTotal, discount);
+            } else {
+                showAlert("Success", "Transaction #" + orderId + " completed!", Alert.AlertType.INFORMATION);
+            }
+            resetCart();
+            filterHistory();
 
-        if (currentCustomer != null) {
-            int pointsEarned = (int) totalAmount;
-            int newTotalPoints = currentCustomer.getPoints() + pointsEarned;
-            cashierDAO.updateCustomerPoints(currentCustomer.getId(), newTotalPoints);
-
-            showAlert("Payment Success",
-                    "Paid: $" + String.format("%.2f", totalAmount) + "\n"
-                    + "Points Earned: " + pointsEarned + "\n"
-                    + "Inventory Updated.",
-                    Alert.AlertType.INFORMATION);
         } else {
-            showAlert("Payment Success", "Completed & Inventory updated.", Alert.AlertType.INFORMATION);
+            showAlert("Error", "Transaction failed. Could not save order.", Alert.AlertType.ERROR);
+        }
+    }
+
+    private static class paymentDialogResult {
+
+        String paymentMethod;
+        boolean isPrintBill;
+
+        public paymentDialogResult(String pm, boolean print) {
+            this.paymentMethod = pm;
+            this.isPrintBill = print;
+        }
+    }
+
+    private paymentDialogResult showPaymentDialog() {
+        Dialog<paymentDialogResult> dialog = new Dialog<>();
+        dialog.setTitle("Process Payment");
+        dialog.setHeaderText("Confirm Transaction");
+
+        ButtonType payButtonType = new ButtonType("Pay Now", ButtonBar.ButtonData.OK_DONE);
+        dialog.getDialogPane().getButtonTypes().addAll(payButtonType, ButtonType.CANCEL);
+
+        GridPane grid = new GridPane();
+        grid.setHgap(10);
+        grid.setVgap(10);
+        grid.setPadding(new Insets(20, 150, 10, 10));
+
+        ComboBox<String> cbPayment = new ComboBox<>();
+        cbPayment.getItems().addAll("Cash", "Credit Card", "E-Wallet");
+        cbPayment.getSelectionModel().selectFirst();
+
+        CheckBox chkPrint = new CheckBox("Print Receipt / Bill");
+        chkPrint.setSelected(true);
+
+        grid.add(new Label("Payment Method:"), 0, 0);
+        grid.add(cbPayment, 1, 0);
+        grid.add(chkPrint, 1, 1);
+
+        dialog.getDialogPane().setContent(grid);
+
+        dialog.setResultConverter(dialogButton -> {
+            if (dialogButton == payButtonType) {
+                return new paymentDialogResult(cbPayment.getValue(), chkPrint.isSelected());
+            }
+            return null;
+        });
+
+        Optional<paymentDialogResult> result = dialog.showAndWait();
+        return result.orElse(null);
+    }
+
+    private void printReceipt(int orderId, double total, String method, double subTotal, double discount) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Receipt Printed");
+        alert.setHeaderText("Transaction Successful");
+
+        StringBuilder bill = new StringBuilder();
+        bill.append("================================\n");
+        bill.append("          TINYMART POS          \n");
+        bill.append("================================\n");
+        bill.append(String.format("Order ID: #%d\n", orderId));
+        bill.append("Date: " + java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")) + "\n");
+        bill.append("Cashier: " + (lblWelcome.getText().replace("Welcome, ", "")) + "\n");
+        if (currentCustomer != null) {
+            bill.append("Customer: " + currentCustomer.getFullName() + "\n");
+        } else {
+            bill.append("Customer: Guest\n");
+        }
+        bill.append("--------------------------------\n");
+        bill.append(String.format("%-20s %3s %8s\n", "Item", "Qty", "Price"));
+        bill.append("--------------------------------\n");
+
+        for (CartItem item : cartList) {
+            String name = item.getProductName();
+            if (name.length() > 20) {
+                name = name.substring(0, 17) + "...";
+            }
+            bill.append(String.format("%-20s %3d %8.2f\n", name, item.getQuantity(), item.getTotal()));
         }
 
-        resetCart();
-        
-        loadDataFromDB(txtInputId.getText());
+        bill.append("--------------------------------\n");
+        bill.append(String.format("Subtotal:       %8.2f\n", subTotal));
+        bill.append(String.format("Discount:      -%8.2f\n", discount));
+        bill.append(String.format("TOTAL:          %8.2f\n", total));
+        bill.append("--------------------------------\n");
+        bill.append("Payment: " + method + "\n");
+        bill.append("================================\n");
+
+        TextArea textArea = new TextArea(bill.toString());
+        textArea.setEditable(false);
+        textArea.setWrapText(true);
+        textArea.setFont(javafx.scene.text.Font.font("Monospaced", 12));
+        textArea.setMaxWidth(Double.MAX_VALUE);
+        textArea.setMaxHeight(Double.MAX_VALUE);
+        GridPane.setVgrow(textArea, Priority.ALWAYS);
+        GridPane.setHgrow(textArea, Priority.ALWAYS);
+        GridPane expContent = new GridPane();
+        expContent.setMaxWidth(Double.MAX_VALUE);
+        expContent.add(textArea, 0, 0);
+
+        alert.getDialogPane().setContent(expContent);
+        alert.showAndWait();
     }
 
     @FXML
@@ -530,6 +694,81 @@ public class CashierController implements Initializable {
         }
     }
 
+    @FXML
+    public void logout(ActionEvent event) {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Logout");
+        alert.setHeaderText("Sign out?");
+        styleDialog(alert);
+
+        if (alert.showAndWait().get() == ButtonType.OK) {
+            try {
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/ui/login.fxml"));
+                Parent root = loader.load();
+
+                Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+                stage.setScene(new Scene(root));
+                stage.centerOnScreen();
+                stage.show();
+
+            } catch (IOException e) {
+                e.printStackTrace();
+                showAlert("Error", "Could not load Login screen.", Alert.AlertType.ERROR);
+            }
+        }
+    }
+
+    private void setupHistoryTable() {
+        colHistId.setCellValueFactory(cellData -> new SimpleObjectProperty<>(cellData.getValue().getOrderId()));
+        colHistTime.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getOrderTime()));
+        colHistCashier.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getCashierName()));
+        colHistCustomer.setCellValueFactory(cellData -> {
+            String name = cellData.getValue().getCustomerName();
+            return new SimpleStringProperty(name == null ? "Guest" : name);
+        });
+
+        colHistTotal.setCellValueFactory(cellData -> new SimpleObjectProperty<>(cellData.getValue().getTotalAmount()));
+        colHistMethod.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getPaymentMethod()));
+    }
+
+    @FXML
+    public void switchToOrder(ActionEvent event) {
+        viewHistory.setVisible(false);
+        viewHistory.setManaged(false);
+
+        viewSelling.setVisible(true);
+        viewSelling.setManaged(true);
+
+        setSidebarActive(btnHome);
+    }
+
+    @FXML
+    public void switchToHistory(ActionEvent event) {
+        viewSelling.setVisible(false);
+        viewSelling.setManaged(false);
+        
+        viewHistory.setVisible(true);
+        viewHistory.setManaged(true);
+        filterHistory();
+        
+        setSidebarActive(btnHistory);
+    }
+
+    private void filterHistory() {
+        LocalDate date = dpHistoryDate.getValue();
+        String keyword = txtSearchHistory.getText().trim();
+
+        List<OrderViewModel> list = cashierDAO.searchOrderHistory(date, keyword);
+        tblHistory.setItems(FXCollections.observableArrayList(list));
+    }
+
+    @FXML
+    public void clearHistoryFilter(ActionEvent event) {
+        dpHistoryDate.setValue(null);
+        txtSearchHistory.clear();
+        filterHistory();
+    }
+
     private void showAlert(String title, String content, Alert.AlertType type) {
         Alert al = new Alert(type);
         al.setTitle(title);
@@ -539,4 +778,5 @@ public class CashierController implements Initializable {
 
         al.showAndWait();
     }
+
 }

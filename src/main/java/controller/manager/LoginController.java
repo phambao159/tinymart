@@ -56,6 +56,7 @@ public class LoginController implements Initializable {
             Employee employee = employeeDAO.authenticate(username, pwd);
 
             if (employee != null) {
+                util.User.setSession(employee);
                 if(employee.getRole().toLowerCase().equals("manager")){
                     App.setRoot("manager","layout"); 
                 } else if (employee.getRole().toLowerCase().equals("cashier")){
