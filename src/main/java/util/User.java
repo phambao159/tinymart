@@ -5,13 +5,18 @@ import model.manager.employee.Employee;
 public final class User {
 
     private static User instance;
-    private Employee employee; 
+    private Employee employee;
+
     private User(Employee employee) {
         this.employee = employee;
     }
 
     public static void setSession(Employee employee) {
-        instance = new User(employee);
+        if (employee == null) {
+            instance = null;
+        } else {
+            instance = new User(employee);
+        }
     }
 
     public static User getSession() {
