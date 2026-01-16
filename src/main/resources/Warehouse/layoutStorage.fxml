@@ -44,7 +44,7 @@
                 </HBox>
                 <HBox alignment="CENTER" prefHeight="60.0" prefWidth="169.0">
                     <children>
-                        <ToggleButton mnemonicParsing="false" onAction="#onDashboard" prefHeight="40.0" prefWidth="175.0" selected="true" text="Storage">
+                        <ToggleButton mnemonicParsing="false" onAction="#onStorage" prefHeight="40.0" prefWidth="175.0" selected="true" text="Storage">
                             <toggleGroup>
                                 <ToggleGroup fx:id="toggleMenu" />
                             </toggleGroup>
@@ -58,7 +58,7 @@
                 </HBox>
                 <HBox alignment="CENTER" prefHeight="60.0" prefWidth="168.0">
                     <children>
-                        <ToggleButton mnemonicParsing="false" onAction="#onNotifi" prefHeight="40.0" prefWidth="171.0" text="Notification" toggleGroup="$toggleMenu" />
+                        <ToggleButton fx:id="lbNoti" mnemonicParsing="false" onAction="#onNotifi" prefHeight="40.0" prefWidth="171.0" text="Notification" toggleGroup="$toggleMenu" />
                     </children>
                 </HBox>
                 <HBox alignment="CENTER" prefHeight="60.0" prefWidth="168.0">

@@ -1,0 +1,69 @@
+/*
+Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+Click nbfs://nbhost/SystemFileSystem/Templates/Other/CascadeStyleSheet.css to edit this template
+*/
+/* 
+    Created on : 15 Jan 2026, 2:26:06 pm
+    Author     : ASUS
+*/
+/* Toàn bộ nền và font */
+#root {
+    -fx-background-image: url("background.png");     /* đường dẫn ảnh */
+    -fx-background-size: cover;                      /* phủ toàn bộ khung */
+    -fx-background-repeat: no-repeat;                /* không lặp lại */
+    -fx-background-position: center center;          /* căn giữa */
+    -fx-padding: 0;                                   /* xóa viền mặc định */
+}
+
+/* Thanh tìm kiếm */
+.hbox {
+    -fx-padding: 10;
+    -fx-background-color: #ffffff;
+    -fx-border-color: #dddddd;
+    -fx-border-width: 0 0 1 0;
+}
+
+
+/* Label */
+.label {
+    -fx-text-fill: white;          /* chữ màu trắng */
+    -fx-font-weight: bold;
+    -fx-font-size: 16px;           /* tăng size chữ */
+}
+.card-label {
+    -fx-text-fill: #333333;
+    -fx-font-size: 14px;
+}
+
+.card-label-status {
+    -fx-text-fill: green;
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+}
+/* TextField */
+.text-field {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #cccccc;
+    -fx-border-radius: 3;
+    -fx-padding: 5;
+}
+
+/* Nút Search */
+.button {
+    -fx-background-color: #FF9800;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-background-radius: 12;   /* tăng từ 4 → 12 để bo tròn hơn */
+    -fx-border-radius: 12;
+    -fx-padding: 6 12 6 12;
+}
+
+/* Hover effect for buttons */
+.button:hover {
+    -fx-background-color: #FB8C00;
+}
+
+/* FlowPane chứa sản phẩm */
+.flow-pane {
+    -fx-padding: 20;
+}

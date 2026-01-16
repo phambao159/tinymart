@@ -13,6 +13,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
@@ -38,23 +39,41 @@ public class LayoutWareHouseController implements Initializable {
     @FXML
     private ToggleButton lbNoti;
 
-    NotificationDAO nDAO = new NotificationDAO();
+    private static LayoutWareHouseController instance;
+
+    private final NotificationDAO nDAO = new NotificationDAO();
+
+    public LayoutWareHouseController() {
+        instance = this;
+    }
+
+    public static LayoutWareHouseController getInstance() {
+        return instance;
+    }
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         // Mặc định load Import.fxml
-        loadView("/Warehouse/Import.fxml");
+        loadView("/Warehouse/Inventory.fxml");
+
+        // Cập nhật số lượng thông báo chưa đọc
+        updateNotificationCount();
+    }
+//số của Notification
+
+    private void updateNotificationCount() {
         try {
             int count = nDAO.countNoti("unread");
             lbNoti.setText(String.format("Notification (%d)", count));
         } catch (Exception e) {
+            lbNoti.setText("Notification");
             e.printStackTrace();
         }
     }
 
     @FXML
-    private void onDashboard(ActionEvent event) {
-        loadView("/manager/report/layout.fxml");
+    private void onStorage(ActionEvent event) {
+        loadView("/Warehouse/Inventory.fxml");
     }
 
     @FXML
@@ -64,7 +83,7 @@ public class LayoutWareHouseController implements Initializable {
 
     @FXML
     private void onNotifi(ActionEvent event) {
-        loadView("/Warehouse/Notification.fxml");
+        openNotificationView();
     }
 
     @FXML
@@ -72,13 +91,17 @@ public class LayoutWareHouseController implements Initializable {
         App.setRoot("ui", "login");
     }
 
-    private void loadView(String fxmlPath) {
+    public void openNotificationView() {
+        lbNoti.setSelected(true); // chọn nút Notification
+        loadView("/Warehouse/Notification.fxml");
+    }
+
+    public void loadView(String fxmlPath) {
         try {
             view.getChildren().clear();
             FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
             Node node = loader.load();
 
-            // Ép kích thước nếu node là Region (AnchorPane, BorderPane, VBox…)
             if (node instanceof Region) {
                 Region region = (Region) node;
                 region.prefWidthProperty().bind(view.widthProperty());
