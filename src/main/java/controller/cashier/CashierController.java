@@ -6,6 +6,8 @@ import model.cashier.CartItem;
 import model.cashier.Category;
 import model.cashier.Product;
 import model.cashier.ProductSizeInfo;
+import model.manager.employee.Employee;
+import dao.cashier.EmployeeShiftDAO;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -35,7 +37,7 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 import model.cashier.OrderViewModel;
 import javafx.beans.property.*;
-import model.manager.employee.Employee;
+
 public class CashierController implements Initializable {
 
     @FXML
@@ -84,7 +86,7 @@ public class CashierController implements Initializable {
     private final ObservableList<CartItem> cartList = FXCollections.observableArrayList();
     private final CashierDAO cashierDAO = new CashierDAO();
 
-    private List<Product> allProductsMaster = new ArrayList<>();
+    private List<Product> allProducts = new ArrayList<>();
 
     private Product selectedProductTemp;
     private ProductSizeInfo selectedSizeTemp;
@@ -120,6 +122,30 @@ public class CashierController implements Initializable {
     @FXML
     private TextField txtSearchHistory;
 
+    @FXML
+    private Button btnCheckIn;
+    @FXML
+    private Button btnCheckOut;
+    @FXML
+    private Label lblShift;
+
+    @FXML
+    private TableView<CartItem> tblOrderDetail;
+
+    @FXML
+    private TableColumn<CartItem, String> colDetailItem;
+
+    @FXML
+    private TableColumn<CartItem, Integer> colDetailQty;
+
+    @FXML
+    private TableColumn<CartItem, Double> colDetailTotal;
+
+    private final dao.cashier.EmployeeShiftDAO shiftDAO = new dao.cashier.EmployeeShiftDAO();
+    private double currentSessionSales = 0.0;
+    private int currentShiftID = 1;
+    private boolean isUpdatingHistory = false;
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         setupTable();
@@ -130,31 +156,42 @@ public class CashierController implements Initializable {
         setSidebarActive(btnHome);
 
         dpHistoryDate.valueProperty().addListener((obs, oldDate, newDate) -> {
-            filterHistory();
-        });
+        if (!isUpdatingHistory) filterHistory();
+    });
+
+    txtSearchHistory.textProperty().addListener((obs, oldText, newText) -> {
+        if (!isUpdatingHistory) filterHistory();
+    });
 
         txtSearchHistory.textProperty().addListener((obs, oldText, newText) -> {
             filterHistory();
         });
         txtInputId.textProperty().addListener((obs, oldV, newV) -> loadDataFromDB(newV));
-        
+
         if (util.User.getSession() != null) {
             Employee emp = util.User.getSession().getEmployee();
-            
+
             setEmployeeID(emp.getEmployeeID());
             setEmployeeName(emp.getFullName());
-            
+
         } else {
-            setEmployeeID(2); 
+            setEmployeeID(2);
         }
+        setupShiftStatus();
+        tblHistory.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
+            if (newSelection != null) {
+                loadHistoryDetails(newSelection);
+            }
+        });
+
     }
 
     private void setSidebarActive(Button activeBtn) {
         btnHome.getStyleClass().remove("active");
         btnHistory.getStyleClass().remove("active");
-                activeBtn.getStyleClass().add("active");
+        activeBtn.getStyleClass().add("active");
     }
-    
+
     public void setEmployeeID(int id) {
         this.currentEmployeeID = id;
         loadEmployeeName();
@@ -213,7 +250,7 @@ public class CashierController implements Initializable {
         btnAll.setMinWidth(Region.USE_PREF_SIZE);
         btnAll.setOnAction(e -> {
             setActiveCategory(btnAll);
-            renderProductGrid(allProductsMaster);
+            renderProductGrid(allProducts);
         });
         categoryContainer.getChildren().add(btnAll);
 
@@ -236,7 +273,7 @@ public class CashierController implements Initializable {
     }
 
     private void filterProductsByCategory(int categoryId) {
-        List<Product> filtered = allProductsMaster.stream()
+        List<Product> filtered = allProducts.stream()
                 .filter(p -> p.getCategoryId() == categoryId)
                 .collect(Collectors.toList());
         renderProductGrid(filtered);
@@ -247,7 +284,7 @@ public class CashierController implements Initializable {
 
         if (keyword == null || keyword.isEmpty()) {
             products = cashierDAO.getAllProducts();
-            this.allProductsMaster = new ArrayList<>(products);
+            this.allProducts = new ArrayList<>(products);
         } else {
             products = cashierDAO.searchProducts(keyword);
         }
@@ -413,22 +450,28 @@ public class CashierController implements Initializable {
         }
 
         paymentDialogResult result = showPaymentDialog();
-        if (result == null) return;
+        if (result == null) {
+            return;
+        }
 
         double subTotal = 0;
-        for (CartItem item : cartList) { subTotal += item.getTotal(); }
+        for (CartItem item : cartList) {
+            subTotal += item.getTotal();
+        }
         double discount = 0;
         double finalTotal = subTotal - discount;
         Integer custId = (currentCustomer != null) ? currentCustomer.getId() : null;
         int orderId = cashierDAO.createOrder(currentEmployeeID, custId, finalTotal, discount, result.paymentMethod, new ArrayList<>(cartList));
 
-        if (orderId != -1) {            
+        if (orderId != -1) {
             lblOrderId.setText("#" + orderId);
+            currentSessionSales += finalTotal;
             for (CartItem item : cartList) {
                 try {
                     int pId = Integer.parseInt(item.getProductId());
                     cashierDAO.reduceStock(pId, item.getSizeId(), item.getQuantity());
-                } catch (Exception e) {}
+                } catch (Exception e) {
+                }
             }
             if (currentCustomer != null) {
                 int points = (int) finalTotal;
@@ -440,7 +483,15 @@ public class CashierController implements Initializable {
                 showAlert("Success", "Transaction #" + orderId + " completed!", Alert.AlertType.INFORMATION);
             }
             resetCart();
+            isUpdatingHistory = true;
+            dpHistoryDate.setValue(null);
+            txtSearchHistory.clear();
+            isUpdatingHistory = false;
             filterHistory();
+            if (!tblHistory.getItems().isEmpty()) {
+                tblHistory.getSelectionModel().selectFirst();
+                tblHistory.scrollTo(0);
+            }
 
         } else {
             showAlert("Error", "Transaction failed. Could not save order.", Alert.AlertType.ERROR);
@@ -559,12 +610,60 @@ public class CashierController implements Initializable {
 
     @FXML
     public void CheckIn(ActionEvent event) {
-        showAlert("Check-in", "Shift started successfully.", Alert.AlertType.INFORMATION);
+        TextInputDialog dialog = new TextInputDialog("0");
+        dialog.setTitle("Start Shift");
+        dialog.setHeaderText("Start your shift");
+        dialog.setContentText("Enter Start Cash:");
+
+        dialog.getDialogPane().getStylesheets().add(getClass().getResource("/cashier/cashier.css").toExternalForm());
+
+        Optional<String> result = dialog.showAndWait();
+        if (result.isPresent()) {
+            try {
+                double startCash = Double.parseDouble(result.get());
+                int empId = currentEmployeeID;
+
+                if (shiftDAO.checkIn(empId, currentShiftID, startCash)) {
+                    showAlert("Success", "Check-in successful!", Alert.AlertType.INFORMATION);
+
+                    btnCheckIn.setDisable(true);
+                    btnCheckIn.setText("Checked In");
+                    btnCheckOut.setDisable(false);
+                    currentSessionSales = 0.0;
+                } else {
+                    showAlert("Error", "Check-in failed (You might have already checked in).", Alert.AlertType.ERROR);
+                }
+            } catch (NumberFormatException e) {
+                showAlert("Invalid Input", "Please enter a valid number.", Alert.AlertType.ERROR);
+            }
+        }
     }
 
     @FXML
     public void ShiftEnd(ActionEvent event) {
-        showAlert("Check-out", "Confirm end of shift?", Alert.AlertType.CONFIRMATION);
+        TextInputDialog dialog = new TextInputDialog("0");
+        dialog.setTitle("End Shift");
+        dialog.setHeaderText("Session Sales: " + String.format("$%.2f", currentSessionSales));
+        dialog.setContentText("End Cash:");
+
+        dialog.getDialogPane().getStylesheets().add(getClass().getResource("/cashier/cashier.css").toExternalForm());
+
+        Optional<String> result = dialog.showAndWait();
+        if (result.isPresent()) {
+            try {
+                double endCash = Double.parseDouble(result.get());
+                int empId = currentEmployeeID;
+
+                if (shiftDAO.checkOut(empId, currentShiftID, currentSessionSales, endCash)) {
+                    showAlert("Shift Ended", "Shift ended successfully. See you next time!", Alert.AlertType.INFORMATION);
+                    logout(event);
+                } else {
+                    showAlert("Error", "Check-out failed.", Alert.AlertType.ERROR);
+                }
+            } catch (NumberFormatException e) {
+                showAlert("Invalid Input", "Please enter a valid number.", Alert.AlertType.ERROR);
+            }
+        }
     }
 
     private void updateTotals() {
@@ -702,15 +801,11 @@ public class CashierController implements Initializable {
         styleDialog(alert);
 
         if (alert.showAndWait().get() == ButtonType.OK) {
+            if (util.User.getSession() != null) {
+                util.User.setSession(null);
+            }
             try {
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("/ui/login.fxml"));
-                Parent root = loader.load();
-
-                Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-                stage.setScene(new Scene(root));
-                stage.centerOnScreen();
-                stage.show();
-
+                main.App.setRoot("ui", "login");
             } catch (IOException e) {
                 e.printStackTrace();
                 showAlert("Error", "Could not load Login screen.", Alert.AlertType.ERROR);
@@ -726,9 +821,13 @@ public class CashierController implements Initializable {
             String name = cellData.getValue().getCustomerName();
             return new SimpleStringProperty(name == null ? "Guest" : name);
         });
-
-        colHistTotal.setCellValueFactory(cellData -> new SimpleObjectProperty<>(cellData.getValue().getTotalAmount()));
-        colHistMethod.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getPaymentMethod()));
+        colHistTotal.setVisible(false);
+        colHistMethod.setVisible(false);
+        if (tblOrderDetail != null) {
+            colDetailItem.setCellValueFactory(new PropertyValueFactory<>("productName"));
+            colDetailQty.setCellValueFactory(new PropertyValueFactory<>("quantity"));
+            colDetailTotal.setCellValueFactory(new PropertyValueFactory<>("total"));
+        }
     }
 
     @FXML
@@ -740,18 +839,22 @@ public class CashierController implements Initializable {
         viewSelling.setManaged(true);
 
         setSidebarActive(btnHome);
+        resetCart();
     }
 
     @FXML
     public void switchToHistory(ActionEvent event) {
         viewSelling.setVisible(false);
         viewSelling.setManaged(false);
-        
+
         viewHistory.setVisible(true);
         viewHistory.setManaged(true);
         filterHistory();
-        
+
         setSidebarActive(btnHistory);
+        cartList.clear();
+        lblOrderId.setText("#Select Order");
+        lblGrandTotal.setText("$0.00");
     }
 
     private void filterHistory() {
@@ -779,4 +882,43 @@ public class CashierController implements Initializable {
         al.showAndWait();
     }
 
+    private void setupShiftStatus() {
+        currentShiftID = shiftDAO.getCurrentShiftID();
+        lblShift.setText("Shift: " + (currentShiftID == 1 ? "Morning" : "Afternoon"));
+        int empId = currentEmployeeID;
+        if (empId != 0 && shiftDAO.isCheckedIn(empId, currentShiftID)) {
+            btnCheckIn.setDisable(true);
+            btnCheckIn.setText("Checked In");
+            btnCheckOut.setDisable(false);
+        } else {
+            btnCheckIn.setDisable(false);
+            btnCheckOut.setDisable(true);
+        }
+    }
+
+    private void loadHistoryDetails(OrderViewModel order) {
+    lblOrderId.setText("#" + order.getOrderId());
+    boxCustomerInfo.setVisible(true);
+    boxCustomerInfo.setManaged(true);
+    
+    String custName = order.getCustomerName() == null ? "Guest" : order.getCustomerName();
+    lblCustomerName.setText("Name: " + custName);
+    
+    if (order.getCustomerPhone() != null && !order.getCustomerPhone().isEmpty()) {
+        txtCustomerPhone.setText(order.getCustomerPhone());
+        lblCustomerPoints.setText("Points: -");
+    } else {
+        txtCustomerPhone.setText("Guest / No Phone");
+        lblCustomerPoints.setText("");
+    }
+
+    List<CartItem> details = cashierDAO.getOrderDetails(order.getOrderId());    
+    cartList.clear();
+    cartList.addAll(details);
+    lblSubTotal.setText(String.format("$%.2f", order.getTotalAmount())); 
+    lblGrandTotal.setText(String.format("$%.2f", order.getTotalAmount()));
+    lblDiscount.setText("0"); 
+    
+    tblCart.refresh();
+}
 }
