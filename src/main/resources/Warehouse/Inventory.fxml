@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.geometry.Insets?>
+
+<BorderPane fx:id="root" xmlns:fx="http://javafx.com/fxml" fx:controller="controller.Warehouse.InventoryController" stylesheets="@Inventory.css">
+
+    <!-- Thanh tìm kiếm -->
+    <top>
+        <HBox spacing="10">
+            <padding>
+                <Insets top="10" right="10" bottom="10" left="10"/>
+            </padding>
+            <Label text="Search by Name:"/>
+            <TextField fx:id="searchNameField" promptText="Enter product name..."/>
+            <Label text="ShelfQuantity Range:"/>
+            <TextField fx:id="minQuantityField" promptText="Min"/>
+            <TextField fx:id="maxQuantityField" promptText="Max"/>
+            <Button text="Search" onAction="#onSearch"/>
+        </HBox>
+    </top>
+
+    <!-- Grid sản phẩm -->
+    <center>
+        <ScrollPane fitToWidth="true">
+            <content>
+                <FlowPane fx:id="productGrid" hgap="20" vgap="20">
+                    <padding>
+                        <Insets top="20" right="20" bottom="20" left="20"/>
+                    </padding>
+                </FlowPane>
+            </content>
+        </ScrollPane>
+    </center>
+
+</BorderPane>

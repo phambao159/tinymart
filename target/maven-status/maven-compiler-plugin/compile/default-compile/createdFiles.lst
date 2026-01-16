@@ -14,6 +14,7 @@ model\Warehouse\Notification.class
 controller\manager\notification\NotificationController.class
 controller\manager\supplier\EditImportController$3.class
 model\cashier\ProductSizeInfo.class
+model\Warehouse\InventoryItemCard.class
 model\cashier\Category.class
 controller\manager\employee\AddEmployeeShiftController$2.class
 controller\manager\product\EditProductController.class
@@ -37,6 +38,7 @@ controller\cashier\CashierController.class
 controller\manager\product\EditSizeController.class
 controller\manager\supplier\EditImportController$4.class
 dao\manager\product\ProductDAO.class
+controller\Warehouse\InventoryItemCardController.class
 model\manager\order\Order.class
 controller\manager\employee\AddEmployeeShiftController$1.class
 model\Warehouse\ImportDetail.class
@@ -92,9 +94,11 @@ dao\manager\order\OrderDetailDAO.class
 controller\manager\employee\EditEmployeeShiftController$1.class
 model\manager\product\Size.class
 controller\Warehouse\ImportDetailController$1.class
+dao\Warehouse\InventoryDAO.class
 controller\manager\customer\AddCustomerController.class
 controller\manager\report\CardOrderController.class
 controller\manager\supplier\EditImportDetailController.class
+dao\Warehouse\InventoryItemCardDAO.class
 controller\manager\supplier\AddImportController$1.class
 dao\manager\employee\EmployeeDAO.class
 controller\manager\product\ProductdetailController.class
@@ -102,6 +106,7 @@ controller\Warehouse\ImportController$1.class
 controller\manager\supplier\ImportController$1.class
 controller\manager\employee\EditEmployeeController.class
 model\manager\supplier\Supplier.class
+controller\Warehouse\InventoryController.class
 controller\manager\supplier\AddImportDetailController.class
 model\manager\supplier\ImportDetail.class
 controller\manager\supplier\ProductCardController.class
@@ -123,6 +128,7 @@ controller\manager\supplier\ImportController$5.class
 dao\manager\report\ReportDAO.class
 controller\manager\employee\ShiftController.class
 controller\manager\supplier\EditSupplierController.class
+model\Warehouse\Inventory.class
 controller\manager\LoginController.class
 controller\manager\supplier\AddImportController.class
 controller\manager\employee\AddEmployeeShiftController.class

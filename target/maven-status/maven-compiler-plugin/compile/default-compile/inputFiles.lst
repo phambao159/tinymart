@@ -1,4 +1,5 @@
 C:\Users\ASUS\OneDrive\Desktop\tinymart\src\main\java\dao\manager\order\OrderDetailDAO.java
+C:\Users\ASUS\OneDrive\Desktop\tinymart\src\main\java\model\Warehouse\InventoryItemCard.java
 C:\Users\ASUS\OneDrive\Desktop\tinymart\src\main\java\dao\manager\product\ProductDAO.java
 C:\Users\ASUS\OneDrive\Desktop\tinymart\src\main\java\dao\manager\supplier\ImportDetailDAO.java
 C:\Users\ASUS\OneDrive\Desktop\tinymart\src\main\java\model\manager\supplier\Supplier.java
@@ -35,6 +36,7 @@ C:\Users\ASUS\OneDrive\Desktop\tinymart\src\main\java\main\App.java
 C:\Users\ASUS\OneDrive\Desktop\tinymart\src\main\java\controller\Warehouse\ImportDetailController.java
 C:\Users\ASUS\OneDrive\Desktop\tinymart\src\main\java\dao\manager\notification\NotificationDAO.java
 C:\Users\ASUS\OneDrive\Desktop\tinymart\src\main\java\controller\manager\LayoutController.java
+C:\Users\ASUS\OneDrive\Desktop\tinymart\src\main\java\controller\Warehouse\InventoryItemCardController.java
 C:\Users\ASUS\OneDrive\Desktop\tinymart\src\main\java\controller\manager\supplier\EditSupplierController.java
 C:\Users\ASUS\OneDrive\Desktop\tinymart\src\main\java\controller\manager\employee\EditEmployeeShiftController.java
 C:\Users\ASUS\OneDrive\Desktop\tinymart\src\main\java\controller\manager\report\LayoutController.java
@@ -53,11 +55,13 @@ C:\Users\ASUS\OneDrive\Desktop\tinymart\src\main\java\controller\manager\product
 C:\Users\ASUS\OneDrive\Desktop\tinymart\src\main\java\dao\manager\product\CategoryDAO.java
 C:\Users\ASUS\OneDrive\Desktop\tinymart\src\main\java\dao\manager\product\ProductSizeDAO.java
 C:\Users\ASUS\OneDrive\Desktop\tinymart\src\main\java\controller\manager\notification\LayoutNotificationController.java
+C:\Users\ASUS\OneDrive\Desktop\tinymart\src\main\java\model\Warehouse\Inventory.java
 C:\Users\ASUS\OneDrive\Desktop\tinymart\src\main\java\controller\manager\product\ProductCardController.java
 C:\Users\ASUS\OneDrive\Desktop\tinymart\src\main\java\controller\manager\employee\EmployeeController.java
 C:\Users\ASUS\OneDrive\Desktop\tinymart\src\main\java\dao\manager\report\ReportDAO.java
 C:\Users\ASUS\OneDrive\Desktop\tinymart\src\main\java\controller\manager\LoginController.java
 C:\Users\ASUS\OneDrive\Desktop\tinymart\src\main\java\controller\manager\notification\SentNotiController.java
+C:\Users\ASUS\OneDrive\Desktop\tinymart\src\main\java\dao\Warehouse\InventoryItemCardDAO.java
 C:\Users\ASUS\OneDrive\Desktop\tinymart\src\main\java\controller\manager\employee\ShiftController.java
 C:\Users\ASUS\OneDrive\Desktop\tinymart\src\main\java\controller\manager\product\EditPromotionController.java
 C:\Users\ASUS\OneDrive\Desktop\tinymart\src\main\java\model\manager\employee\Employee.java
@@ -86,12 +90,14 @@ C:\Users\ASUS\OneDrive\Desktop\tinymart\src\main\java\controller\manager\notific
 C:\Users\ASUS\OneDrive\Desktop\tinymart\src\main\java\controller\manager\employee\EditEmployeeController.java
 C:\Users\ASUS\OneDrive\Desktop\tinymart\src\main\java\dao\manager\employee\EmployeeShiftDAO.java
 C:\Users\ASUS\OneDrive\Desktop\tinymart\src\main\java\controller\manager\customer\AddCustomerController.java
+C:\Users\ASUS\OneDrive\Desktop\tinymart\src\main\java\controller\Warehouse\InventoryController.java
 C:\Users\ASUS\OneDrive\Desktop\tinymart\src\main\java\controller\manager\supplier\EditImportController.java
 C:\Users\ASUS\OneDrive\Desktop\tinymart\src\main\java\model\manager\customer\Customer.java
 C:\Users\ASUS\OneDrive\Desktop\tinymart\src\main\java\model\manager\supplier\Import.java
 C:\Users\ASUS\OneDrive\Desktop\tinymart\src\main\java\controller\manager\report\RevenueController.java
 C:\Users\ASUS\OneDrive\Desktop\tinymart\src\main\java\controller\manager\product\SizeController.java
 C:\Users\ASUS\OneDrive\Desktop\tinymart\src\main\java\controller\manager\supplier\ProductCardController.java
+C:\Users\ASUS\OneDrive\Desktop\tinymart\src\main\java\dao\Warehouse\InventoryDAO.java
 C:\Users\ASUS\OneDrive\Desktop\tinymart\src\main\java\model\cashier\Category.java
 C:\Users\ASUS\OneDrive\Desktop\tinymart\src\main\java\controller\manager\notification\NotiCardController.java
 C:\Users\ASUS\OneDrive\Desktop\tinymart\src\main\java\controller\manager\employee\EmployeeShiftController.java

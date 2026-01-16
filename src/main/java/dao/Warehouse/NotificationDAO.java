@@ -70,7 +70,7 @@ public class NotificationDAO {
     }
 
     public void updateNotificationStatus(int notificationId, boolean isRead) {
-        String sql = "UPDATE Notifications SET isRead = ? WHERE id = ?";
+        String sql = "UPDATE Notification SET IsRead = ? WHERE NotificationID = ?";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setBoolean(1, isRead);
             ps.setInt(2, notificationId);

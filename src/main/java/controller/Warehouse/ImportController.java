@@ -5,6 +5,10 @@ import java.io.IOException;
 import model.Warehouse.Imports;
 import util.DBConnection;
 
+import javafx.scene.shape.Circle;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -39,7 +43,8 @@ public class ImportController implements Initializable {
     private TableColumn<Imports, String> colStatus;
     @FXML
     private TableColumn colIndex;
-
+    @FXML
+    private Circle notifDot;
     @FXML
     private TextField txtImportID;
     @FXML
@@ -157,5 +162,12 @@ public class ImportController implements Initializable {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    @FXML
+    private void onNotifClick() {
+        LayoutWareHouseController layout = LayoutWareHouseController.getInstance();
+        layout.openNotificationView();   // hiển thị Notification.fxml trong StackPane view
+        notifDot.setVisible(false);      // ẩn chấm đỏ sau khi mở
     }
 }
