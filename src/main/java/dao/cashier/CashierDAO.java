@@ -219,11 +219,13 @@ public class CashierDAO {
         String sql = "SELECT o.OrderID, o.OrderDateTime, "
                 + "e.FullName AS CashierName, "
                 + "COALESCE(c.FullName, 'Guest') AS CustomerName, "
+                + "COALESCE(c.PhoneNumber, '') AS PhoneNumber, "
+                + "COALESCE(c.Points, 0) AS Points, "
                 + "o.TotalAmount, o.PaymentMethod "
                 + "FROM `Order` o "
                 + "JOIN Employee e ON o.EmployeeID = e.EmployeeID "
                 + "LEFT JOIN Customer c ON o.CustomerID = c.CustomerID "
-                + "ORDER BY o.OrderDateTime DESC";
+                + "ORDER BY o.OrderID DESC";
 
         try (Connection conn = dc.getConnect(); PreparedStatement pstmt = conn.prepareStatement(sql); ResultSet rs = pstmt.executeQuery()) {
 
@@ -234,6 +236,7 @@ public class CashierDAO {
                         rs.getString("CashierName"),
                         rs.getString("CustomerName"),
                         rs.getString("PhoneNumber"),
+                        rs.getInt("Points"),
                         rs.getDouble("TotalAmount"),
                         rs.getString("PaymentMethod")
                 ));
@@ -244,62 +247,64 @@ public class CashierDAO {
         return list;
     }
 
-    // Trong file CashierDAO.java, tìm đến hàm searchOrderHistory
+    public List<OrderViewModel> searchOrderHistory(LocalDate date, String keyword) {
+        List<OrderViewModel> list = new ArrayList<>();
+        StringBuilder sql = new StringBuilder(
+                "SELECT o.OrderID, o.OrderDateTime, "
+                + "e.FullName AS CashierName, "
+                + "COALESCE(c.FullName, 'Guest') AS CustomerName, "
+                + "COALESCE(c.PhoneNumber, '') AS PhoneNumber, "
+                + "COALESCE(c.Points, 0) AS Points,"
+                + "o.TotalAmount, o.PaymentMethod "
+                + "FROM `Order` o "
+                + "JOIN Employee e ON o.EmployeeID = e.EmployeeID "
+                + "LEFT JOIN Customer c ON o.CustomerID = c.CustomerID "
+                + "WHERE 1=1 "
 
-public List<OrderViewModel> searchOrderHistory(LocalDate date, String keyword) {
-    List<OrderViewModel> list = new ArrayList<>();
-    StringBuilder sql = new StringBuilder(
-            "SELECT o.OrderID, o.OrderDateTime, "
-            + "e.FullName AS CashierName, "
-            + "COALESCE(c.FullName, 'Guest') AS CustomerName, "
-            + "COALESCE(c.PhoneNumber, '') AS PhoneNumber, " // Lấy thêm SĐT, nếu null thì để trống
-            + "o.TotalAmount, o.PaymentMethod "
-            + "FROM `Order` o "
-            + "JOIN Employee e ON o.EmployeeID = e.EmployeeID "
-            + "LEFT JOIN Customer c ON o.CustomerID = c.CustomerID "
-            + "WHERE 1=1 ");
-
-    if (date != null) {
-        sql.append(" AND DATE(o.OrderDateTime) = ? ");
-    }
-
-    if (keyword != null && !keyword.isEmpty()) {
-        sql.append(" AND (c.FullName LIKE ? OR c.PhoneNumber LIKE ?) ");
-    }
-
-    sql.append(" ORDER BY o.OrderDateTime DESC");
-
-    try (Connection conn = dc.getConnect(); PreparedStatement pstmt = conn.prepareStatement(sql.toString())) {
-        int index = 1;
+        );
 
         if (date != null) {
-            pstmt.setDate(index++, java.sql.Date.valueOf(date));
+            sql.append(" AND DATE(o.OrderDateTime) = ? ");
         }
 
         if (keyword != null && !keyword.isEmpty()) {
-            String searchPattern = "%" + keyword + "%";
-            pstmt.setString(index++, searchPattern);
-            pstmt.setString(index++, searchPattern);
+            sql.append(" AND (c.FullName LIKE ? OR c.PhoneNumber LIKE ?) ");
         }
 
-        try (ResultSet rs = pstmt.executeQuery()) {
-            while (rs.next()) {
-                list.add(new OrderViewModel(
-                        rs.getInt("OrderID"),
-                        rs.getString("OrderDateTime"),
-                        rs.getString("CashierName"),
-                        rs.getString("CustomerName"),
-                        rs.getString("PhoneNumber"),
-                        rs.getDouble("TotalAmount"),
-                        rs.getString("PaymentMethod")
-                ));
+        sql.append("ORDER BY o.OrderID DESC");
+
+        try (Connection conn = dc.getConnect(); PreparedStatement pstmt = conn.prepareStatement(sql.toString())) {
+            int index = 1;
+
+            if (date != null) {
+                pstmt.setDate(index++, java.sql.Date.valueOf(date));
             }
+
+            if (keyword != null && !keyword.isEmpty()) {
+                String searchPattern = "%" + keyword + "%";
+                pstmt.setString(index++, searchPattern);
+                pstmt.setString(index++, searchPattern);
+            }
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    list.add(new OrderViewModel(
+                            rs.getInt("OrderID"),
+                            rs.getString("OrderDateTime"),
+                            rs.getString("CashierName"),
+                            rs.getString("CustomerName"),
+                            rs.getString("PhoneNumber"),
+                            rs.getInt("Points"),
+                            rs.getDouble("TotalAmount"),
+                            rs.getString("PaymentMethod")
+                    ));
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-    } catch (Exception e) {
-        e.printStackTrace();
+        return list;
     }
-    return list;
-}
 
     public int createOrder(int employeeId, Integer customerId, double totalAmount, double discount, String paymentMethod, List<model.cashier.CartItem> cartItems) {
         int generatedOrderId = -1;

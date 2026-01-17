@@ -136,7 +136,7 @@
                                 <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
                             </columnResizePolicy>
                             <columns>
-                                <TableColumn fx:id="colHistId" maxWidth="80.0" style="-fx-alignment: CENTER;" text="ID" />
+                                <TableColumn fx:id="colHistId" maxWidth="200.0" style="-fx-alignment: CENTER;" text="ID" />
                                 <TableColumn fx:id="colHistTime" prefWidth="150.0" text="Date Time" />
                                 <TableColumn fx:id="colHistCashier" text="Cashier" /> 
                                 <TableColumn fx:id="colHistCustomer" text="Customer" />
@@ -195,7 +195,7 @@
                 <HBox spacing="10.0">
                     <children>
                         <TextField fx:id="txtCustomerPhone" promptText="Enter Phone No." styleClass="search-field" HBox.hgrow="ALWAYS" />
-                        <Button onAction="#SearchCustomer" style="-fx-background-color: #2E7D32; -fx-text-fill: white; -fx-cursor: hand;" text="🔍" />
+                        <Button fx:id="btnsearchCustomer" onAction="#SearchCustomer" style="-fx-background-color: #2E7D32; -fx-text-fill: white; -fx-cursor: hand;" text="🔍" />
                     </children>
                 </HBox>
 
@@ -225,6 +225,7 @@
                 <TableView fx:id="tblCart" VBox.vgrow="ALWAYS">
                     <columns>
                         <TableColumn fx:id="colName" editable="false" prefWidth="140.0" sortable="false" text="Item" />
+                        <TableColumn fx:id="colPrice" editable="false" prefWidth="60.0" sortable="false" style="-fx-alignment: CENTER-RIGHT;" text="Price" />
                         <TableColumn fx:id="colQty" editable="false" prefWidth="40.0" sortable="false" style="-fx-alignment: CENTER;" text="Qty" />
                         <TableColumn fx:id="colTotal" editable="false" prefWidth="90.0" sortable="false" style="-fx-alignment: CENTER-RIGHT;" text="Total" />
                     </columns>
@@ -250,8 +251,8 @@
                     </HBox>
                 </VBox>
 
-                <Button maxWidth="1.7976931348623157E308" onAction="#Payment" prefHeight="50.0" styleClass="btn-process" text="Payment" />
-                <Button maxWidth="1.7976931348623157E308" onAction="#RemoveItem" style="-fx-background-color: transparent; -fx-text-fill: red; -fx-underline: true;" text="Remove Selected" />
+                <Button fx:id="btnPaymentProcess" maxWidth="1.7976931348623157E308" onAction="#Payment" prefHeight="50.0" styleClass="btn-process" text="Payment" />
+                <Button fx:id="btnRemoveItem" maxWidth="1.7976931348623157E308" onAction="#RemoveItem" style="-fx-background-color: transparent; -fx-text-fill: red; -fx-underline: true;" text="Remove Selected" />
             
             </children>
         </VBox>
