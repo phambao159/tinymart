@@ -1,6 +1,7 @@
 package model.cashier;
 
 public class OrderViewModel {
+
     private int orderId;
     private String orderTime;
     private String cashierName;
@@ -21,12 +22,35 @@ public class OrderViewModel {
         this.paymentMethod = paymentMethod;
     }
 
-    public int getOrderId() { return orderId; }
-    public String getOrderTime() { return orderTime; }
-    public String getCashierName() { return cashierName; }
-    public String getCustomerName() { return customerName; }
-    public String getCustomerPhone() { return customerPhone; }
-    public int getCustomerPoints() { return customerPoints; }
-    public double getTotalAmount() { return totalAmount; }
-    public String getPaymentMethod() { return paymentMethod; }
+    public int getOrderId() {
+        return orderId;
+    }
+
+    public String getOrderTime() {
+        return orderTime;
+    }
+
+    public String getCashierName() {
+        return cashierName;
+    }
+
+    public String getCustomerName() {
+        return customerName;
+    }
+
+    public String getCustomerPhone() {
+        return customerPhone;
+    }
+
+    public int getCustomerPoints() {
+        return customerPoints;
+    }
+
+    public double getTotalAmount() {
+        return totalAmount;
+    }
+
+    public String getPaymentMethod() {
+        return paymentMethod;
+    }
 }

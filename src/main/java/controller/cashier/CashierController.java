@@ -333,6 +333,8 @@ public class CashierController implements Initializable {
     private void renderProductGrid(List<Product> products) {
         productGrid.getChildren().clear();
         for (Product p : products) {
+            StackPane stackContainer = new StackPane();
+
             VBox card = new VBox(10);
             card.getStyleClass().add("product-card");
             card.setPrefSize(160, 210);
@@ -353,18 +355,23 @@ public class CashierController implements Initializable {
             if (p.getTotalStock() <= 0) {
                 card.setOpacity(0.5);
                 card.setDisable(true);
-
                 Label outStockLbl = new Label("OUT OF STOCK");
                 outStockLbl.setStyle("-fx-text-fill: red; -fx-font-weight: bold;");
-
-                card.getChildren().add(outStockLbl);
+                card.getChildren().addAll(imgView, nameLbl, priceLbl, outStockLbl);
             } else {
                 card.setOnMouseClicked(e -> openOverlay(p));
+                card.getChildren().addAll(imgView, nameLbl, priceLbl);
             }
+            stackContainer.getChildren().add(card);
+            if (p.isHasPromo()) {
+                Label promoBadge = new Label("🔥 PROMO");
+                promoBadge.setStyle("-fx-background-color: #ff4757; -fx-text-fill: white; -fx-padding: 3px 8px; -fx-background-radius: 0 0 0 10; -fx-font-weight: bold; -fx-font-size: 10px;");
+                StackPane.setAlignment(promoBadge, Pos.TOP_RIGHT);
+                StackPane.setMargin(promoBadge, new Insets(5, 5, 0, 0));
 
-            card.getChildren().addAll(imgView, nameLbl, priceLbl);
-
-            productGrid.getChildren().add(card);
+                stackContainer.getChildren().add(promoBadge);
+            }
+            productGrid.getChildren().add(stackContainer);
         }
     }
 
@@ -414,7 +421,18 @@ public class CashierController implements Initializable {
                 btn.setOnAction(e -> {
                     if (btn.isSelected()) {
                         selectedSizeTemp = size;
-                        overlayPrice.setText(String.format("$%.2f (Stock: %d)", size.getPrice(), size.getStock()));
+                        
+                        String infoText = String.format("$%.2f (Stock: %d)", size.getPrice(), size.getStock());
+                        
+                        if (size.getPromoDescription() != null && !size.getPromoDescription().isEmpty()) {
+                            infoText += "\n " + size.getPromoDescription();
+                            overlayPrice.setStyle("-fx-text-fill: #e55039; -fx-font-weight: bold; -fx-text-alignment: center;");
+                        } else {
+                            overlayPrice.setStyle("-fx-text-fill: #2E7D32; -fx-font-weight: bold;");
+                        }
+
+                        overlayPrice.setText(infoText);
+
                         int maxStock = size.getStock();
                         if (maxStock > 0) {
                             spinnerQty.setDisable(false);
@@ -462,9 +480,17 @@ public class CashierController implements Initializable {
         }
 
         if (!exists) {
-            cartList.add(new CartItem(selectedProductTemp.getId(), sizeId, finalName, qty, price));
-        }
 
+            cartList.add(new CartItem(
+                    selectedProductTemp.getId(),
+                    sizeId,
+                    finalName,
+                    qty,
+                    price,
+                    selectedSizeTemp.getPromoType(),
+                    selectedSizeTemp.getPromoValue()
+            ));
+        }
         updateTotals();
         tblCart.refresh();
         overlayPane.setVisible(false);
@@ -495,15 +521,34 @@ public class CashierController implements Initializable {
         }
 
         double subTotal = 0;
+        double totalDiscount = 0;
+
         for (CartItem item : cartList) {
-            subTotal += item.getTotal();
+            double price = item.getPrice();
+            int qty = item.getQuantity();
+            double itemTotal = price * qty;
+
+            subTotal += itemTotal;
+
+            String promoType = item.getPromotionType();
+            double promoVal = item.getPromotionValue();
+
+            if (promoType != null) {
+                if ("BOGO".equalsIgnoreCase(promoType)) {
+                    int freeItems = qty / 2;
+                    totalDiscount += freeItems * price;
+                } else if (promoType.toLowerCase().contains("discount") || promoType.toLowerCase().contains("percentage")) {
+                    if (promoVal > 0) {
+                        totalDiscount += itemTotal * (promoVal / 100.0);
+                    }
+                }
+            }
         }
-        double discount = 0;
-        double finalTotal = subTotal - discount;
+
+        double finalTotal = subTotal - totalDiscount;
         Integer custId = (currentCustomer != null) ? currentCustomer.getId() : null;
 
-        int orderId = cashierDAO.createOrder(currentEmployeeID, custId, finalTotal, discount, result.paymentMethod, new ArrayList<>(cartList));
-
+        int orderId = cashierDAO.createOrder(currentEmployeeID, custId, finalTotal, totalDiscount, result.paymentMethod, new ArrayList<>(cartList));
         if (orderId != -1) {
             currentSessionSales += finalTotal;
             for (CartItem item : cartList) {
@@ -521,7 +566,7 @@ public class CashierController implements Initializable {
 
             String billContent = "";
             if (result.isPrintBill) {
-                billContent = generateBillContent(orderId, finalTotal, result.paymentMethod, subTotal, discount);
+                billContent = generateBillContent(orderId, finalTotal, result.paymentMethod, subTotal, totalDiscount);
             }
 
             isUpdatingHistory = true;
@@ -747,14 +792,36 @@ public class CashierController implements Initializable {
     }
 
     private void updateTotals() {
-        double sub = 0;
-        for (CartItem i : cartList) {
-            sub += i.getTotal();
+        double subTotal = 0;
+        double totalDiscount = 0;
+
+        for (CartItem item : cartList) {
+            double price = item.getPrice();
+            int qty = item.getQuantity();
+            double itemTotal = price * qty;
+
+            subTotal += itemTotal;
+
+            String promoType = item.getPromotionType();
+            double promoVal = item.getPromotionValue();
+
+            if (promoType != null) {
+                if ("BOGO".equalsIgnoreCase(promoType)) {
+                    int freeItems = qty / 2;
+                    totalDiscount += freeItems * price;
+                } else if (promoType.toLowerCase().contains("discount") || promoType.toLowerCase().contains("percentage")) {
+                    if (promoVal > 0) {
+                        totalDiscount += itemTotal * (promoVal / 100.0);
+                    }
+                }
+            }
         }
 
-        lblSubTotal.setText(String.format("$%.2f", sub));
-        lblGrandTotal.setText(String.format("$%.2f", sub));
+        double grandTotal = subTotal - totalDiscount;
 
+        lblSubTotal.setText(String.format("$%.2f", subTotal));
+        lblDiscount.setText(String.format("$%.2f", totalDiscount));
+        lblGrandTotal.setText(String.format("$%.2f", grandTotal));
     }
 
     @FXML

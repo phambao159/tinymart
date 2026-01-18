@@ -6,12 +6,18 @@ public class ProductSizeInfo {
     private String sizeName;
     private double price;
     private int stock;
+    private String promoType;
+    private double promoValue;
+    private String promoDescription;
 
-    public ProductSizeInfo(int sizeId, String sizeName, double price, int stock) {
+    public ProductSizeInfo(int sizeId, String sizeName, double price, int stock, String promoType, double promoValue, String promoDescription) {
         this.sizeId = sizeId;
         this.sizeName = sizeName;
         this.price = price;
         this.stock = stock;
+        this.promoType = promoType;
+        this.promoValue = promoValue;
+        this.promoDescription = promoDescription;
     }
 
     public String getSizeName() {
@@ -33,5 +39,17 @@ public class ProductSizeInfo {
     @Override
     public String toString() {
         return sizeName;
+    }
+
+    public String getPromoType() {
+        return promoType;
+    }
+
+    public double getPromoValue() {
+        return promoValue;
+    }
+
+    public String getPromoDescription() {
+        return promoDescription;
     }
 }

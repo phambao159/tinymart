@@ -25,10 +25,17 @@ public class CashierDAO {
 
         String sql = "SELECT p.ProductID, p.Name, p.Image, p.CategoryID, "
                 + "MIN(ps.SellingPrice) as Price, "
-                + "COALESCE(SUM(id.ShelfQuantity), 0) as TotalStock "
+                + "COALESCE(SUM(id.ShelfQuantity), 0) as TotalStock, "
+                + "MAX(CASE "
+                + "WHEN promo.PromotionID IS NOT NULL "
+                + "AND promo.Status = 'Active' "
+                + "AND CURDATE() BETWEEN promo.StartDate AND promo.EndDate "
+                + "THEN 1 ELSE 0 "
+                + "END) as HasPromo "
                 + "FROM product p "
                 + "JOIN productsize ps ON p.ProductID = ps.ProductID "
                 + "LEFT JOIN ImportDetail id ON ps.ProductSizeID = id.ProductSizeID "
+                + "LEFT JOIN Promotion promo ON ps.PromotionID = promo.PromotionID "
                 + "WHERE p.Status = 'Active' "
                 + "AND (p.Name LIKE ? OR p.ProductID LIKE ?) "
                 + "GROUP BY p.ProductID, p.Name, p.Image, p.CategoryID";
@@ -41,14 +48,17 @@ public class CashierDAO {
 
             ResultSet rs = pstmt.executeQuery();
             while (rs.next()) {
-                list.add(new Product(
+                Product p = new Product(
                         String.valueOf(rs.getInt("ProductID")),
                         rs.getString("Name"),
                         rs.getDouble("Price"),
                         rs.getString("Image"),
                         rs.getInt("CategoryID"),
                         rs.getInt("TotalStock")
-                ));
+                );
+                p.setHasPromo(rs.getInt("HasPromo") == 1);
+
+                list.add(p);
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -60,13 +70,16 @@ public class CashierDAO {
         List<ProductSizeInfo> list = new ArrayList<>();
 
         String sql = "SELECT ps.SizeID, s.Type, ps.SellingPrice, "
-                + "COALESCE(SUM(id.ShelfQuantity), 0) as CurrentStock "
+                + "COALESCE(SUM(id.ShelfQuantity), 0) as CurrentStock, "
+                + "p.Type as PromoType, p.Value as PromoValue, p.Description as PromoDesc "
                 + "FROM productsize ps "
                 + "JOIN size s ON ps.SizeID = s.SizeID "
                 + "LEFT JOIN ImportDetail id ON ps.ProductSizeID = id.ProductSizeID "
+                + "LEFT JOIN Promotion p ON ps.PromotionID = p.PromotionID "
+                + "AND p.Status = 'Active' "
+                + "AND CURDATE() BETWEEN p.StartDate AND p.EndDate "
                 + "WHERE ps.ProductID = ? "
-                + "GROUP BY ps.SizeID, s.Type, ps.SellingPrice";
-
+                + "GROUP BY ps.SizeID, s.Type, ps.SellingPrice, p.Type, p.Value, p.Description";
         try (Connection conn = dc.getConnect(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, productId);
             ResultSet rs = pstmt.executeQuery();
@@ -75,7 +88,10 @@ public class CashierDAO {
                         rs.getInt("SizeID"),
                         rs.getString("Type"),
                         rs.getDouble("SellingPrice"),
-                        rs.getInt("CurrentStock")
+                        rs.getInt("CurrentStock"),
+                        rs.getString("PromoType"),
+                        rs.getDouble("PromoValue"),
+                        rs.getString("PromoDesc")
                 ));
             }
         } catch (Exception e) {
@@ -260,7 +276,6 @@ public class CashierDAO {
                 + "JOIN Employee e ON o.EmployeeID = e.EmployeeID "
                 + "LEFT JOIN Customer c ON o.CustomerID = c.CustomerID "
                 + "WHERE 1=1 "
-
         );
 
         if (date != null) {
@@ -434,12 +449,15 @@ public class CashierDAO {
 
             while (rs.next()) {
                 String fullName = rs.getString("Name") + " (" + rs.getString("Type") + ")";
+
                 list.add(new model.cashier.CartItem(
                         String.valueOf(rs.getInt("ProductID")),
                         0,
                         fullName,
                         rs.getInt("Quantity"),
-                        rs.getDouble("SellingPrice")
+                        rs.getDouble("SellingPrice"),
+                        null,
+                        0.0
                 ));
             }
         } catch (Exception e) {

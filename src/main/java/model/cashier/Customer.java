@@ -3,6 +3,7 @@ package model.cashier;
 import java.sql.Date;
 
 public class Customer {
+
     private int id;
     private String fullName;
     private String phoneNumber;
@@ -26,10 +27,27 @@ public class Customer {
         this.points = 0;
     }
 
-    public int getId() { return id; }
-    public String getFullName() { return fullName; }
-    public String getPhoneNumber() { return phoneNumber; }
-    public int getPoints() { return points; }
-    public void setPoints(int points) { this.points = points; }
-    public String getEmail() { return email; }
+    public int getId() {
+        return id;
+    }
+
+    public String getFullName() {
+        return fullName;
+    }
+
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public int getPoints() {
+        return points;
+    }
+
+    public void setPoints(int points) {
+        this.points = points;
+    }
+
+    public String getEmail() {
+        return email;
+    }
 }
