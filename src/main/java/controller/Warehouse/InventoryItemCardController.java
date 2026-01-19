@@ -35,7 +35,7 @@ public class InventoryItemCardController {
         sizeType.setText(item.getSizeType());
         inboundQuantity.setText("Inbound: " + item.getInboundQuantity());
         outboundQuantity.setText("Outbound: " + item.getOutboundQuantity());
-        expiryDate.setText(item.getExpiryDate() != null ? item.getExpiryDate().toString() : "N/A");
+//        expiryDate.setText(item.getExpiryDate() != null ? item.getExpiryDate().toString() : "N/A");
         status.setText(item.getStatus());
 
         // Load ảnh
