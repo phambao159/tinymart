@@ -1,17 +1,16 @@
 package controller.Warehouse;
 
+import dao.Warehouse.InventoryDAO;
+import dao.Warehouse.InventoryItemCardDAO;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.VBox;
-import javafx.scene.control.TextField;
-
-import java.io.IOException;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import dao.Warehouse.InventoryItemCardDAO;
+import model.Warehouse.Inventory;
 import model.Warehouse.InventoryItemCard;
+
+import java.util.List;
 
 public class InventoryController {
 
@@ -24,63 +23,88 @@ public class InventoryController {
     @FXML
     private TextField maxQuantityField;
 
-    private List<InventoryItemCard> allItems;
+    private InventoryDAO inventoryDAO;
+    private InventoryItemCardDAO itemCardDAO;
+
+    public InventoryController() {
+        this.inventoryDAO = new InventoryDAO();
+        this.itemCardDAO = new InventoryItemCardDAO();
+    }
 
     @FXML
     public void initialize() {
-        InventoryItemCardDAO dao = new InventoryItemCardDAO();
-        System.out.println("✅ DAO đã được khởi tạo trong Controller!");
-        allItems = dao.getAllCardItems();
-        System.out.println("✅ Rendering " + allItems.size() + " items...");
-        renderGrid(allItems); // Hiển thị sản phẩm ngay khi mở trang
+        loadConfirmedInventory();
+    }
+
+    private void loadConfirmedInventory() {
+        try {
+            Inventory inventory = inventoryDAO.getConfirmedInventory();
+            displayItems(inventory.getItems());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void displayItems(List<InventoryItemCard> items) {
+        productGrid.getChildren().clear();
+        System.out.println("Controller: Found items = " + items.size());
+
+        for (InventoryItemCard item : items) {
+            System.out.println("Controller: Loading card for " + item.getProductName());
+            try {
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/Warehouse/InventoryItemCard.fxml"));
+                VBox card = loader.load();
+
+                if (card == null) {
+                    System.out.println("Controller: card is null for " + item.getProductName());
+                    continue;
+                }
+
+                InventoryItemCardController controller = loader.getController();
+                if (controller == null) {
+                    System.out.println("Controller: controller is null for " + item.getProductName());
+                    continue;
+                }
+
+                controller.setData(item);
+                productGrid.getChildren().add(card);
+                System.out.println("Controller: card added for " + item.getProductName());
+
+            } catch (Exception e) {
+                System.out.println("Controller: Error loading card for " + item.getProductName());
+                e.printStackTrace();
+            }
+        }
+
+        System.out.println("Controller: Grid children count = " + productGrid.getChildren().size());
     }
 
     @FXML
     private void onSearch() {
-        String name = searchNameField.getText().toLowerCase();
+        System.out.println("Controller: onSearch triggered");
+        String name = (searchNameField != null) ? searchNameField.getText().trim() : "";
+        String minStr = (minQuantityField != null) ? minQuantityField.getText().trim() : "";
+        String maxStr = (maxQuantityField != null) ? maxQuantityField.getText().trim() : "";
 
-        int minQty = 0;
-        int maxQty = Integer.MAX_VALUE;
+        Integer stockMin = null, stockMax = null;
+        try {
+            if (!minStr.isEmpty()) {
+                stockMin = Integer.parseInt(minStr);
+            }
+            if (!maxStr.isEmpty()) {
+                stockMax = Integer.parseInt(maxStr);
+            }
+        } catch (NumberFormatException nfe) {
+            System.out.println("Controller: Invalid stock range input");
+        }
 
         try {
-            if (!minQuantityField.getText().isEmpty()) {
-                minQty = Integer.parseInt(minQuantityField.getText());
-            }
-            if (!maxQuantityField.getText().isEmpty()) {
-                maxQty = Integer.parseInt(maxQuantityField.getText());
-            }
-        } catch (NumberFormatException e) {
-            System.out.println("⚠️ Lỗi nhập số lượng: " + e.getMessage());
+            List<InventoryItemCard> items = itemCardDAO.searchItems(name, stockMin, stockMax);
+            System.out.println("Controller: searchItems returned " + items.size() + " items");
+            displayItems(items);
+        } catch (Exception e) {
+            System.out.println("Controller: Error in onSearch");
+            e.printStackTrace();
         }
-
-        List<InventoryItemCard> filtered = filterItems(name, minQty, maxQty);
-        renderGrid(filtered);
-    }
-
-    private List<InventoryItemCard> filterItems(String name, int minQty, int maxQty) {
-        return allItems.stream()
-                .filter(item -> item.getProductName().toLowerCase().contains(name)
-                        && item.getShelfQuantity() >= minQty
-                        && item.getShelfQuantity() <= maxQty)
-                .collect(Collectors.toList());
-    }
-
-    private void renderGrid(List<InventoryItemCard> items) {
-        productGrid.getChildren().clear();
-        for (InventoryItemCard item : items) {
-            try {
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("/Warehouse/InventoryItemCard.fxml"));
-                VBox card = loader.load();
-                InventoryItemCardController controller = loader.getController();
-                controller.setData(item);
-                productGrid.getChildren().add(card);
-                System.out.println("✅ Card added to grid: " + item.getProductName());
-            } catch (IOException e) {
-                System.out.println("❌ Card load error: " + e.getMessage());
-            }
-        }
-
-        System.out.println("📊 Rendering " + items.size() + " items...");
-        items.forEach(item -> System.out.println(item.getProductName() + " - " + item.getShelfQuantity()));
     }
 }

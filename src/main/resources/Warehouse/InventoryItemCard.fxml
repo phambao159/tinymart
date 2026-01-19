@@ -4,7 +4,9 @@
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.control.*?>
 
-<VBox xmlns:fx="http://javafx.com/fxml" fx:controller="controller.Warehouse.InventoryItemCardController"
+<VBox xmlns:fx="http://javafx.com/fxml" 
+      fx:controller="controller.Warehouse.InventoryItemCardController"
+      fx:id="cardRoot"
       spacing="5" alignment="CENTER"
       style="-fx-background-color: #f4f4f4; -fx-padding: 10; -fx-border-radius: 5; -fx-background-radius: 5;"
       prefWidth="180">
@@ -12,7 +14,11 @@
     <ImageView fx:id="productImage" fitWidth="120" fitHeight="120" preserveRatio="true"/>
     <Label fx:id="productName" styleClass="card-label"/>
     <Label fx:id="sizeType" styleClass="card-label"/>
-    <Label fx:id="shelfQuantity" styleClass="card-label"/>
+    
+    <!-- Thêm hai label riêng cho inbound và outbound -->
+    <Label fx:id="inboundQuantity" styleClass="card-label"/>
+    <Label fx:id="outboundQuantity" styleClass="card-label"/>
+    
     <Label fx:id="expiryDate" styleClass="card-label"/>
     <Label fx:id="status" styleClass="card-label-status"/>
 </VBox>

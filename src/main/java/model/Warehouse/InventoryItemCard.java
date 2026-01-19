@@ -1,43 +1,44 @@
 package model.Warehouse;
 
+import java.time.LocalDate;
+
 public class InventoryItemCard {
+    private int productSizeId;
     private String productName;
     private String sizeType;
-    private String expiryDate;
-    private int shelfQuantity;
     private String status;
-    private String imagePath;
+    private LocalDate expiryDate;
+    private int inboundQuantity;     // Tổng Quantity
+    private int outboundQuantity;    // Tổng ShelfQuantity
+    private String imageFileName;    // chỉ lưu tên file, ví dụ "coca.png"
 
-    // Constructor
-    public InventoryItemCard() {}
-
-    public InventoryItemCard(String productName, String sizeType,
-                             String expiryDate, int shelfQuantity,
-                             String status, String imagePath) {
+    public InventoryItemCard(int productSizeId, String productName, String sizeType,
+                             String status, LocalDate expiryDate,
+                             int inboundQuantity, int outboundQuantity, String imageFileName) {
+        this.productSizeId = productSizeId;
         this.productName = productName;
         this.sizeType = sizeType;
-        this.expiryDate = expiryDate;
-        this.shelfQuantity = shelfQuantity;
         this.status = status;
-        this.imagePath = imagePath;
+        this.expiryDate = expiryDate;
+        this.inboundQuantity = inboundQuantity;
+        this.outboundQuantity = outboundQuantity;
+        this.imageFileName = imageFileName;
     }
 
-    // Getter & Setter
+    
+    public int getProductSizeId() { return productSizeId; }
     public String getProductName() { return productName; }
-    public void setProductName(String productName) { this.productName = productName; }
-
     public String getSizeType() { return sizeType; }
-    public void setSizeType(String sizeType) { this.sizeType = sizeType; }
-
-    public String getExpiryDate() { return expiryDate; }
-    public void setExpiryDate(String expiryDate) { this.expiryDate = expiryDate; }
-
-    public int getShelfQuantity() { return shelfQuantity; }
-    public void setShelfQuantity(int shelfQuantity) { this.shelfQuantity = shelfQuantity; }
-
     public String getStatus() { return status; }
-    public void setStatus(String status) { this.status = status; }
+    public LocalDate getExpiryDate() { return expiryDate; }
+    public int getInboundQuantity() { return inboundQuantity; }
+    public int getOutboundQuantity() { return outboundQuantity; }
 
-    public String getImagePath() { return imagePath; }
-    public void setImagePath(String imagePath) { this.imagePath = imagePath; }
+    
+    public String getImagePath() {
+        if (imageFileName == null || imageFileName.isEmpty()) {
+            return null;
+        }
+        return "/image.manager/" + imageFileName;
+    }
 }
