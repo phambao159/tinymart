@@ -19,6 +19,6 @@
     <Label fx:id="inboundQuantity" styleClass="card-label"/>
     <Label fx:id="outboundQuantity" styleClass="card-label"/>
     
-    <Label fx:id="expiryDate" styleClass="card-label"/>
+<!--    <Label fx:id="expiryDate" styleClass="card-label"/>-->
     <Label fx:id="status" styleClass="card-label-status"/>
 </VBox>
