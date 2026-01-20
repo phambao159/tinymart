@@ -50,7 +50,6 @@
                   <TextArea fx:id="txtDescription" prefHeight="200.0" prefWidth="200.0" promptText="Enter details" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                   
                   <Label text="Type:" GridPane.rowIndex="2" />
-                  <Label text="Type:" GridPane.rowIndex="2" />
                   
                   <Label text="Value:" GridPane.rowIndex="3" />
                   <TextField fx:id="txtValue" promptText="Amount or Percentage" GridPane.columnIndex="1" GridPane.rowIndex="3" />

@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
-import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -34,10 +33,12 @@ public class SentNotiController implements Initializable {
     public void initialize(URL url, ResourceBundle rb) {
         loadSent();
         
-        // Thêm tính năng tìm kiếm ngay khi đang gõ (Real-time search) nếu muốn
-        tfSearch.textProperty().addListener((observable, oldValue, newValue) -> {
-            performSearch(newValue);
-        });
+        // Tính năng tìm kiếm real-time (khi đang gõ)
+        if (tfSearch != null) {
+            tfSearch.textProperty().addListener((observable, oldValue, newValue) -> {
+                performSearch(newValue);
+            });
+        }
     }
 
     /**
@@ -59,7 +60,6 @@ public class SentNotiController implements Initializable {
         sentContainer.getChildren().clear();
         
         if (list == null || list.isEmpty()) {
-            // Có thể thêm một Label "No messages found" vào đây
             return;
         }
 
@@ -94,7 +94,7 @@ public class SentNotiController implements Initializable {
     }
 
     /**
-     * Xử lý tìm kiếm
+     * Xử lý tìm kiếm thủ công (khi bấm nút Search)
      */
     @FXML
     private void onSearch(ActionEvent event) {
@@ -107,7 +107,7 @@ public class SentNotiController implements Initializable {
             if (keyword == null || keyword.isEmpty()) {
                 results = nDAO.getSentNoti();
             } else {
-                results = nDAO.searchsentNotification(keyword); // Đảm bảo nDAO có hàm này
+                results = nDAO.searchsentNotification(keyword); 
             }
             renderNotiCards(results);
         } catch (Exception e) {
@@ -140,7 +140,7 @@ public class SentNotiController implements Initializable {
     }
 
     /**
-     * Hàm tiện ích mở Popup
+     * Hàm tiện ích mở Popup và refresh danh sách khi đóng
      */
     private void openPopup(String fxmlPath, String title) {
         try {

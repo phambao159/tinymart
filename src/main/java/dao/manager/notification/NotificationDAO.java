@@ -45,6 +45,7 @@ public class NotificationDAO {
             pstmt.setLong(1, id);
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
+
                     return mapResultSetToNotification(rs);
                 }
             }
@@ -63,6 +64,7 @@ public class NotificationDAO {
             pstmt.setTimestamp(5, new java.sql.Timestamp(n.getSentDate().getTime()));
             pstmt.setBoolean(6, n.isIsRead());
             pstmt.executeUpdate();
+
         }
     }
 
@@ -78,6 +80,7 @@ public class NotificationDAO {
             pstmt.setBoolean(6, n.isIsRead());
             pstmt.setLong(7, n.getNotificationID());
             pstmt.executeUpdate();
+
         }
     }
 
@@ -111,7 +114,7 @@ public class NotificationDAO {
         }
         return list;
     }
-    
+
     public List<Notification> searchsentNotification(String keyword) throws Exception {
         List<Notification> list = new ArrayList<>();
         String sql = "SELECT * FROM Notification WHERE (Title LIKE ? OR Content LIKE ?) AND EmployeeID = 1 ORDER BY SentDate DESC";

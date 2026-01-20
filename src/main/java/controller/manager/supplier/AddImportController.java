@@ -200,7 +200,9 @@ public class AddImportController implements Initializable {
             employeeDAO.getData().stream().filter(e -> "Warehouse".equalsIgnoreCase(e.getRole())).collect(Collectors.toList())
         ));
         cbStatus.setItems(FXCollections.observableArrayList("Pending", "Completed", "Cancelled"));
+
         cbStatus.setValue("Pending");
+
 
         // Set hiển thị tên
         cbSupplier.setConverter(new javafx.util.StringConverter<>() {

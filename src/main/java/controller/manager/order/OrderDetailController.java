@@ -22,8 +22,8 @@ public class OrderDetailController implements Initializable {
     @FXML private Label lbDate;
     @FXML private Label lbCustomer;
     @FXML private Label lbEmployee;
-    @FXML
-    private Label lbTotal;
+    @FXML private Label lbTotal;
+    @FXML private Label lbDiscount;
 
     @FXML private TableView<OrderDetail> tbDetail;
     @FXML private TableColumn<OrderDetail, String> colProduct;
@@ -31,19 +31,19 @@ public class OrderDetailController implements Initializable {
     @FXML private TableColumn<OrderDetail, Integer> colQuantity;
     @FXML private TableColumn<OrderDetail, Double> colSubTotal;
 
-    // Sử dụng OrderDetailDAO bạn vừa cung cấp
+    // Sử dụng OrderDetailDAO cung cấp quyền truy cập dữ liệu chi tiết hóa đơn
     private final OrderDetailDAO detailDAO = new OrderDetailDAO();
-    @FXML
-    private Label lbDiscount;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         setupTableColumns();
     }
 
+    /**
+     * Cấu hình các cột cho TableView chi tiết hóa đơn
+     */
     private void setupTableColumns() {
-        // Cấu hình các cột
-        // Hiển thị kết hợp ProductName + TypeName (Size)
+        // Hiển thị kết hợp ProductName + TypeName (Ví dụ: Coca Cola (Size L))
         colProduct.setCellFactory(column -> new TableCell<OrderDetail, String>() {
             @Override
             protected void updateItem(String item, boolean empty) {
@@ -60,7 +60,7 @@ public class OrderDetailController implements Initializable {
         colPrice.setCellValueFactory(new PropertyValueFactory<>("unitPrice"));
         colQuantity.setCellValueFactory(new PropertyValueFactory<>("quantity"));
         
-        // Cột SubTotal sử dụng thuộc tính tự tính toán trong Model
+        // Cột SubTotal sử dụng thuộc tính tự tính toán trong Model OrderDetail
         colSubTotal.setCellValueFactory(new PropertyValueFactory<>("subTotal"));
 
         // Định dạng số và căn lề
@@ -70,7 +70,8 @@ public class OrderDetailController implements Initializable {
     }
 
     /**
-     * Phương thức chính để đổ dữ liệu từ trang Order sang
+     * Phương thức chính để đổ dữ liệu từ trang danh sách Order sang trang chi tiết
+     * @param order Đối tượng Order được chọn từ TableView chính
      */
     public void setData(Order order) {
         // 1. Gán dữ liệu Header từ object Order
@@ -78,14 +79,21 @@ public class OrderDetailController implements Initializable {
         lbDate.setText(order.getOrderDateTime().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")));
         lbCustomer.setText(order.getCustomerName());
         lbEmployee.setText(order.getEmployeeName());
-        lbTotal.setText(String.format("%,.2f", order.getTotalAmount()));
-        lbDiscount.setText(String.format("-%,.2f", order.getDiscountAmount()));
+        
+        // Hiển thị Tổng tiền và Giảm giá (giữ từ bản HEAD)
+        lbTotal.setText(String.format("%,.0f", order.getTotalAmount()));
+        if (lbDiscount != null) {
+            lbDiscount.setText(String.format("-%,.0f", order.getDiscountAmount()));
+        }
 
-        // 2. Gọi OrderDetailDAO để lấy danh sách món hàng
+        // 2. Gọi OrderDetailDAO để lấy danh sách các mặt hàng trong hóa đơn
         List<OrderDetail> details = detailDAO.getDetailsByOrderId(order.getOrderID());
         tbDetail.setItems(FXCollections.observableArrayList(details));
     }
 
+    /**
+     * Định dạng cột tiền tệ: Căn phải, thêm dấu phân cách hàng nghìn
+     */
     private void formatCurrencyColumn(TableColumn<OrderDetail, Double> column) {
         column.setCellFactory(tc -> new TableCell<OrderDetail, Double>() {
             @Override
@@ -94,7 +102,7 @@ public class OrderDetailController implements Initializable {
                 if (empty || price == null) {
                     setText(null);
                 } else {
-                    setText(String.format("%,.0f", price)); // Căn chỉnh không lấy số lẻ nếu là VNĐ
+                    setText(String.format("%,.0f", price)); 
                 }
             }
         });

@@ -13,22 +13,42 @@ import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import model.manager.report.Report;
 
 public class DashboardController implements Initializable {
 
+    @FXML
+    private Label revenue;
+
     // --- Các Label hiển thị con số ---
     @FXML
-    private Label revenue, subRevenue, order, subOrder, category, subCategory, customer, subCustomer;
+    private Label subRevenue, order, subOrder, category, subCategory, customer, subCustomer;
 
     // --- Các Container và UI Control ---
     @FXML
     private StackPane viewReport;
-    @FXML
-    private ToggleGroup toggleReport;
 
     private final ReportDAO reportDAO = new ReportDAO();
     private LayoutController mainController;
+    @FXML
+    private VBox cardRevenue;
+    @FXML
+    private Label lbTitleRevenue;
+    @FXML
+    private VBox cardOrder;
+    @FXML
+    private Label lbTitleOrder;
+    @FXML
+    private VBox cardCategory;
+    @FXML
+    private Label lbCategory;
+    @FXML
+    private VBox cardCustomer;
+    @FXML
+    private Label lbCustomer;
+    @FXML
+    private ToggleGroup toggleReport;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -108,11 +128,5 @@ public class DashboardController implements Initializable {
         this.mainController = main;
     }
 
-    // Nếu bạn giữ nút "See More" hoặc tương tự để nhảy sang trang Order
-    @FXML
-    private void onSeeMore(ActionEvent event) {
-        if (mainController != null) {
-            mainController.onOrder(null);
-        }
-    }
+   
 }

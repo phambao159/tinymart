@@ -2,6 +2,7 @@ package model.manager.report;
 
 public class Report {
 
+
     // Thuộc tính cũ (Dùng cho biểu đồ và Top 10)
     private String label;
     private double value;
@@ -15,11 +16,11 @@ public class Report {
     private int custPrevMonth;
     private String topCategory;
 
-    // CONSTRUCTOR 1: Dùng cho biểu đồ (Revenue Chart, Top Selling)
     public Report(String label, double value) {
         this.label = label;
         this.value = value;
     }
+
 
     // CONSTRUCTOR 2: Dùng cho Dashboard tổng quát
     public Report(double rev30, double revPrev30, int ordersToday,
@@ -41,6 +42,7 @@ public class Report {
     public double getValue() {
         return value;
     }
+
 
     // --- Getters cho Dashboard ---
     public double getRev30() {
@@ -71,3 +73,4 @@ public class Report {
         return topCategory;
     }
 }
+

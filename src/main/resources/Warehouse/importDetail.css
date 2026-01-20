@@ -1,0 +1,62 @@
+/*
+Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+Click nbfs://nbhost/SystemFileSystem/Templates/Other/CascadeStyleSheet.css to edit this template
+*/
+/* 
+    Created on : 6 Jan 2026, 3:56:21 pm
+    Author     : ASUS
+*/
+/* Nền tổng thể */
+.anchor-pane {
+    -fx-background-color: linear-gradient(to bottom right, #fdfdfd, #f0f0f0);
+}
+
+/* Tiêu đề */
+.label-title {
+    -fx-text-fill: #FF8C00; /* màu cam nổi bật */
+    -fx-font-family: "Segoe UI Semibold";
+    -fx-font-size: 26px;
+    -fx-font-weight: bold;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.4), 4, 0, 0, 2);
+}
+
+/* TextField */
+.text-field {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #cccccc;
+    -fx-border-radius: 4;
+    -fx-background-radius: 4;
+    -fx-padding: 4;
+    -fx-text-fill: #333333;
+}
+
+/* TableView */
+.table-view {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #dddddd;
+    -fx-border-radius: 4;
+    -fx-background-radius: 4;
+}
+
+.table-column {
+    -fx-alignment: CENTER;
+}
+
+/* Button Confirm */
+.button {
+    -fx-background-color: #2ecc71; /* xanh lá */
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-background-radius: 4;
+    -fx-padding: 6 12 6 12;
+}
+
+.button:hover {
+    -fx-background-color: #27ae60; /* xanh lá đậm khi hover */
+}
+.label-info {
+    -fx-text-fill: #2ecc71;          /* xanh lá cây tươi */
+    -fx-font-family: "Brush Script MT", "Lucida Handwriting", "Segoe Script", cursive; /* font nghệ thuật */
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+}

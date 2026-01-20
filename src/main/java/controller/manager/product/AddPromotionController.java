@@ -17,8 +17,6 @@ public class AddPromotionController implements Initializable {
 
     @FXML
     private TextField txtName;
-
-    private TextField txtType;
     @FXML
     private TextField txtValue;
     @FXML
@@ -27,39 +25,48 @@ public class AddPromotionController implements Initializable {
     private DatePicker dpStart, dpEnd;
     @FXML
     private ComboBox<String> cbStatus;
-
-    private final PromotionDAO dao = new PromotionDAO();
-    @FXML
-    private Label title;
     @FXML
     private ComboBox<String> cbType;
+    @FXML
+    private Label title;
+
+    private final PromotionDAO dao = new PromotionDAO();
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         cbStatus.setItems(FXCollections.observableArrayList("Active", "Inactive", "Expired"));
         cbStatus.getSelectionModel().selectFirst();
         dpStart.setValue(LocalDate.now());
-        cbType.setItems(FXCollections.observableArrayList("Fixed Discount","BOGO"));
-        
-        
+        cbType.setItems(FXCollections.observableArrayList("Fixed Discount", "BOGO"));
     }
 
     @FXML
     private void onSave(ActionEvent event) {
         try {
-            if (txtName.getText().isEmpty() || txtType.getText().isEmpty()) {
+            // Kiểm tra các trường bắt buộc (Name và Value)
+            if (txtName.getText().isEmpty() || txtValue.getText().isEmpty() || cbType.getValue() == null) {
                 showAlert("Error", "Please fill required fields!");
                 return;
             }
-            Promotion p = new Promotion(0, txtName.getText(), txtDescription.getText(),
-                    cbType.getValue(), Double.parseDouble(txtValue.getText()),
-                    dpStart.getValue(), dpEnd.getValue(), cbStatus.getValue());
+            
+            Promotion p = new Promotion(
+                    0, 
+                    txtName.getText(), 
+                    txtDescription.getText(),
+                    cbType.getValue(), 
+                    Double.parseDouble(txtValue.getText()),
+                    dpStart.getValue(), 
+                    dpEnd.getValue(), 
+                    cbStatus.getValue()
+            );
 
             if (dao.insert(p)) {
                 close(event);
             }
+        } catch (NumberFormatException e) {
+            showAlert("Error", "Value must be a valid number!");
         } catch (Exception e) {
-            showAlert("Error", "Invalid input!");
+            showAlert("Error", "An error occurred: " + e.getMessage());
         }
     }
 
@@ -73,6 +80,9 @@ public class AddPromotionController implements Initializable {
     }
 
     private void showAlert(String t, String c) {
-        new Alert(Alert.AlertType.ERROR, c).showAndWait();
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle(t);
+        alert.setContentText(c);
+        alert.showAndWait();
     }
 }

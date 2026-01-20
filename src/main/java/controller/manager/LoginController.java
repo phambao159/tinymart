@@ -31,14 +31,13 @@ public class LoginController implements Initializable {
     @FXML
     private PasswordField password; 
 
-    private EmployeeDAO employeeDAO = new EmployeeDAO();
-    
+    private EmployeeDAO employeeDAO; 
 
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-
-        
+        // Khởi tạo DAO trong hàm initialize để đảm bảo đúng vòng đời của JavaFX
+        employeeDAO = new EmployeeDAO();
     }    
 
     @FXML
@@ -53,32 +52,30 @@ public class LoginController implements Initializable {
         }
 
         try {
-
             Employee employee = employeeDAO.authenticate(username, pwd);
 
             if (employee != null) {
                 util.User.setSession(employee);
-                if(employee.getRole().toLowerCase().equals("manager")){
-                    App.setRoot("manager","layout"); 
-                } else if (employee.getRole().toLowerCase().equals("cashier")){
-                    App.setRoot("cashier","cashier");
-                }else if (employee.getRole().toLowerCase().equals("warehouse")){
-                    App.setRoot("Warehouse","layoutStorage");
+                String role = employee.getRole().toLowerCase();
+
+                // Chuyển hướng dựa trên vai trò người dùng
+                if (role.equals("manager")) {
+                    App.setRoot("manager", "layout"); 
+                } else if (role.equals("cashier")) {
+                    App.setRoot("cashier", "cashier");
+                } else if (role.equals("warehouse")) {
+                    App.setRoot("Warehouse", "layoutStorage");
                 } 
 
             } else {
-
                 showAlert("Error Login", "Username or Password is not correct.", AlertType.ERROR);
-
                 password.clear();
             }
 
         } catch (IOException e) {
-
-            showAlert("Error System", "Not found Manager Dashboard", AlertType.ERROR);
+            showAlert("Error System", "Not found Dashboard view", AlertType.ERROR);
             e.printStackTrace();
         } catch (Exception e) {
-
             showAlert("Error Database", "Cannot connect to Database!", AlertType.ERROR);
             e.printStackTrace();
         }

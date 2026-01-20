@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane id="AnchorPane" maxWidth="1.7976931348623157E308" style="-fx-background-color: white; -fx-background-radius: 10; -fx-border-color: #f0f0f0; -fx-border-radius: 10;" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.manager.report.CardOrderController">
+   <children>
+      <HBox alignment="CENTER_LEFT" spacing="15.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
+         <children>
+            <VBox spacing="5.0" HBox.hgrow="ALWAYS" minWidth="0">
+               <children>
+                  <Label fx:id="lblProductNames" text="Product A, Product B..." textOverrun="ELLIPSIS">
+                     <font>
+                        <Font name="System Bold" size="14.0" />
+                     </font>
+                  </Label>
+                  <Label fx:id="lblDateTime" text="2026-01-01 14:30:00" textFill="#797979" />
+                  <HBox spacing="10.0">
+                     <children>
+                        <Label text="Payment:" textFill="#949494" />
+                        <Label fx:id="lblPaymentMethod" style="-fx-font-weight: bold;" text="Cash" textFill="#2ecc71" />
+                     </children>
+                  </HBox>
+               </children>
+            </VBox>
+            
+            <VBox alignment="CENTER_RIGHT" minWidth="100.0" prefWidth="120.0">
+               <children>
+                  <Label fx:id="lblTotalAmount" text="\$120.00" textFill="#e74c3c">
+                     <font>
+                        <Font name="System Bold" size="18.0" />
+                     </font>
+                  </Label>
+                  <Label text="Total" textFill="#b2b2b2">
+                     <font>
+                        <Font size="10.0" />
+                     </font>
+                  </Label>
+               </children>
+            </VBox>
+         </children>
+      </HBox>
+   </children>
+</AnchorPane>

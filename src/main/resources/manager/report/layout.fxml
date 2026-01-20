@@ -110,7 +110,6 @@
                                             </toggleGroup>
                                         </ToggleButton>
                                         <ToggleButton mnemonicParsing="false" onAction="#onTop10" text="Top 10 Selling Product" toggleGroup="$toggleReport" />
-           
                                     </children>
                                 </HBox>
                                 <StackPane fx:id="viewReport" prefHeight="461.0" prefWidth="1089.0" />

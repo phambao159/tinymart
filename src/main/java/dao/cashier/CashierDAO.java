@@ -382,9 +382,17 @@ public class CashierDAO {
             generatedOrderId = -1;
         } finally {
             try {
-                if (rs != null) rs.close();
-                if (psOrder != null) psOrder.close();
-                if (psDetail != null) psDetail.close();
+
+                if (rs != null) {
+                    rs.close();
+                }
+                if (psOrder != null) {
+                    psOrder.close();
+                }
+                if (psDetail != null) {
+                    psDetail.close();
+                }
+
                 if (conn != null) {
                     conn.setAutoCommit(true);
                     conn.close();
@@ -457,4 +465,5 @@ public class CashierDAO {
         }
         return list;
     }
+
 }

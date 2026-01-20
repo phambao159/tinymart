@@ -108,7 +108,6 @@ public class RevenueController implements Initializable {
         if (data == null || data.isEmpty()) return;
 
         for (Report r : data) {
-            // Lưu ý: r.getLabel() và r.getValue() từ model Report cũ vẫn hoạt động
             series.getData().add(new XYChart.Data<>(r.getLabel(), r.getValue()));
         }
 
@@ -125,7 +124,11 @@ public class RevenueController implements Initializable {
             label.setStyle("-fx-font-weight: bold; -fx-text-fill: #e67e22; -fx-font-size: 11px;");
             label.setMouseTransparent(true);
 
-           
+            // Thêm label vào Parent của barNode
+            javafx.scene.Parent parent = barNode.getParent();
+            if (parent instanceof javafx.scene.Group) {
+                ((javafx.scene.Group) parent).getChildren().add(label);
+            }
 
             // Hàm cập nhật vị trí label
             Runnable posUpdater = () -> {

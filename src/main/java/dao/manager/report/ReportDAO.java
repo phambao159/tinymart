@@ -5,14 +5,17 @@ import util.DBConnection;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+
 import java.util.HashMap; // PHẢI CÓ DÒNG NÀY
 import java.util.Map;     // PHẢI CÓ DÒNG NÀY
+
 
 public class ReportDAO {
 
     private final DBConnection dc = new DBConnection();
 
     /**
+
      * HÀM TỔNG LỰC: Lấy tất cả thông số Dashboard bằng Map
      */
     /**
@@ -71,6 +74,7 @@ public class ReportDAO {
     }
 
     /**
+
      * Lấy Top 10 sản phẩm bán chạy
      */
     public List<Report> getTopSellingProducts(String filter) {
@@ -82,7 +86,6 @@ public class ReportDAO {
                 + "JOIN ProductSize ps ON od.ProductSizeID = ps.ProductSizeID JOIN Product p ON ps.ProductID = p.ProductID "
                 + whereClause
                 + " GROUP BY p.ProductID, p.Name ORDER BY TotalSold DESC LIMIT 10";
-
         try (Connection conn = dc.getConnect(); PreparedStatement pstmt = conn.prepareStatement(sql); ResultSet rs = pstmt.executeQuery()) {
             while (rs.next()) {
                 list.add(new Report(rs.getString("Name"), rs.getDouble("TotalSold")));
@@ -92,6 +95,7 @@ public class ReportDAO {
         }
         return list;
     }
+
 
     // --- CÁC HÀM BỔ TRỢ ---
     private String buildRevenueSql(String filter) {

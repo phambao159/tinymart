@@ -17,21 +17,22 @@
     <children>
         <VBox spacing="15.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
             <children>
-                <HBox alignment="CENTER_LEFT" prefHeight="34.0" prefWidth="850.0" spacing="10.0" style="-fx-padding-top: 50;">
+                <HBox alignment="CENTER_LEFT" prefHeight="34.0" spacing="10.0" style="-fx-padding: 10 0 0 10;">
                     <children>
                         <Label prefHeight="17.0" prefWidth="58.0" text="Period : " />
                         <ComboBox fx:id="periodyear" prefWidth="150.0" promptText="2026" />
                         <ComboBox fx:id="periodmonth" prefWidth="150.0" promptText="All" />
                     </children>
                 </HBox>
-                <HBox prefHeight="580.0" prefWidth="820.0" spacing="20.0" VBox.vgrow="ALWAYS">
+                
+                <HBox spacing="20.0" VBox.vgrow="ALWAYS">
                     <children>
-                        <BarChart fx:id="barChartRevenue" animated="false" prefHeight="569.0" prefWidth="820.0" title="Revenue by Period" HBox.hgrow="ALWAYS">
+                        <BarChart fx:id="barChartRevenue" animated="false" prefHeight="569.0" title="Revenue by Period" HBox.hgrow="ALWAYS">
                             <xAxis>
                                 <CategoryAxis label="Date" side="BOTTOM" />
                             </xAxis>
                             <yAxis>
-                                <NumberAxis label="Revenue ($)" side="LEFT" />
+                                <NumberAxis label="Revenue (VNĐ)" side="LEFT" />
                             </yAxis>
                         </BarChart>
                     </children>

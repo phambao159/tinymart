@@ -33,6 +33,7 @@ public class EditPromotionController implements Initializable {
 
     private final PromotionDAO promotionDAO = new PromotionDAO();
     private Promotion selectedPromotion;
+    
     @FXML
     private Label title;
     @FXML
@@ -42,7 +43,7 @@ public class EditPromotionController implements Initializable {
     public void initialize(URL url, ResourceBundle rb) {
         // Khởi tạo các lựa chọn cho trạng thái
         cbStatus.setItems(FXCollections.observableArrayList("Active", "Inactive", "Expired"));
-        cbType.setItems(FXCollections.observableArrayList("Fixed Discount","BOGO"));
+        cbType.setItems(FXCollections.observableArrayList("Fixed Discount", "BOGO"));
     }
 
     /**
@@ -54,7 +55,7 @@ public class EditPromotionController implements Initializable {
         txtID.setText(String.valueOf(promotion.getPromotionID()));
         txtName.setText(promotion.getName());
         txtDescription.setText(promotion.getDescription());
-        cbType.setValue(promotion.getType()); // Gán giá trị vào TextField
+        cbType.setValue(promotion.getType()); 
         txtValue.setText(String.valueOf(promotion.getValue()));
         dpStart.setValue(promotion.getStartDate());
         dpEnd.setValue(promotion.getEndDate());
@@ -71,7 +72,7 @@ public class EditPromotionController implements Initializable {
             LocalDate start = dpStart.getValue();
             LocalDate end = dpEnd.getValue();
 
-            if (name.isEmpty() || type.isEmpty() || valueStr.isEmpty() || start == null || end == null) {
+            if (name.isEmpty() || type == null || type.isEmpty() || valueStr.isEmpty() || start == null || end == null) {
                 showAlert(Alert.AlertType.ERROR, "Form Error", "Please fill in all required fields!");
                 return;
             }
