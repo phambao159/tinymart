@@ -1,0 +1,137 @@
+/* Tổng thể giao diện */
+.mainFxmlClass {
+    -fx-background-color: #f1f2f6;
+}
+
+/* Kiểu dáng cho các VBox container (trái và phải) */
+.vbox-container {
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 0);
+}
+
+/* Label tiêu đề lớn */
+.label {
+    -fx-font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Tùy chỉnh TableView */
+.table-view {
+    -fx-background-color: transparent;
+    -fx-border-color: #dcdde1;
+    -fx-border-radius: 5;
+    -fx-background-radius: 5;
+}
+
+.table-view .column-header-background {
+    -fx-background-color: #f8f9fa;
+    -fx-border-color: transparent transparent #dcdde1 transparent;
+}
+
+.table-view .column-header .label {
+    -fx-text-fill: #2f3640;
+    -fx-font-weight: bold;
+}
+
+.table-view .cell {
+    -fx-cell-size: 40;
+    -fx-alignment: center-left;
+    -fx-text-fill: #2f3640;
+}
+
+/* Hiệu ứng khi hover vào dòng trong bảng */
+.table-row-cell:hover {
+    -fx-background-color: #D1F2EB;
+}
+
+.table-row-cell:focused{
+    -fx-background-color: #D1F2EB;
+}
+
+/* Tùy chỉnh TextField tìm kiếm */
+.text-field {
+    -fx-background-radius: 20;
+    -fx-border-radius: 20;
+    -fx-border-color: #dcdde1;
+    -fx-padding: 0 15 0 15;
+    -fx-background-color: white;
+}
+
+.text-field:focused {
+    -fx-border-color: #3498db;
+    -fx-effect: dropshadow(three-pass-box, rgba(52, 152, 219, 0.2), 5, 0, 0, 0);
+}
+
+/* Tùy chỉnh ComboBox */
+.combo-box {
+    -fx-background-radius: 5;
+    -fx-border-radius: 5;
+    -fx-border-color: #dcdde1;
+    -fx-background-color: white;
+}
+
+
+.button-apply {
+    -fx-background-color: #1E8449 !important;
+    -fx-text-fill: white !important;
+    -fx-font-weight: bold;
+    -fx-background-radius: 5;
+    -fx-cursor: hand;
+}
+
+.button-apply:hover {
+    -fx-background-color: #145A32 !important; 
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 5, 0, 0, 2);
+}
+
+/* Nút Cancel */
+.button-cancel {
+    -fx-background-color: #95a5a6;
+    -fx-text-fill: white;
+    -fx-background-radius: 5;
+    -fx-cursor: hand;
+}
+
+.button-cancel:hover {
+    -fx-background-color: #7f8c8d;
+}
+
+/* Card sản phẩm trong FlowPane (Nếu bạn tạo Card bằng Button hoặc VBox) */
+.product-card {
+    -fx-background-color: white;
+    -fx-border-color: #dcdde1;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-padding: 10;
+    -fx-alignment: center;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 5, 0, 0, 0);
+}
+
+.product-card:hover {
+    -fx-border-color: #1E8449;
+    -fx-scale-x: 1.02;
+    -fx-scale-y: 1.02;
+}
+
+/* Tùy chỉnh ScrollPane để mượt hơn */
+.scroll-pane {
+    -fx-background-color: transparent;
+}
+
+.scroll-pane .viewport {
+    -fx-background-color: transparent;
+}
+
+.button-deleteAll {
+    -fx-background-color: #FF0000 !important;
+    -fx-text-fill: white !important;
+    -fx-font-weight: bold;
+    -fx-background-radius: 5;
+    -fx-cursor: hand;
+}
+
+.button-deleteAll:hover {
+    -fx-background-color: #FC2B2B !important; 
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 5, 0, 0, 2);
+}
+
+

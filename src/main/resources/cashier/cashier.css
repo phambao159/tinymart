@@ -1,0 +1,200 @@
+* {
+    -fx-primary-green: #2E7D32;
+    -fx-light-green-bg: #E8F5E9;
+    -fx-font-family: 'Segoe UI', sans-serif;
+}
+
+.root {
+    -fx-text-fill: #333333; 
+}
+
+.label {
+    -fx-text-fill: #333333; 
+}
+
+.sidebar-panel {
+    -fx-background-color: #2E7D32; 
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 10, 0, 0, 0);
+}
+
+.sidebar-panel .label {
+    -fx-text-fill: white;
+}
+
+.menu-btn {
+    -fx-background-color: transparent;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+    -fx-alignment: CENTER_LEFT; 
+    -fx-padding: 12 20 12 25; 
+    -fx-cursor: hand;
+    -fx-background-radius: 0; 
+    -fx-border-color: transparent;
+    -fx-border-width: 0 0 0 5;
+}
+
+.menu-btn:hover {
+    -fx-background-color: rgba(255, 255, 255, 0.1);
+    -fx-text-fill: white;
+}
+
+.menu-btn.active {
+    -fx-background-color: rgba(255, 255, 255, 0.2);
+    -fx-text-fill: white;
+    -fx-border-color: transparent transparent transparent white;
+    -fx-border-width: 0 0 0 5;
+    -fx-border-style: solid;
+}
+
+.btn-checkin, .btn-checkout {
+    -fx-background-color: rgba(255, 255, 255, 0.2);
+    -fx-text-fill: white;
+    -fx-cursor: hand;
+    -fx-background-radius: 5;
+}
+
+.btn-logout {
+    -fx-background-color: rgba(0, 0, 0, 0.2);
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+}
+.btn-logout:hover {
+    -fx-background-color: #d32f2f;
+}
+
+.shift-text {
+    -fx-text-fill: #E8F5E9;
+    -fx-font-weight: bold;
+}
+
+.cat-btn {
+    -fx-background-color: white;
+    -fx-text-fill: #555555;
+    -fx-background-radius: 20;
+    -fx-padding: 8 25;
+    -fx-font-weight: bold;
+    -fx-border-color: #EEE;
+    -fx-border-radius: 20;
+    -fx-cursor: hand;
+}
+.cat-btn.active {
+    -fx-background-color: -fx-primary-green;
+    -fx-text-fill: white;
+    -fx-border-color: -fx-primary-green;
+}
+
+.product-card { 
+    -fx-background-color: white; 
+    -fx-background-radius: 15; 
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 8, 0, 0, 2); 
+}
+.product-card .label {
+    -fx-text-fill: #333333; 
+}
+.product-card:hover { 
+    -fx-effect: dropshadow(three-pass-box, rgba(46, 125, 50, 0.2), 10, 0, 0, 4); 
+    -fx-translate-y: -2; 
+}
+
+.search-field { 
+    -fx-background-color: white; 
+    -fx-background-radius: 20; 
+    -fx-border-color: #EEE; 
+    -fx-padding: 8; 
+    -fx-text-fill: #333;
+}
+
+#overlayPane .label {
+    -fx-text-fill: #333333;
+}
+#overlayPrice {
+    -fx-text-fill: -fx-primary-green; 
+}
+
+.my-dialog {
+    -fx-background-color: white;
+}
+.my-dialog .label {
+    -fx-text-fill: #333333;
+}
+.my-dialog .header-panel {
+    -fx-background-color: -fx-primary-green;
+}
+.my-dialog .header-panel .label {
+    -fx-text-fill: white;
+}
+
+.history-table {
+    -fx-background-color: white;
+}
+.table-view .column-header-background {
+    -fx-background-color: #2E7D32;
+}
+
+.table-cell {
+    -fx-text-fill: #333333;
+    -fx-alignment: CENTER-LEFT;
+}
+
+.bill-panel { 
+    -fx-background-color: white; 
+}
+.bill-panel .label {
+    -fx-text-fill: #333333;
+}
+#lblGrandTotal {
+    -fx-text-fill: #2E7D32;
+}
+
+.btn-process { 
+    -fx-background-color: -fx-primary-green; 
+    -fx-text-fill: white; 
+    -fx-font-weight: bold; 
+    -fx-background-radius: 20; 
+}
+
+.table-view .table-cell {
+    -fx-text-fill: #333333 !important;
+    -fx-alignment: CENTER-LEFT;
+}
+
+.table-row-cell:odd {
+    -fx-background-color: #F9FBE7;
+}
+.table-row-cell:even {
+    -fx-background-color: white;
+}
+
+.table-view:focused .table-row-cell:selected, 
+.table-row-cell:selected {
+    -fx-background-color: -fx-primary-green;
+}
+
+.table-view:focused .table-row-cell:selected .table-cell, 
+.table-row-cell:selected .table-cell {
+    -fx-text-fill: white !important;
+}
+
+.size-btn {
+    -fx-background-color: white;
+    -fx-border-color: #DDD;
+    -fx-border-radius: 5;
+    -fx-background-radius: 5;
+    -fx-text-fill: #555;
+    -fx-cursor: hand;
+    -fx-padding: 8 15;
+}
+
+.size-btn:hover {
+    -fx-border-color: -fx-primary-green;
+    -fx-background-color: #F1F8E9;
+}
+
+.size-btn:selected {
+    -fx-background-color: -fx-primary-green;
+    -fx-text-fill: white;
+    -fx-border-color: -fx-primary-green;
+    -fx-font-weight: bold;
+}

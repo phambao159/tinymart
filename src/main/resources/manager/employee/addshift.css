@@ -1,0 +1,70 @@
+/* 1. Nền tổng thể */
+.mainFxmlClass {
+    -fx-background-color: #ffffff;
+}
+
+/* 2. Tiêu đề cửa sổ */
+.label {
+    -fx-font-family: "Segoe UI", Arial;
+}
+
+.vbox > .label {
+    -fx-text-fill: #2980B9; /* Màu xanh dương thương hiệu cho Shift */
+    -fx-padding: 0 0 5 0;
+}
+
+/* 3. Label cho các trường nhập liệu */
+.grid-pane .label {
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #5D6D7E;
+}
+
+/* 4. Tùy chỉnh các ô TextField */
+.text-field {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #D5DBDB;
+    -fx-border-radius: 5;
+    -fx-background-radius: 5;
+    -fx-min-height: 35px;
+    -fx-font-size: 13px;
+    -fx-padding: 0 10 0 10;
+}
+
+/* Hiệu ứng khi Click vào ô nhập liệu */
+.text-field:focused {
+    -fx-border-color: #3498DB;
+    -fx-border-width: 1.5;
+    -fx-effect: dropshadow(three-pass-box, rgba(52, 152, 219, 0.1), 5, 0, 0, 0);
+}
+
+/* 5. Tùy chỉnh các nút bấm */
+.button {
+    -fx-cursor: hand;
+    -fx-background-radius: 5;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-transition: 0.2s;
+}
+
+/* Nút Save */
+.button[text="SAVE"] {
+    -fx-background-color: #28a745;
+    -fx-text-fill: white;
+}
+
+.button[text="SAVE"]:hover {
+    -fx-background-color: #218838;
+    -fx-translate-y: -1;
+}
+
+/* Nút Cancel */
+.button[text="CANCEL"] {
+    -fx-background-color: #6c757d;
+    -fx-text-fill: white;
+}
+
+.button[text="CANCEL"]:hover {
+    -fx-background-color: #5a6268;
+    -fx-translate-y: -1;
+}

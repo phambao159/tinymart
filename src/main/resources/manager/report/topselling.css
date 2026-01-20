@@ -1,0 +1,75 @@
+    /* Tổng thể nền tảng */
+    .root {
+        -fx-background-color: #fcfcfc;
+        -fx-font-family: "Segoe UI", sans-serif;
+    }
+
+    /* Định dạng Label và ComboBox (Giữ đồng bộ với Revenue) */
+    .label {
+        -fx-text-fill: #34495e;
+        -fx-font-size: 14px;
+
+    }
+
+    .combo-box {
+        -fx-background-color: white;
+        -fx-border-color: #d1d8e0;
+        -fx-border-radius: 4;
+        -fx-background-radius: 4;
+    }
+
+    .combo-box:hover {
+        -fx-border-color: #1E8449;
+    }
+
+    /* Định dạng PieChart */
+    .chart-title {
+        -fx-text-fill: #2c3e50;
+        -fx-font-size: 20px;
+
+    }
+
+    /* Định dạng các miếng bánh (Pie Slices) */
+    /* JavaFX tự động gán các class default-color0, default-color1... */
+    .default-color0.chart-pie { -fx-pie-color: #45aaf2; } /* Blue */
+    .default-color1.chart-pie { -fx-pie-color: #4b7bec; } /* Royal Blue */
+    .default-color2.chart-pie { -fx-pie-color: #a55eea; } /* Purple */
+    .default-color3.chart-pie { -fx-pie-color: #ef5777; } /* Pink */
+    .default-color4.chart-pie { -fx-pie-color: #ff5e57; } /* Red */
+    .default-color5.chart-pie { -fx-pie-color: #ffc048; } /* Orange */
+    .default-color6.chart-pie { -fx-pie-color: #ffdd59; } /* Yellow */
+    .default-color7.chart-pie { -fx-pie-color: #0be881; } /* Green */
+    .default-color8.chart-pie { -fx-pie-color: #05c46b; } /* Teal */
+    .default-color9.chart-pie { -fx-pie-color: #808e9b; } /* Gray */
+
+    /* Hiệu ứng khi di chuột vào miếng bánh */
+    .chart-pie {
+        -fx-border-color: white;
+        -fx-border-width: 2px;
+    }
+
+    .chart-pie:hover {
+        -fx-scale-x: 1.05;
+        -fx-scale-y: 1.05;
+        -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 10, 0, 0, 0);
+    }
+
+    /* Nhãn hiển thị trên PieChart */
+    .chart-pie-label {
+        -fx-fill: #4b6584;
+        -fx-font-size: 12px;
+
+    }
+
+    .chart-pie-label-line {
+        -fx-stroke: #d1d8e0;
+        -fx-stroke-width: 1px;
+    }
+
+    /* Chú thích (Legend) */
+    .chart-legend {
+        -fx-background-color: #ffffff;
+        -fx-background-radius: 10;
+        -fx-border-color: #f1f2f6;
+        -fx-padding: 10;
+    }

@@ -1,0 +1,119 @@
+/* 1. Tổng thể nền */
+.mainFxmlClass {
+    -fx-background-color: #ffffff;
+    -fx-padding: 0 20 20 20;
+}
+
+/* 2. Thanh tìm kiếm và nút bấm */
+.text-field {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #D5DBDB;
+    -fx-border-radius: 4;
+    -fx-min-width: 250px;
+    -fx-min-height: 35px;
+    -fx-padding: 0 10 0 10;
+}
+
+.text-field:focused {
+    -fx-border-color: #2E86C1; /* Màu xanh dương cho Order */
+    -fx-border-width: 1.5;
+}
+
+.button {
+    -fx-background-color: #1E8449; /* Giữ màu xanh lá cho nút thêm mới */
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+    -fx-min-height: 35px;
+    -fx-padding: 0 20 0 20;
+    -fx-background-radius: 4;
+}
+
+.button:hover {
+    -fx-background-color: #145A32;
+    -fx-translate-y: -1;
+}
+
+/* 3. Định dạng TableView cho Đơn hàng */
+.table-view {
+    -fx-background-color: transparent;
+    -fx-border-color: #EAECEE;
+    -fx-border-radius: 4;
+}
+
+/* Tiêu đề cột */
+.table-view .column-header {
+    -fx-background-color: #F2F4F4; /* Màu xám nhẹ cho header */
+    -fx-border-color: #EAECEE;
+    -fx-padding: 8 0 8 0;
+}
+
+.table-view .column-header .label {
+    -fx-text-fill: #2C3E50;
+    -fx-font-weight: bold;
+    -fx-font-size: 13px;
+}
+
+/* Dòng trong bảng */
+.table-row-cell {
+    -fx-cell-size: 45px;
+}
+
+.table-row-cell:hover {
+    -fx-background-color: #AFFFCA;
+}
+
+.table-row-cell:selected {
+    -fx-background-color: #AFFFCA; /* Xanh dương nhạt khi chọn dòng */
+    -fx-text-fill: #212121;
+}
+
+.table-cell {
+    -fx-text-fill: #34495E;
+    -fx-alignment: CENTER;
+}
+
+/* Căn lề cho các cột ID */
+#colOrderID, #colCustomerID, #colEmployeeID {
+    -fx-alignment: CENTER;
+}
+
+/* Làm nổi bật cột Tổng tiền (Total Amount) */
+#colTotalAmount {
+    -fx-font-weight: bold;
+    -fx-text-fill: #C0392B; /* Màu đỏ đô cho số tiền để dễ nhận biết */
+}
+
+/* Làm nổi bật cột Trạng thái (Status) */
+#colStatus {
+    -fx-font-weight: bold;
+}
+
+/* Loại bỏ viền focus mặc định */
+.table-view:focused {
+    -fx-background-color: transparent, transparent, transparent;
+}
+
+/* Style cho nút Reset */
+.button-reset {
+    -fx-background-color: #E74C3C; /* Màu đỏ nhạt */
+    -fx-text-fill: white;
+}
+
+.button-reset:hover {
+    -fx-background-color: #C0392B;
+}
+
+/* Định dạng chung cho ComboBox và DatePicker */
+.combo-box, .date-picker {
+    -fx-background-color: white;
+    -fx-border-color: #D5DBDB;
+    -fx-border-radius: 4;
+    -fx-background-radius: 4;
+    -fx-min-height: 35px;
+}
+
+.date-picker .text-field {
+    -fx-border-width: 0; /* Xóa viền của textfield bên trong datepicker */
+    -fx-min-width: 100px;
+}

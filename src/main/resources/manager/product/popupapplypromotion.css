@@ -1,0 +1,79 @@
+/* Tổng thể nền popup */
+.mainFxmlClass {
+    -fx-background-color: #ffffff;
+    -fx-font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Tiêu đề chính */
+.label {
+    -fx-text-fill: #2f3640;
+    -fx-font-size : 15px;
+    -fx-font-weight: bold;
+}
+
+/* Đường kẻ phân cách */
+.separator {
+    -fx-padding: 5 0 5 0;
+}
+
+/* Tùy chỉnh ComboBox */
+.combo-box {
+    -fx-background-color: white;
+    -fx-border-color: #dcdde1;
+    -fx-border-radius: 5;
+    -fx-background-radius: 5;
+    -fx-padding: 2;
+}
+
+.combo-box:focused {
+    -fx-border-color: #1E8449;
+    -fx-effect: dropshadow(three-pass-box, rgba(30, 132, 73, 0.1), 5, 0, 0, 0);
+}
+
+.combo-box .list-cell {
+    -fx-padding: 5 10 5 10;
+}
+
+/* Nút bấm tổng quát */
+.button {
+    -fx-background-radius: 5;
+    -fx-cursor: hand;
+    -fx-font-size: 13px;
+    -fx-transition: 0.2s;
+}
+
+/* Nút Add to Selection (Màu xanh chủ đạo) */
+.button-add {
+    -fx-background-color: #1E8449;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+}
+
+.button-add:hover {
+    -fx-background-color: #145A32;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.15), 5, 0, 0, 2);
+}
+
+/* Nút Cancel */
+.button-cancel {
+    -fx-background-color: #f1f2f6;
+    -fx-text-fill: #2f3640;
+    -fx-border-color: #dcdde1;
+    -fx-border-radius: 5;
+}
+
+.button-cancel:hover {
+    -fx-background-color: #dfe4ea;
+}
+
+/* Tùy chỉnh các Label trong GridPane */
+.grid-pane .label {
+    -fx-font-size: 14px;
+    -fx-text-fill: #7f8c8d;
+}
+
+/* Label tên sản phẩm nổi bật */
+#lbProductName {
+    -fx-text-fill: #1E8449;
+    -fx-font-size: 15px;
+}

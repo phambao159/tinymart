@@ -1,0 +1,86 @@
+/* Tổng thể nền */
+.anchor-pane {
+    -fx-background-color: #ffffff;
+}
+
+/* Định dạng Bảng (TableView) */
+.table-view {
+    -fx-background-color: transparent;
+    -fx-border-color: #D5DBDB;
+    -fx-border-radius: 5;
+    -fx-background-radius: 5;
+}
+
+/* Tiêu đề cột bảng */
+.table-view .column-header {
+    -fx-background-color: #1E8449; /* Màu chủ đạo xanh lá */
+    -fx-size: 35;
+}
+
+.table-view .column-header .label {
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+}
+
+/* Dòng được chọn trong bảng */
+.table-view .table-row-cell:selected {
+    -fx-background-color: #FF9800; /* Màu cam Highlight */
+    -fx-background-insets: 0;
+}
+
+/* Định dạng ImageView */
+#imageProduct {
+    -fx-border-color: #1E8449;
+    -fx-border-width: 2;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+}
+
+/* Khung bọc khu vực "Add New Size" */
+.vbox-form { /* Bạn có thể thêm styleClass="vbox-form" vào VBox dưới separator */
+    -fx-background-color: #F8F9F9;
+    -fx-padding: 15;
+    -fx-border-color: #EAECEE;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+}
+
+/* TextField và ComboBox */
+.text-field, .combo-box {
+    -fx-background-color: white;
+    -fx-border-color: #D5DBDB;
+    -fx-border-radius: 4;
+
+}
+
+.text-field:focused, .combo-box:focused {
+    -fx-border-color: #D5DBDB; /* Màu cam Highlight khi nhập liệu */
+    -fx-effect: dropshadow(three-pass-box, rgba(255, 152, 0, 0.2), 5, 0, 0, 0);
+}
+
+/* Nút bấm (Buttons) */
+.button {
+    -fx-cursor: hand;
+    -fx-background-radius: 5;
+    -fx-font-weight: bold;
+}
+
+/* Nút Add */
+.button[onAction="#onAddEntry"] {
+    -fx-background-color: #1E8449 !important;
+    -fx-text-fill: white !important;
+}
+
+.button[onAction="#onAddEntry"]:hover {
+    -fx-background-color: #145A32 !important;
+}
+
+/* Nút Delete */
+.button[onAction="#onDelete"] {
+    -fx-background-color: #E74C3C !important;
+    -fx-text-fill: white !important;
+}
+
+.button[onAction="#onDelete"]:hover {
+    -fx-background-color: #C0392B !important;
+}

@@ -1,0 +1,92 @@
+/* 1. Container chính */
+.vbox {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #dcdde1;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+}
+
+/* 2. Tiêu đề và Nhãn */
+.label {
+    -fx-font-family: "Segoe UI", Arial;
+}
+
+.vbox > .label {
+    -fx-text-fill: #1E8449; /* Xanh lá chủ đạo */
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+}
+
+/* Tên sản phẩm nổi bật */
+#lbProductName {
+    -fx-text-fill: #2c3e50;
+    -fx-font-size: 15px;
+}
+
+/* Giá nhập khẩu */
+#lbPrice {
+    -fx-text-fill: #E67E22; /* Màu cam nổi bật cho giá tiền */
+}
+
+/* Nhãn bên trái trong GridPane */
+.grid-pane .label {
+    -fx-font-weight: bold;
+    -fx-text-fill: #57606f;
+}
+
+/* 3. Ô nhập liệu (ComboBox, TextField, DatePicker) */
+.combo-box, .text-field, .date-picker {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #dcdde1;
+    -fx-border-radius: 4;
+    -fx-background-radius: 4;
+    -fx-min-height: 35;
+}
+
+.combo-box:focused, .text-field:focused, .date-picker:focused {
+    -fx-border-color: #1E8449;
+    -fx-border-width: 1.5;
+}
+
+/* 4. Nhóm nút bấm hành động */
+.button {
+    -fx-cursor: hand;
+    -fx-background-radius: 5;
+    -fx-font-weight: bold;
+    -fx-transition: 0.2s;
+    -fx-min-height: 35;
+}
+
+/* Nút Update: Màu cam thương hiệu (như trong FXML bạn đang để) */
+.button[text="Update"] {
+    -fx-background-color: #e67e22;
+    -fx-text-fill: white;
+}
+.button[text="Update"]:hover {
+    -fx-background-color: #d35400;
+    -fx-translate-y: -1;
+}
+
+/* Nút Delete: Màu đỏ cảnh báo */
+.button[text="Delete"] {
+    -fx-background-color: #ff7675;
+    -fx-text-fill: white;
+}
+.button[text="Delete"]:hover {
+    -fx-background-color: #ee5253;
+}
+
+/* Nút Cancel: Màu trung tính */
+.button[text="Cancel"] {
+    -fx-background-color: #f1f2f6;
+    -fx-text-fill: #2f3542;
+    -fx-border-color: #ced4da;
+}
+.button[text="Cancel"]:hover {
+    -fx-background-color: #dfe4ea;
+}
+
+/* 5. Phân cách */
+.separator {
+    -fx-padding: 5 0 5 0;
+}

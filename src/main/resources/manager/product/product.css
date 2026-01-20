@@ -1,0 +1,89 @@
+/* Tổng thể khung chứa */
+.mainFxmlClass {
+    -fx-background-color: #F8F9FA;
+}
+
+/* Thanh công cụ (Bộ lọc & Nút bấm) */
+#hSearch {
+    -fx-padding: 10 0; /* Chỉ padding trên dưới */
+    -fx-background-color: transparent;
+}
+#hAdd{
+    -fx-padding: 10 0; /* Chỉ padding trên dưới */
+    -fx-background-color: transparent;
+}
+
+/* Kiểu cho TextField tìm kiếm */
+.text-field {
+    -fx-background-color: white;
+    -fx-border-color: #DCDDE1;
+    -fx-border-radius: 5;
+    -fx-background-radius: 5;
+    -fx-padding: 7 12;
+    -fx-font-size: 13px;
+    -fx-pref-width: 200;
+}
+
+.text-field:focused {
+    -fx-border-color: #1E8449;
+    -fx-effect: dropshadow(three-pass-box, rgba(30, 132, 73, 0.1), 5, 0, 0, 0);
+}
+
+/* Kiểu cho ComboBox bộ lọc */
+.combo-box {
+    -fx-background-color: white;
+    -fx-border-color: #DCDDE1;
+    -fx-border-radius: 5;
+    -fx-background-radius: 5;
+}
+
+.combo-box:hover {
+    -fx-border-color: #1E8449;
+}
+
+.combo-box:focused {
+    -fx-border-color: #1E8449;
+    -fx-border-width: 1.5;
+}
+
+/* Nút "Add New Product" */
+.button {
+    -fx-background-color: #1E8449;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-padding: 8 20;
+    -fx-background-radius: 5;
+    -fx-cursor: hand;
+}
+
+.button:hover {
+    -fx-background-color: #145A32; /* Xanh đậm hơn khi di chuột */
+}
+
+/* Kiểu cho ScrollPane */
+.scroll-pane {
+    -fx-background-color: transparent;
+    -fx-padding: 10 0 0 0; /* Padding trên để tách biệt với nút bấm */
+}
+
+.scroll-pane .viewport {
+    -fx-background-color: transparent;
+}
+
+/* Container chứa các card sản phẩm (FlowPane) */
+.productContainer {
+    -fx-padding: 10;
+    -fx-background-color: transparent;
+    -fx-alignment: TOP_LEFT;
+}
+
+/* Tùy chỉnh thanh cuộn cho mượt mà */
+.scroll-pane .scroll-bar:vertical {
+    -fx-background-color: transparent;
+    -fx-pref-width: 8;
+}
+
+.scroll-pane .scroll-bar:vertical .thumb {
+    -fx-background-color: #BDC3C7;
+    -fx-background-radius: 5;
+}

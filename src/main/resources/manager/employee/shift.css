@@ -1,0 +1,85 @@
+/* 1. Tổng thể nền */
+.mainFxmlClass {
+    -fx-background-color: #ffffff;
+    -fx-padding: 0 20 20 20;
+}
+
+/* 2. Thanh tìm kiếm và nút bấm */
+.text-field {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #D5DBDB;
+    -fx-border-radius: 4;
+    -fx-min-width: 250px;
+    -fx-min-height: 35px;
+    -fx-padding: 0 10 0 10;
+}
+
+.text-field:focused {
+    -fx-border-color: #3498DB; /* Màu xanh dương cho Shift để phân biệt với Employee */
+    -fx-border-width: 1.5;
+}
+
+.button {
+    -fx-background-color: #1E8449; /* Màu xanh dương hiện đại */
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+    -fx-min-height: 35px;
+    -fx-padding: 0 20 0 20;
+    -fx-background-radius: 4;
+}
+
+.button:hover {
+    -fx-background-color: #145A32;
+}
+
+/* 3. Định dạng TableView cho Ca làm việc */
+.table-view {
+    -fx-background-color: transparent;
+    -fx-border-color: #EAECEE;
+    -fx-border-radius: 4;
+}
+
+/* Tiêu đề cột */
+.table-view .column-header {
+    -fx-background-color: #F8F9F9;
+    -fx-border-color: #EAECEE;
+    -fx-padding: 8 0 8 0;
+}
+
+.table-view .column-header .label {
+    -fx-text-fill: #2C3E50;
+    -fx-font-weight: bold;
+    -fx-font-size: 13px;
+}
+
+/* Dòng trong bảng */
+.table-row-cell {
+    -fx-cell-size: 45px;
+}
+
+.table-row-cell:hover {
+    -fx-background-color: #EBF5FB; /* Màu xanh dương nhạt khi hover */
+}
+
+.table-row-cell:selected {
+    -fx-background-color: #D6EAF8;
+    -fx-text-fill: #2C3E50;
+}
+
+/* Ô dữ liệu */
+.table-cell {
+    -fx-text-fill: #34495E;
+    -fx-alignment: CENTER; /* Căn giữa cho thời gian dễ nhìn */
+}
+
+/* Căn trái riêng cho cột Tên ca */
+#colName {
+    -fx-alignment: CENTER_LEFT;
+    -fx-padding: 0 0 0 15;
+}
+
+/* Loại bỏ viền focus mặc định */
+.table-view:focused {
+    -fx-background-color: transparent, transparent, transparent;
+}

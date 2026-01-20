@@ -1,0 +1,52 @@
+/* Tổng thể khung giao diện */
+#AnchorPane {
+    /* Loại bỏ padding trái/phải, chỉ giữ padding trên/dưới */
+    -fx-padding: 20 0 20 0; 
+    -fx-background-color: white; 
+}
+
+/* Thanh chứa các nút điều hướng (HBox) */
+#layoutmenu {
+    -fx-background-color: transparent;
+    /* Padding dưới để tách biệt với vùng nội dung */
+    -fx-padding: 0 0 0 0;
+    -fx-alignment: CENTER_LEFT;
+}
+
+/* Định dạng các nút ToggleButton */
+.toggle-button {
+    -fx-background-color: transparent;
+    -fx-text-fill: #7F8C8D;
+    -fx-font-size: 14px;
+    -fx-font-family: "Segoe UI", Helvetica, Arial, sans-serif;
+    -fx-padding: 10 25; /* Tăng padding trong nút để vùng click rộng hơn */
+    -fx-border-color: #D5DBDB;
+    -fx-border-width: 0 0 3 0; 
+    -fx-cursor: hand;
+    -fx-background-radius: 0; /* Giữ nút vuông vức sát lề */
+}
+
+/* Hiệu ứng khi di chuột qua các nút */
+.toggle-button:hover {
+    -fx-text-fill: #1E8449;
+    -fx-background-color: #E8F5E9; 
+}
+
+/* Trạng thái khi nút được chọn */
+.toggle-button:selected {
+    -fx-text-fill: #1E8449;
+    -fx-border-color: #1E8449; 
+    -fx-background-color: transparent;
+}
+
+/* Loại bỏ viền focus mặc định */
+.toggle-button:focused {
+    -fx-focus-color: transparent;
+    -fx-ring-color: transparent;
+}
+
+/* Vùng hiển thị nội dung bên dưới (StackPane) */
+#viewProduct {
+    -fx-background-color: white;
+    -fx-background-radius: 0; 
+}

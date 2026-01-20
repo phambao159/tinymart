@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.net.URL?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<AnchorPane id="AnchorPane" prefHeight="500.0" prefWidth="950.0" styleClass="mainFxmlClass" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.manager.order.OrderController">
+    <stylesheets>
+        <URL value="@order.css" />
+    </stylesheets>
+    <children>
+        <VBox alignment="TOP_CENTER" spacing="10.0" AnchorPane.bottomAnchor="0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" AnchorPane.topAnchor="0">
+            <padding>
+                <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+            </padding>
+            <children>
+                <HBox alignment="CENTER_LEFT" prefHeight="60.0" spacing="15.0">
+                    <children>
+                        <TextField fx:id="txtSearch" onAction="#onSearch" prefWidth="180.0" promptText="Search Order ..." />
+                        
+                        <ComboBox fx:id="cbCashier" prefWidth="150.0" promptText="Select Cashier" />
+                        
+                        <HBox alignment="CENTER_LEFT" spacing="5.0">
+                            <children>
+                                <DatePicker fx:id="dpFrom" prefWidth="130.0" promptText="From Date" />
+                                <DatePicker fx:id="dpTo" prefWidth="130.0" promptText="To Date" />
+                            </children>
+                        </HBox>
+                        
+                        <Button mnemonicParsing="false" onAction="#onResetFilter" prefHeight="35.0" styleClass="button-reset" text="Reset" />
+                    </children>
+                </HBox>
+
+                <TableView fx:id="tbOrder" VBox.vgrow="ALWAYS">
+                    <columns>
+                        <TableColumn fx:id="colOrderID" prefWidth="80.0" text="Order ID" />
+                        <TableColumn fx:id="colOrderDate" prefWidth="160.0" text="Order Date" />
+                        <TableColumn fx:id="colTotalAmount" prefWidth="130.0" text="Total Amount" />
+                        <TableColumn fx:id="colCustomerID" prefWidth="180.0" text="Customer" />
+                        <TableColumn fx:id="colEmployeeID" prefWidth="150.0" text="Cashier" /> 
+                        <TableColumn fx:id="colPayment" prefWidth="130.0" text="Payment Method" />
+                    </columns>
+                    <columnResizePolicy>
+                        <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                    </columnResizePolicy>
+                </TableView>
+            </children>
+        </VBox>
+    </children>
+</AnchorPane>

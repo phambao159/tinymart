@@ -1,0 +1,45 @@
+/* 1. Tổng thể nền */
+.mainFxmlClass {
+    -fx-background-color: #ffffff;
+}
+
+/* 2. HBox chứa menu điều hướng */
+.hbox {
+    -fx-padding: 10 20 0 20;
+    -fx-background-color: #ffffff;
+}
+
+/* 3. Tùy chỉnh chung cho ToggleButton */
+.toggle-button {
+    -fx-background-color: transparent; /* Nền trong suốt */
+    -fx-text-fill: #7F8C8D; /* Màu chữ xám khi chưa chọn */
+    -fx-font-size: 14px;
+    -fx-font-family: "Segoe UI", Arial;
+    -fx-cursor: hand;
+    -fx-padding: 8 15;
+    -fx-background-radius: 0;
+    -fx-border-color: transparent transparent #D5DBDB transparent; /* Đường kẻ mờ bên dưới */
+    -fx-border-width: 0 0 2 0;
+}
+
+/* Hiệu ứng khi di chuột qua (Hover) */
+.toggle-button:hover {
+    -fx-text-fill: #1E8449;
+    -fx-background-color: #F8F9F9;
+}
+
+/* Trạng thái khi ĐƯỢC CHỌN (Selected) */
+.toggle-button:selected {
+    -fx-background-color: transparent;
+    -fx-text-fill: #1E8449; /* Chữ chuyển sang màu xanh lá */
+    -fx-font-weight: bold;
+    -fx-border-color: transparent transparent #1E8449 transparent; /* Gạch chân màu xanh đậm */
+    -fx-border-width: 0 0 3 0; /* Gạch chân dày hơn một chút */
+}
+
+/* 4. Tùy chỉnh StackPane (Vùng hiển thị nội dung) */
+#viewEmployee {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #EAECEE transparent transparent transparent; /* Đường kẻ tách biệt với menu */
+    -fx-border-width: 1 0 0 0;
+}

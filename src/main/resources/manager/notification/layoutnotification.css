@@ -1,0 +1,52 @@
+/* Tổng thể giao diện */
+.mainFxmlClass {
+    -fx-background-color: white;
+    -fx-padding: 20;
+}
+
+/* Vùng chứa các nút chuyển đổi (HBox) */
+.hbox {
+    -fx-padding: 0 0 20 0;
+    -fx-alignment: CENTER_LEFT;
+}
+
+/* Định dạng chung cho ToggleButton */
+.toggle-button {
+    -fx-background-color: transparent;
+    -fx-text-fill: #566573;
+    -fx-font-size: 14px;
+    -fx-font-family: "Segoe UI", Helvetica, Arial, sans-serif;
+    -fx-font-weight: bold;
+    -fx-padding: 8 20;
+    -fx-border-color: #D5DBDB;
+    -fx-border-width: 0 0 2 0; /* Chỉ hiện viền dưới */
+    -fx-cursor: hand;
+    -fx-transition: all 0.3s ease-in-out;
+}
+
+/* Hiệu ứng khi di chuột qua */
+.toggle-button:hover {
+    -fx-text-fill: #1E8449;
+    -fx-background-color: #E8F5E9;
+}
+
+/* Trạng thái khi được chọn (Active tab) */
+.toggle-button:selected {
+    -fx-text-fill: #1E8449;
+    -fx-border-color: #1E8449; /* Viền dưới màu xanh chủ đạo */
+    -fx-background-color: transparent;
+}
+
+/* Loại bỏ hiệu ứng focus mặc định của JavaFX */
+.toggle-button:focused {
+    -fx-focus-color: transparent;
+    -fx-ring-color: transparent;
+}
+
+/* Vùng hiển thị nội dung (StackPane) */
+#viewNoti {
+    -fx-background-color: white;
+    -fx-background-radius: 10;
+
+    -fx-padding: 15 0;
+}

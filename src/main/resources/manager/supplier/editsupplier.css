@@ -1,0 +1,88 @@
+/* 1. Tổng thể nền */
+.mainFxmlClass {
+    -fx-background-color: #ffffff;
+}
+
+/* 2. Tiêu đề chính */
+.vbox > .label {
+    -fx-text-fill: #1E8449; /* Xanh lá chủ đạo */
+    -fx-font-family: "Segoe UI", Arial;
+    -fx-padding: 0 0 5 0;
+}
+
+/* 3. Label tiêu đề các trường trong GridPane */
+.grid-pane .label {
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #5D6D7E;
+}
+
+/* 4. Tùy chỉnh các ô nhập liệu (TextField & TextArea) */
+.text-field, .text-area {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #D5DBDB;
+    -fx-border-radius: 4;
+    -fx-background-radius: 4;
+    -fx-font-size: 13px;
+    -fx-transition: 0.2s;
+}
+
+.text-field {
+    -fx-min-height: 35px;
+    -fx-padding: 0 10 0 10;
+}
+
+/* Ô ID (Chỉ đọc) */
+#txtId {
+    -fx-background-color: #F8F9F9;
+    -fx-text-fill: #7F8C8D;
+    -fx-border-style: dashed;
+}
+
+/* Hiệu ứng focus */
+.text-field:focused, .text-area:focused {
+    -fx-border-color: #1E8449;
+    -fx-border-width: 1.5;
+}
+
+/* 5. Nhóm nút bấm hành động (Hệ màu mới) */
+.button {
+    -fx-cursor: hand;
+    -fx-background-radius: 5;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-transition: 0.2s;
+}
+
+
+.btn-update {
+    -fx-background-color: #1E8449;
+    -fx-text-fill: white;
+}
+.btn-update:hover {
+    -fx-background-color: #145A32;
+    -fx-translate-y: -1;
+}
+
+/* Nút DELETE: Màu đỏ */
+.btn-delete {
+    -fx-background-color: #DC3545;
+    -fx-text-fill: white;
+}
+.btn-delete:hover {
+    -fx-background-color: #C82333;
+    -fx-translate-y: -1;
+}
+
+/* Nút CANCEL: Màu trắng */
+.btn-cancel {
+    -fx-background-color: #FFFFFF;
+    -fx-text-fill: #6C757D;
+    -fx-border-color: #CED4DA;
+    -fx-border-radius: 5;
+    -fx-background-radius: 5;
+}
+.btn-cancel:hover {
+    -fx-background-color: #F8F9F9;
+    -fx-border-color: #ADB5BD;
+}

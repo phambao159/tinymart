@@ -1,0 +1,56 @@
+/* 1. Tổng thể nền */
+.mainFxmlClass {
+    -fx-background-color: #ffffff;
+}
+
+/* 2. HBox chứa các ToggleButton điều hướng */
+.hbox {
+    -fx-padding: 10 20 0 20;
+    -fx-background-color: #ffffff;
+    -fx-alignment: CENTER_LEFT;
+}
+
+/* 3. Tùy chỉnh chung cho ToggleButton (Dạng Tab gạch chân) */
+.toggle-button {
+    -fx-background-color: transparent; /* Nền trong suốt để lộ đường gạch */
+    -fx-text-fill: #7F8C8D; /* Màu chữ xám mặc định */
+    -fx-font-size: 14px;
+    -fx-font-family: "Segoe UI", Arial;
+    -fx-font-weight: normal;
+    -fx-cursor: hand;
+    -fx-padding: 10 20;
+    -fx-background-radius: 0;
+    -fx-border-color: transparent transparent #D5DBDB transparent; /* Đường kẻ mờ mặc định bên dưới */
+    -fx-border-width: 0 0 2 0;
+    -fx-transition: 0.2s;
+}
+
+/* Hiệu ứng khi di chuột qua (Hover) */
+.toggle-button:hover {
+    -fx-text-fill: #145A32; /* Màu Hover xanh đậm của bạn */
+    -fx-background-color: #F4F7F6; /* Nền xanh nhạt rất mờ */
+}
+
+/* Trạng thái khi ĐƯỢC CHỌN (Selected) */
+.toggle-button:selected {
+    -fx-background-color: transparent;
+    -fx-text-fill: #1E8449; /* Màu chủ đạo xanh lá */
+    -fx-font-weight: bold;
+    -fx-border-color: transparent transparent #1E8449 transparent; /* Gạch chân màu chủ đạo */
+    -fx-border-width: 0 0 3 0; /* Gạch chân dày để làm nổi bật */
+}
+
+/* Trạng thái đặc biệt cho nút quan trọng nếu cần Highlight (ví dụ nút Import) */
+/* Bạn có thể thêm StyleClass này trong FXML nếu muốn nút Import có màu Cam */
+.toggle-button-highlight:selected {
+    -fx-text-fill: #FF9800;
+    -fx-border-color: transparent transparent #FF9800 transparent;
+}
+
+/* 4. Vùng hiển thị nội dung (StackPane) */
+#viewSupplier {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #EAECEE transparent transparent transparent;
+    -fx-border-width: 1 0 0 0;
+    -fx-padding: 0 0 0 0;
+}

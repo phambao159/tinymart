@@ -1,0 +1,79 @@
+/* 1. Tổng thể nền */
+.mainFxmlClass {
+    -fx-background-color: #ffffff;
+}
+
+/* 2. Tiêu đề "ADD NEW SUPPLIER" */
+.vbox > .label {
+    -fx-text-fill: #1E8449; /* Màu chủ đạo xanh lá */
+    -fx-font-family: "Segoe UI", Arial;
+    -fx-padding: 0 0 10 0;
+}
+
+/* 3. Label cho các trường dữ liệu */
+.grid-pane .label {
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #5D6D7E;
+}
+
+/* 4. Tùy chỉnh các ô nhập liệu (TextField & TextArea) */
+.text-field, .text-area {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #D5DBDB;
+    -fx-border-radius: 4;
+    -fx-background-radius: 4;
+    -fx-font-size: 13px;
+}
+
+.text-field {
+    -fx-min-height: 35px;
+    -fx-padding: 0 10 0 10;
+}
+
+.text-area {
+    -fx-padding: 0 0 0 0;
+}
+
+/* Hiệu ứng khi focus vào ô nhập liệu */
+.text-field:focused, .text-area:focused {
+    -fx-border-color: #1E8449; /* Màu xanh lá chủ đạo */
+    -fx-border-width: 1.5;
+    -fx-effect: dropshadow(three-pass-box, rgba(30, 132, 73, 0.1), 5, 0, 0, 0);
+}
+
+/* 5. Tùy chỉnh các nút bấm */
+.button {
+    -fx-cursor: hand;
+    -fx-background-radius: 5;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-transition: 0.2s;
+}
+
+/* Nút SAVE (Sử dụng màu chủ đạo) */
+.button[text="SAVE"] {
+    -fx-background-color: #1E8449;
+    -fx-text-fill: white;
+}
+
+.button[text="SAVE"]:hover {
+    -fx-background-color: #145A32; /* Màu Hover xanh lá đậm */
+    -fx-translate-y: -1;
+}
+
+/* Nút CANCEL (Màu xám trung tính) */
+.button[text="CANCEL"] {
+    -fx-background-color: #6c757d;
+    -fx-text-fill: white;
+}
+
+.button[text="CANCEL"]:hover {
+    -fx-background-color: #5a6268;
+    -fx-translate-y: -1;
+}
+
+/* 6. Tùy chỉnh ScrollBar cho TextArea (nếu có) */
+.text-area .scroll-pane {
+    -fx-background-color: transparent;
+}

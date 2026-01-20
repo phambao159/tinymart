@@ -1,0 +1,117 @@
+/* 1. Tổng thể */
+.mainFxmlClass {
+    -fx-background-color: #f4f7f6; /* Nền xám cực nhạt để làm nổi khối trắng */
+}
+
+/* 2. Tiêu đề các phân vùng */
+.label {
+    -fx-font-family: "Segoe UI", Arial;
+}
+
+.vbox > .label {
+    -fx-text-fill: #1E8449; 
+    -fx-padding: 0 0 5 0;
+}
+
+/* 3. Ô nhập liệu & Chọn lựa */
+.combo-box, .date-picker, .text-field {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #dcdde1;
+    -fx-border-radius: 4;
+    -fx-background-radius: 4;
+    -fx-min-height: 35;
+}
+
+.combo-box:focused, .date-picker:focused, .text-field:focused {
+    -fx-border-color: #1E8449;
+    -fx-border-width: 1.5;
+}
+
+/* 4. TableView Chỉnh sửa chi tiết */
+.table-view {
+    -fx-background-color: white;
+    -fx-border-color: #dcdde1;
+    -fx-border-radius: 5;
+}
+
+.table-view .column-header {
+    -fx-background-color: #f8f9fa;
+    -fx-padding: 10 0 10 0;
+}
+
+.table-view .column-header .label {
+    -fx-text-fill: #2c3e50;
+    -fx-font-weight: bold;
+}
+
+/* Cột Total và Giá tiền */
+#colTotal, #colPrice {
+    -fx-text-fill: #1E8449;
+    -fx-font-weight: bold;
+}
+
+/* 5. Vùng hiển thị Tổng tiền */
+#lblTotalCost {
+    -fx-text-fill: #1E8449; /* Chuyển từ đỏ sang xanh để bớt áp lực thị giác */
+}
+
+/* 6. Nút bấm hành động */
+.button {
+    -fx-cursor: hand;
+    -fx-background-radius: 5;
+    -fx-font-weight: bold;
+    -fx-transition: 0.2s;
+}
+
+/* Nút UPDATE IMPORT */
+.button[text="UPDATE IMPORT"] {
+    -fx-background-color: #1E8449;
+    -fx-text-fill: white;
+}
+
+.button[text="UPDATE IMPORT"]:hover {
+    -fx-background-color: #145A32;
+    -fx-translate-y: -1;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 5, 0, 0, 1);
+}
+
+/* Nút Cancel */
+.button[text="Cancel"] {
+    -fx-background-color: white;
+    -fx-text-fill: #7f8c8d;
+    -fx-border-color: #bdc3c7;
+}
+
+.button[text="Cancel"]:hover {
+    -fx-background-color: #f8f9fa;
+    -fx-border-color: #95a5a6;
+}
+
+/* 7. Vùng Quick Select (Bên phải) */
+.scroll-pane {
+    -fx-background-color: transparent;
+    -fx-padding: 5;
+}
+
+/* Card sản phẩm tạo động */
+.product-card {
+    -fx-background-color: #ffffff;
+    -fx-padding: 12;
+    -fx-alignment: center;
+    -fx-border-color: #dcdde1;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-pref-width: 160;
+    -fx-cursor: hand;
+}
+
+.product-card:hover {
+    -fx-border-color: #FF9800; /* Viền cam khi rê chuột chọn */
+    -fx-border-width: 2;
+    -fx-translate-y: -2;
+}
+
+.product-card .label-price {
+    -fx-text-fill: #FF9800; /* Giá sản phẩm màu cam */
+    -fx-font-weight: bold;
+}

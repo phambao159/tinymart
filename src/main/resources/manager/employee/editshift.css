@@ -1,0 +1,76 @@
+/* 1. Nền tổng thể */
+.mainFxmlClass {
+    -fx-background-color: #ffffff;
+}
+
+/* 2. Tiêu đề cửa sổ */
+.vbox > .label {
+    -fx-text-fill: #2C3E50;
+    -fx-font-family: "Segoe UI Semibold", Arial;
+    -fx-padding: 0 0 5 0;
+}
+
+/* 3. Label mô tả các trường nhập liệu */
+.grid-pane .label {
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #5D6D7E;
+}
+
+/* 4. Tùy chỉnh các ô nhập liệu (TextField) */
+.text-field {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #D5DBDB;
+    -fx-border-radius: 5;
+    -fx-background-radius: 5;
+    -fx-min-height: 35px;
+    -fx-font-size: 13px;
+}
+
+.text-field:focused {
+    -fx-border-color: #007bff; /* Màu xanh dương đồng bộ với nút Update */
+    -fx-border-width: 1.5;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 123, 255, 0.1), 5, 0, 0, 0);
+}
+
+/* 5. Định dạng các nút bấm (Buttons) */
+.button {
+    -fx-cursor: hand;
+    -fx-background-radius: 5;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-transition: 0.2s;
+}
+
+/* Hiệu ứng nhấc nút lên khi hover */
+.button:hover {
+    -fx-translate-y: -1;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 5, 0, 0, 2);
+}
+
+/* Nút UPDATE (Xanh dương - Chính) */
+.button[text="UPDATE"] {
+    -fx-background-color: #1E8449;
+    -fx-text-fill: white;
+}
+.button[text="UPDATE"]:hover {
+    -fx-background-color: #145A32;
+}
+
+/* Nút DELETE (Đỏ - Cảnh báo) */
+.button[text="DELETE"] {
+    -fx-background-color: #dc3545;
+    -fx-text-fill: white;
+}
+.button[text="DELETE"]:hover {
+    -fx-background-color: #c82333;
+}
+
+/* Nút CANCEL (Xám - Thoát) */
+.button[text="CANCEL"] {
+    -fx-background-color: #6c757d;
+    -fx-text-fill: white;
+}
+.button[text="CANCEL"]:hover {
+    -fx-background-color: #5a6268;
+}

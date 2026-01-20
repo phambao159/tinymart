@@ -1,0 +1,76 @@
+/* 1. Tổng thể khung nền */
+.mainFxmlClass {
+    -fx-background-color: #ffffff;
+}
+
+/* 2. Tiêu đề "Add New Category" */
+#title{
+    -fx-text-fill: #1E8449; /* Màu xanh lá chủ đạo cho các trang Add */
+    -fx-font-family: "Segoe UI", Arial;
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-padding: 0 0 5 0;
+}
+
+/* 3. Kiểu cho các nhãn Label */
+.label {
+    -fx-font-family: "Segoe UI", Arial;
+    -fx-text-fill: #2C3E50;
+    -fx-font-size: 14px;
+}
+
+/* 4. Ô nhập liệu (TextField & TextArea) */
+.text-field, .text-area {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #D5DBDB;
+    -fx-border-radius: 4;
+    -fx-background-radius: 4;
+    -fx-font-size: 13px;
+}
+
+/* Hiệu ứng Highlight màu cam khi focus giống trang Edit/Add Product */
+.text-field:focused, .text-area:focused {
+    -fx-border-color: #FF9800; 
+    -fx-border-width: 1.5;
+}
+
+/* 5. Nút bấm chung */
+.button {
+    -fx-cursor: hand;
+    -fx-font-weight: bold;
+    -fx-padding: 8 15;
+    -fx-background-radius: 5;
+    -fx-font-family: "Segoe UI", Arial;
+    -fx-transition: all 0.2s;
+}
+
+/* Nút Cancel (Ghi đè style inline để mượt hơn) */
+.button[onAction="#onCancel"] {
+    -fx-background-color: #ECF0F1 !important;
+    -fx-text-fill: #2C3E50 !important;
+}
+
+.button[onAction="#onCancel"]:hover {
+    -fx-background-color: #D5DBDB !important;
+}
+
+/* Nút Save (Màu xanh lá) */
+.button[onAction="#onSave"] {
+    -fx-background-color: #27ae60 !important;
+    -fx-text-fill: white !important;
+}
+
+.button[onAction="#onSave"]:hover {
+    -fx-background-color: #219150 !important;
+    /* Hiệu ứng đổ bóng nhẹ khi hover */
+    -fx-effect: dropshadow(three-pass-box, rgba(39, 174, 96, 0.3), 10, 0, 0, 0);
+}
+
+/* Tùy chỉnh thanh cuộn bên trong TextArea cho gọn */
+.text-area .scroll-pane {
+    -fx-background-color: transparent;
+}
+
+.text-area .content {
+    -fx-background-color: #ffffff;
+}

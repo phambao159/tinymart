@@ -1,0 +1,66 @@
+/* 1. Tổng thể khung nền */
+.mainFxmlClass {
+    -fx-background-color: #ffffff;
+}
+
+/* 2. Tiêu đề "Add New Size" */
+#title {
+    -fx-text-fill: #1E8449; /* Màu xanh lá chủ đạo cho trang Add */
+    -fx-font-family: "Segoe UI", Arial;
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+}
+
+/* 3. Kiểu cho nhãn "Size Type:" */
+.label {
+    -fx-font-family: "Segoe UI", Arial;
+    -fx-text-fill: #2C3E50;
+    -fx-font-size: 14px;
+}
+
+/* 4. Ô nhập liệu TextField */
+.text-field {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #D5DBDB;
+    -fx-border-radius: 4;
+    -fx-background-radius: 4;
+    -fx-padding: 5 10;
+    -fx-font-size: 13px;
+}
+
+/* Hiệu ứng màu cam khi người dùng nhấn vào ô nhập liệu */
+.text-field:focused {
+    -fx-border-color: #FF9800; 
+    -fx-border-width: 1.5;
+}
+
+/* 5. Nút bấm chung */
+.button {
+    -fx-cursor: hand;
+    -fx-font-weight: bold;
+    -fx-padding: 7 15;
+    -fx-background-radius: 5;
+    -fx-font-family: "Segoe UI", Arial;
+}
+
+/* Nút Cancel (Màu xám) */
+.button:not([style*="background-color"]) {
+    -fx-background-color: #ECF0F1;
+    -fx-text-fill: #2C3E50;
+    -fx-border-color: transparent;
+}
+
+.button:not([style*="background-color"]):hover {
+    -fx-background-color: #D5DBDB;
+}
+
+/* Nút Save (Màu xanh lá - Ghi đè style trong FXML) */
+.button[onAction="#onSave"] {
+    -fx-background-color: #27ae60 !important;
+    -fx-text-fill: white !important;
+}
+
+.button[onAction="#onSave"]:hover {
+    -fx-background-color: #219150 !important;
+    -fx-effect: dropshadow(three-pass-box, rgba(39, 174, 96, 0.3), 10, 0, 0, 0);
+}

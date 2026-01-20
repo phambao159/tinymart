@@ -1,0 +1,94 @@
+/* Tổng thể khung cửa sổ */
+.mainFxmlClass {
+    -fx-background-color: #ffffff;
+}
+
+/* Tiêu đề chính */
+.label {
+    -fx-font-family: "Segoe UI", Arial;
+    -fx-text-fill: #2C3E50;
+    -fx-font-size: 14px;
+}
+
+/* Tiêu đề lớn (Edit Product Information) */
+.mainFxmlClass > VBox > Label:first-child {
+    -fx-text-fill: #1E8449; /* Đổi từ màu xanh dương cũ sang màu chủ đạo */
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+    -fx-padding: 0 0 10 0;
+}
+
+/* Kiểu cho TextField và ComboBox */
+.text-field, .combo-box {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #D5DBDB;
+    -fx-border-radius: 4;
+    -fx-background-radius: 4;
+}
+
+/* Highlight khi người dùng chọn vào ô nhập liệu */
+.text-field:focused, .combo-box:focused {
+    -fx-border-color: #FF9800; /* Màu cam Highlight */
+    -fx-border-width: 1.5;
+}
+
+/* TextField ID (Chế độ chỉ đọc) */
+#txtID {
+    -fx-background-color: #F4F6F6;
+    -fx-text-fill: #7F8C8D;
+    -fx-border-color: #D5DBDB;
+}
+
+/* Định dạng khung xem trước hình ảnh */
+#imgPreview {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #EAECEE;
+    -fx-border-width: 2;
+    -fx-border-radius: 8;
+}
+
+/* Nút bấm chung */
+.button {
+    -fx-cursor: hand;
+    -fx-font-weight: bold;
+    -fx-padding: 8 15;
+    -fx-background-radius: 5;
+    -fx-transition: all 0.2s;
+}
+
+/* Nút Change Image & Cancel */
+.button:not([style*="background-color"]) {
+    -fx-background-color: #ECF0F1;
+    -fx-text-fill: #2C3E50;
+}
+
+.button:not([style*="background-color"]):hover {
+    -fx-background-color: #D5DBDB;
+}
+
+/* Nút Update (Màu xanh chủ đạo) */
+.button[onAction="#onUpdate"] {
+    -fx-background-color: #1E8449 !important;
+    -fx-text-fill: white !important;
+}
+
+.button[onAction="#onUpdate"]:hover {
+    -fx-background-color: #145A32 !important;
+    -fx-effect: dropshadow(three-pass-box, rgba(30, 132, 73, 0.3), 10, 0, 0, 0);
+}
+
+/* Nút Delete (Màu đỏ cảnh báo) */
+.button[onAction="#onDelete"] {
+    -fx-background-color: #E74C3C !important;
+    -fx-text-fill: white !important;
+}
+
+.button[onAction="#onDelete"]:hover {
+    -fx-background-color: #C0392B !important;
+}
+
+/* Separator đứng */
+.separator:vertical .line {
+    -fx-border-color: #D5DBDB;
+    -fx-border-width: 0 1 0 0;
+}

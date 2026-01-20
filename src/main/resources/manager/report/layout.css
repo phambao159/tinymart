@@ -1,0 +1,114 @@
+/*
+ * Empty Stylesheet file.
+ */
+
+.mainFxmlClass {
+    -fx-background-color: white;
+}
+/* Style chung cho các thẻ Card */
+/* Style chung cho các thẻ Card */
+.vbox-card {
+    -fx-background-radius: 8;
+    -fx-padding: 15;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 5, 0, 0, 3);
+}
+
+/* Ép tất cả Label bên trong Card sang màu trắng để giống mẫu */
+.vbox-card .label {
+    -fx-text-fill: white;
+}
+
+/* 1. Card Doanh thu - Xanh lá (Success) */
+#cardRevenue {
+    -fx-background-color: #1E8449;
+}
+
+/* 2. Card Đơn hàng - Xanh dương (Primary) */
+#cardOrder {
+    -fx-background-color: #448AFF;
+}
+
+/* 3. Card Danh mục - Cam (Warning/Alert) */
+#cardCategory {
+    -fx-background-color: #FF9800;
+}
+
+/* 4. Card Khách hàng - Tím (Accent) */
+#cardCustomer {
+    -fx-background-color: #9C27B0;
+}
+
+/* Tinh chỉnh riêng cho các con số lớn cho nổi bật */
+#revenue, #order, #category, #customer {
+    -fx-font-size: 26px;
+    -fx-font-weight: bold;
+}
+
+/* Tinh chỉnh cho các dòng chú thích nhỏ bên dưới */
+#subRevenue, #subOrder, #subCategory, #subCustomer {
+    -fx-opacity: 0.9;
+    -fx-font-size: 12px;
+}
+#viewReport{
+    -fx-padding : 15 0 0 0;
+}
+
+/* Quan trọng: Khử màu xám và viền của ScrollPane */
+#viewOrder {
+    -fx-background-color: #ffffff;
+    -fx-background: #ffffff; /* Thuộc tính này quyết định màu nền thực của vùng chứa */
+    -fx-border-color: transparent; /* Ẩn viền nếu muốn */
+}
+
+/* Khử màu nền xám của lớp phủ bên trong ScrollPane */
+#viewOrder .viewport {
+    -fx-background-color: #ffffff;
+}
+
+/* Vùng chứa các card */
+#orderContainer {
+    -fx-background-color: #ffffff;
+    -fx-padding: 15px; /* Thêm khoảng trống ở mép để các card không dính sát viền */
+}
+.toggle-button {
+    -fx-background-color: #f1f2f6;
+    -fx-text-fill: #2f3542;
+    -fx-border-color: #d1d8e0;
+    -fx-border-width: 1;
+    -fx-padding: 8 20;
+    -fx-cursor: hand;
+}
+
+/* Trạng thái khi được chọn (Selected) */
+.toggle-button:selected {
+    -fx-background-color: #1E8449; /* Màu xanh chủ đạo */
+    -fx-text-fill: white;
+    -fx-border-color: #2980b9;
+}
+
+/* Bo góc cho nút đầu và nút cuối */
+.toggle-button:first-child {
+    -fx-background-radius: 5 0 0 5;
+    -fx-border-radius: 5 0 0 5;
+}
+
+.toggle-button:last-child {
+    -fx-background-radius: 0 5 5 0;
+    -fx-border-radius: 0 5 5 0;
+    -fx-border-insets: 0 0 0 -1; /* Đè viền lên nhau */
+}
+
+#btnSeeMore {
+    -fx-background-color: #1E8449; 
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+    -fx-min-height: 35px;
+    -fx-padding: 0 20 0 20;
+    -fx-background-radius: 4;
+}
+
+#btnSeeMore:hover {
+    -fx-background-color: #145A32;
+    -fx-translate-y: -1;
+}

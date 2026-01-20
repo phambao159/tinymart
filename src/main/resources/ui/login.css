@@ -1,0 +1,66 @@
+#AnchorPane {
+    -fx-background-image: url('background.png');
+    -fx-background-size: cover; 
+    -fx-background-repeat: no-repeat;
+    -fx-background-position: center center;
+}
+
+/* Giảm radius của shadow xuống mức tối thiểu (10) hoặc dùng Border */
+#mainLogin {
+    -fx-padding: 60px 30px;
+    -fx-background-radius: 20px;
+    -fx-background-color: white;
+    /* Dùng shadow rất nhẹ để không gây lag */
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.05), 10, 0, 0, 0);
+}
+
+#hBoxImage {
+    -fx-background-radius: 999px;
+    -fx-background-color: white;
+    /* Thay vì shadow 60, dùng viền mỏng để làm nổi bật */
+    -fx-border-color: #A9DFBF;
+    -fx-border-radius: 999px;
+    -fx-border-width: 1px;
+}
+
+.text-field {
+    -fx-background-color: #F4F7F5; /* Màu nền hơi xám nhẹ cho hiện đại */
+    -fx-background-radius: 8px;
+    -fx-border-radius: 8px;
+    -fx-border-color: transparent; /* Mặc định không viền */
+    -fx-padding: 10px;
+    -fx-font-size: 14px;
+    -fx-font-family: "Inter", "Arial", sans-serif;
+    -fx-transition: all 0.2s;
+}
+
+/* Hiệu ứng khi focus: Chỉ đổi màu viền và màu nền, KHÔNG dùng shadow */
+.text-field:focused {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #27AE60;
+    -fx-border-width: 1.5px;
+    -fx-effect: null; 
+}
+
+.button {
+    -fx-font-family: "Inter", "Arial", sans-serif;
+    -fx-background-color: #27AE60;
+    -fx-text-fill: white;
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+    -fx-padding: 10px 40px;
+    -fx-background-radius: 8px;
+    -fx-cursor: hand;
+}
+
+.button:hover {
+    -fx-background-color: #1E8449;
+    /* Hiệu ứng phóng to nhẹ thay vì bóng đổ */
+    -fx-scale-x: 1.02;
+    -fx-scale-y: 1.02;
+}
+
+.button:pressed {
+    -fx-scale-x: 0.98;
+    -fx-scale-y: 0.98;
+}

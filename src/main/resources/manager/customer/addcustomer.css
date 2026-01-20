@@ -1,0 +1,67 @@
+/* 1. Nền tổng thể cửa sổ */
+.mainFxmlClass {
+    -fx-background-color: #ffffff;
+}
+
+/* 2. Tiêu đề "ADD NEW CUSTOMER" */
+#title {
+    -fx-text-fill: #1E8449; 
+    -fx-font-family: "Segoe UI Semibold", Arial;
+}
+
+/* 3. Label cho các trường dữ liệu */
+.grid-pane .label {
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #5D6D7E;
+}
+
+/* 4. Tùy chỉnh các ô nhập liệu (TextField) */
+.text-field {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #D5DBDB;
+    -fx-border-radius: 5;
+    -fx-background-radius: 5;
+    -fx-min-height: 38px;
+    -fx-font-size: 13px;
+    -fx-padding: 0 10 0 10;
+}
+
+/* Hiệu ứng khi người dùng click vào ô nhập */
+.text-field:focused {
+    -fx-border-color: #1E8449; /* Màu tím Indigo */
+    -fx-border-width: 1.5;
+    -fx-effect: dropshadow(three-pass-box, rgba(103, 58, 183, 0.1), 5, 0, 0, 0);
+}
+
+/* 5. Định dạng các nút bấm */
+.button {
+    -fx-cursor: hand;
+    -fx-background-radius: 6;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-transition: 0.2s;
+}
+
+/* Nút SAVE (Xanh lá - Thành công) */
+.button[text="SAVE"] {
+    -fx-background-color: #28a745;
+    -fx-text-fill: white;
+}
+
+.button[text="SAVE"]:hover {
+    -fx-background-color: #218838;
+    -fx-translate-y: -1;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 5, 0, 0, 2);
+}
+
+/* Nút CANCEL (Xám - Trung tính) */
+.button[text="CANCEL"] {
+    -fx-background-color: #6c757d;
+    -fx-text-fill: white;
+}
+
+.button[text="CANCEL"]:hover {
+    -fx-background-color: #5a6268;
+    -fx-translate-y: -1;
+}
