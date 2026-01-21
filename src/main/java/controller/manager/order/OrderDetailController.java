@@ -22,8 +22,11 @@ public class OrderDetailController implements Initializable {
     @FXML private Label lbDate;
     @FXML private Label lbCustomer;
     @FXML private Label lbEmployee;
-    @FXML private Label lbTotal;
-    @FXML private Label lbDiscount;
+    
+    @FXML private Label lbTotal;        // Tổng tiền hàng (Gốc)
+    @FXML private Label prDiscount;     // Giảm giá Voucher/Promotion
+    @FXML private Label pDiscount;      // Giảm giá Điểm (Point)
+    @FXML private Label lbActualTotal;  // Thực trả (Thêm mới nếu FXML có, hoặc dùng lbTotal tùy bạn)
 
     @FXML private TableView<OrderDetail> tbDetail;
     @FXML private TableColumn<OrderDetail, String> colProduct;
@@ -31,7 +34,6 @@ public class OrderDetailController implements Initializable {
     @FXML private TableColumn<OrderDetail, Integer> colQuantity;
     @FXML private TableColumn<OrderDetail, Double> colSubTotal;
 
-    // Sử dụng OrderDetailDAO cung cấp quyền truy cập dữ liệu chi tiết hóa đơn
     private final OrderDetailDAO detailDAO = new OrderDetailDAO();
 
     @Override
@@ -39,11 +41,8 @@ public class OrderDetailController implements Initializable {
         setupTableColumns();
     }
 
-    /**
-     * Cấu hình các cột cho TableView chi tiết hóa đơn
-     */
     private void setupTableColumns() {
-        // Hiển thị kết hợp ProductName + TypeName (Ví dụ: Coca Cola (Size L))
+        // Hiển thị ProductName (TypeName)
         colProduct.setCellFactory(column -> new TableCell<OrderDetail, String>() {
             @Override
             protected void updateItem(String item, boolean empty) {
@@ -59,41 +58,48 @@ public class OrderDetailController implements Initializable {
 
         colPrice.setCellValueFactory(new PropertyValueFactory<>("unitPrice"));
         colQuantity.setCellValueFactory(new PropertyValueFactory<>("quantity"));
-        
-        // Cột SubTotal sử dụng thuộc tính tự tính toán trong Model OrderDetail
         colSubTotal.setCellValueFactory(new PropertyValueFactory<>("subTotal"));
 
-        // Định dạng số và căn lề
         formatCurrencyColumn(colPrice);
         formatCurrencyColumn(colSubTotal);
         colQuantity.setStyle("-fx-alignment: CENTER;");
     }
 
     /**
-     * Phương thức chính để đổ dữ liệu từ trang danh sách Order sang trang chi tiết
-     * @param order Đối tượng Order được chọn từ TableView chính
+     * Đổ dữ liệu từ đơn hàng vào các nhãn hiển thị
      */
     public void setData(Order order) {
-        // 1. Gán dữ liệu Header từ object Order
+        // 1. Thông tin chung
         lbOrderID.setText("#" + order.getOrderID());
         lbDate.setText(order.getOrderDateTime().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")));
-        lbCustomer.setText(order.getCustomerName());
+        lbCustomer.setText(order.getCustomerName() != null ? order.getCustomerName() : "Guest");
         lbEmployee.setText(order.getEmployeeName());
         
-        // Hiển thị Tổng tiền và Giảm giá (giữ từ bản HEAD)
+        // 2. Thông tin thanh toán chi tiết
+        // lbTotal hiển thị tổng tiền hàng chưa trừ giảm giá
         lbTotal.setText(String.format("%,.0f", order.getTotalAmount()));
-        if (lbDiscount != null) {
-            lbDiscount.setText(String.format("-%,.0f", order.getDiscountAmount()));
+        
+        // prDiscount hiển thị giảm giá khuyến mãi (Voucher)
+        if (prDiscount != null) {
+            prDiscount.setText(String.format("-%,.0f", order.getDiscountAmount()));
+        }
+        
+        // pDiscount hiển thị giảm giá bằng điểm tích lũy
+        if (pDiscount != null) {
+            pDiscount.setText(String.format("-%,.0f", order.getPointDiscount()));
         }
 
-        // 2. Gọi OrderDetailDAO để lấy danh sách các mặt hàng trong hóa đơn
+        // Nếu bạn có label hiển thị con số cuối cùng khách phải trả
+        if (lbActualTotal != null) {
+            double actualPay = order.getTotalAmount() - order.getDiscountAmount() - order.getPointDiscount();
+            lbActualTotal.setText(String.format("%,.0f", actualPay));
+        }
+
+        // 3. Tải danh sách sản phẩm chi tiết
         List<OrderDetail> details = detailDAO.getDetailsByOrderId(order.getOrderID());
         tbDetail.setItems(FXCollections.observableArrayList(details));
     }
 
-    /**
-     * Định dạng cột tiền tệ: Căn phải, thêm dấu phân cách hàng nghìn
-     */
     private void formatCurrencyColumn(TableColumn<OrderDetail, Double> column) {
         column.setCellFactory(tc -> new TableCell<OrderDetail, Double>() {
             @Override
