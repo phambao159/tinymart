@@ -10,12 +10,39 @@ public class EmployeeShiftDAO {
     private final DBConnection dc = new DBConnection();
 
     public int getCurrentShiftID() {
-        LocalTime now = LocalTime.now();
-        if (now.isBefore(LocalTime.of(14, 0))) {
-            return 1;
-        } else {
-            return 2;
+        int shiftId = 1;
+        String sql = "SELECT ShiftID, StartTime, EndTime FROM Shift";
+        
+        try (Connection conn = dc.getConnect(); 
+             PreparedStatement pstmt = conn.prepareStatement(sql); 
+             ResultSet rs = pstmt.executeQuery()) {
+
+            LocalTime now = LocalTime.now();
+            
+            while (rs.next()) {
+                Time dbStart = rs.getTime("StartTime");
+                Time dbEnd = rs.getTime("EndTime");
+                int id = rs.getInt("ShiftID");
+                
+                if (dbStart != null && dbEnd != null) {
+                    LocalTime start = dbStart.toLocalTime();
+                    LocalTime end = dbEnd.toLocalTime();                                       
+                    if (start.isBefore(end)) {
+                        if ((now.equals(start) || now.isAfter(start)) && now.isBefore(end)) {
+                            return id;
+                        }
+                    } 
+                    else {
+                        if ((now.equals(start) || now.isAfter(start)) || now.isBefore(end)) {
+                            return id;
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+        return shiftId;
     }
 
     public boolean isCheckedIn(int employeeID, int shiftID) {
