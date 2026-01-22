@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox xmlns="http://javafx.com/javafx/25"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="controller.Warehouse.InventoryReportCardController"
+      spacing="5"
+      style="-fx-border-color: #cccccc; -fx-border-radius: 5; -fx-padding: 10; -fx-background-color: #f9f9f9;">
+
+    <ImageView fx:id="productImage" fitWidth="80" fitHeight="80" preserveRatio="true"/>
+    <Label fx:id="productName" style="-fx-font-weight: bold; -fx-font-size: 14px;"/>
+    <Label fx:id="sizeType"/>
+    <Label fx:id="expireDate"/>
+    <Label fx:id="quantity"/>
+    <Label fx:id="status"/>
+    <Label fx:id="actionType" style="-fx-text-fill: #cc0000; -fx-font-weight: bold;"/>
+</VBox>

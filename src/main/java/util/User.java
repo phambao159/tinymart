@@ -30,4 +30,8 @@ public final class User {
     public void cleanUserSession() {
         employee = null;
     }
+
+    public Object getRole() {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
 }
