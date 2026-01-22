@@ -11,13 +11,13 @@ public class OrderDetailDAO {
     private final DBConnection dc = new DBConnection();
 
     /**
-     * Lấy danh sách chi tiết của một hóa đơn để hiển thị tên sản phẩm Đã bỏ
-     * SalePrice, chỉ lấy ProductName và TypeName
+     * Lấy danh sách chi tiết của một hóa đơn Lấy trực tiếp các trường giá từ
+     * bảng OrderDetail
      */
     public List<OrderDetail> getDetailsByOrderId(int orderId) {
         List<OrderDetail> list = new ArrayList<>();
-        // Thêm ps.SellingPrice vào câu lệnh SELECT
-        String sql = "SELECT od.*, p.Name AS ProductName, s.Type AS TypeName, ps.SellingPrice "
+        // SQL lấy các trường giá từ chính bảng OrderDetail và JOIN để lấy tên hiển thị
+        String sql = "SELECT od.*, p.Name AS ProductName, s.Type AS TypeName "
                 + "FROM OrderDetail od "
                 + "JOIN ProductSize ps ON od.ProductSizeID = ps.ProductSizeID "
                 + "JOIN Product p ON ps.ProductID = p.ProductID "
@@ -35,9 +35,12 @@ public class OrderDetailDAO {
                     detail.setProductSizeID(rs.getInt("ProductSizeID"));
                     detail.setQuantity(rs.getInt("Quantity"));
 
-                    // Lấy SellingPrice từ bảng ProductSize và gán vào field UnitPrice của Model
-                    detail.setUnitPrice(rs.getDouble("SellingPrice"));
+                    // Lấy 3 trường giá mới từ DB
+                    detail.setOriginalPrice(rs.getDouble("original_price"));
+                    detail.setSellingPrice(rs.getDouble("selling_price"));
+                    detail.setUnitCost(rs.getDouble("unit_cost"));
 
+                    // Các trường thông tin thêm
                     detail.setProductName(rs.getString("ProductName"));
                     detail.setTypeName(rs.getString("TypeName"));
 
@@ -51,16 +54,20 @@ public class OrderDetailDAO {
     }
 
     /**
-     * Thêm mới chi tiết hóa đơn (Chỉ gồm ID và số lượng)
+     * Thêm mới chi tiết hóa đơn (Bao gồm cả các mức giá tại thời điểm bán)
      */
     public boolean insert(OrderDetail detail) {
-        String sql = "INSERT INTO OrderDetail (OrderID, ProductSizeID, Quantity) VALUES (?, ?, ?)";
+        String sql = "INSERT INTO OrderDetail (OrderID, ProductSizeID, Quantity, original_price, selling_price, unit_cost) "
+                + "VALUES (?, ?, ?, ?, ?, ?)";
 
         try (Connection conn = dc.getConnect(); PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, detail.getOrderID());
             ps.setInt(2, detail.getProductSizeID());
             ps.setInt(3, detail.getQuantity());
+            ps.setDouble(4, detail.getOriginalPrice());
+            ps.setDouble(5, detail.getSellingPrice());
+            ps.setDouble(6, detail.getUnitCost());
 
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
@@ -73,7 +80,8 @@ public class OrderDetailDAO {
      * Thêm hàng loạt chi tiết hóa đơn (Dùng Transaction)
      */
     public boolean insertMultiple(List<OrderDetail> details) {
-        String sql = "INSERT INTO OrderDetail (OrderID, ProductSizeID, Quantity) VALUES (?, ?, ?)";
+        String sql = "INSERT INTO OrderDetail (OrderID, ProductSizeID, Quantity, original_price, selling_price, unit_cost) "
+                + "VALUES (?, ?, ?, ?, ?, ?)";
         Connection conn = null;
         try {
             conn = dc.getConnect();
@@ -84,6 +92,9 @@ public class OrderDetailDAO {
                     ps.setInt(1, detail.getOrderID());
                     ps.setInt(2, detail.getProductSizeID());
                     ps.setInt(3, detail.getQuantity());
+                    ps.setDouble(4, detail.getOriginalPrice());
+                    ps.setDouble(5, detail.getSellingPrice());
+                    ps.setDouble(6, detail.getUnitCost());
                     ps.addBatch();
                 }
                 ps.executeBatch();

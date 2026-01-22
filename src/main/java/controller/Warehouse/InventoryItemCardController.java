@@ -1,11 +1,18 @@
 package controller.Warehouse;
 
+import dao.Warehouse.InventoryItemDetailDAO;
+import java.util.List;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 import model.Warehouse.InventoryItemCard;
+import model.Warehouse.InventoryItemDetailRow;
 
 public class InventoryItemCardController {
 
@@ -16,13 +23,7 @@ public class InventoryItemCardController {
     @FXML
     private Label sizeType;
     @FXML
-    private Label inboundQuantity;
-    @FXML
-    private Label outboundQuantity;
-    @FXML
-    private Label expiryDate;
-    @FXML
-    private Label status;
+    private Label stockLabel;   // ✅ hiển thị tổng stock
     @FXML
     private VBox cardRoot;
 
@@ -33,10 +34,7 @@ public class InventoryItemCardController {
 
         productName.setText(item.getProductName());
         sizeType.setText(item.getSizeType());
-        inboundQuantity.setText("Inbound: " + item.getInboundQuantity());
-        outboundQuantity.setText("Outbound: " + item.getOutboundQuantity());
-        expiryDate.setText(item.getExpiryDate() != null ? item.getExpiryDate().toString() : "N/A");
-        status.setText(item.getStatus());
+        stockLabel.setText("Stock: " + item.getStock());
 
         // Load ảnh
         if (item.getImagePath() != null) {
@@ -48,13 +46,36 @@ public class InventoryItemCardController {
             }
         }
 
-        // ✅ Nếu status = inactive → làm mờ card
-        if ("inactive".equalsIgnoreCase(item.getStatus())) {
-            cardRoot.setOpacity(0.5);   // chỉ làm mờ toàn bộ card
-            cardRoot.setDisable(true);  // disable để không cho double-click
-        } else {
-            cardRoot.setOpacity(1.0);   // active thì hiển thị bình thường
-            cardRoot.setDisable(false);
+        // ✅ Double-click mở chi tiết
+        cardRoot.setOnMouseClicked(event -> {
+            if (event.getClickCount() == 2) {
+                openDetailWindow(item);
+            }
+        });
+    }
+
+    private void openDetailWindow(InventoryItemCard item) {
+        try {
+            // Lấy dữ liệu chi tiết từ DAO
+            InventoryItemDetailDAO detailDAO = new InventoryItemDetailDAO();
+            List<InventoryItemDetailRow> details = detailDAO.getDetailsByProductSizeId(item.getProductSizeId());
+
+            // Load FXML chi tiết
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/Warehouse/InventoryItemDetail.fxml"));
+            Parent root = loader.load();
+
+            // Set dữ liệu cho controller chi tiết
+            InventoryItemDetailController controller = loader.getController();
+            controller.setData(item.getProductName(), item.getSizeType(), "active", details); 
+            // ✅ status có thể bỏ, hoặc set mặc định "active"
+
+            // Mở cửa sổ mới
+            Stage stage = new Stage();
+            stage.setTitle("Product Details");
+            stage.setScene(new Scene(root));
+            stage.show();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 }

@@ -68,10 +68,16 @@
             <children>
                 <HBox alignment="CENTER_RIGHT" spacing="15.0">
                     <children>
-                        <Label style="-fx-font-size: 14px;" text="Total Discount:" />
-                        <Label fx:id="lbDiscount" style="-fx-font-size: 16px; -fx-font-weight: bold;" text="0.00" textFill="#e74c3c" />
+                        <Label style="-fx-font-size: 14px;" text="Product Discount:" />
+                        <Label fx:id="prDiscount" style="-fx-font-size: 16px; -fx-font-weight: bold;" text="0.00" textFill="#e74c3c" />
                     </children>
                 </HBox>
+            <HBox alignment="CENTER_RIGHT" spacing="15.0">
+               <children>
+                  <Label style="-fx-font-size: 14px;" text="Point Discount:" />
+                  <Label fx:id="pDiscount" style="-fx-font-size: 16px; -fx-font-weight: bold;" text="0.00" textFill="#e74c3c" />
+               </children>
+            </HBox>
                 <HBox alignment="CENTER_RIGHT" spacing="15.0">
                     <children>
                         <Label style="-fx-font-size: 16px; -fx-font-weight: bold;" text="Total Amount:" />

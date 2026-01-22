@@ -74,9 +74,9 @@ public class ImportDetailController {
         txtLyDo.setText(imp.getStatus());
         txtTongTien.setText(String.valueOf(imp.getTotalCost()));
 
-        boolean isConfirmed = "Confirmed".equalsIgnoreCase(imp.getStatus());
-        btnConfirm.setDisable(isConfirmed);
-        tbImportDetail.setEditable(!isConfirmed);
+        boolean isCompleted = "Completed".equalsIgnoreCase(imp.getStatus());
+        btnConfirm.setDisable(isCompleted);
+        tbImportDetail.setEditable(!isCompleted);
 
         // Setup columns
         colImportDetailID.setCellValueFactory(new PropertyValueFactory<>("importDetailID"));
@@ -153,9 +153,9 @@ public class ImportDetailController {
             }
 
             // Sau khi cập nhật ExpiryDate thành công -> cập nhật Status
-            boolean success = importDAO.updateStatus(importData.getImportID(), "Confirmed");
+            boolean success = importDAO.updateStatus(importData.getImportID(), "Completed");
             if (success) {
-                txtLyDo.setText("Confirmed");
+                txtLyDo.setText("Completed");
                 Alert alert = new Alert(Alert.AlertType.INFORMATION, "Xác nhận thành công!");
                 alert.showAndWait();
                 btnConfirm.setDisable(true);

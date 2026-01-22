@@ -3,7 +3,6 @@
 <?import java.net.URL?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ToggleButton?>
-<?import javafx.scene.control.ToggleGroup?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
@@ -27,52 +26,65 @@
               AnchorPane.bottomAnchor="25.0"
               AnchorPane.leftAnchor="35.0"
               prefWidth="168.0">
+
             <children>
+                <!-- Logo -->
                 <HBox fx:id="hBoxImage" alignment="CENTER" prefHeight="100.0" prefWidth="200.0">
                     <children>
-                        <ImageView fx:id="imgLogo" fitHeight="121.0" fitWidth="179.0" pickOnBounds="true" preserveRatio="true">
+                        <ImageView fx:id="imgLogo" fitHeight="121.0" fitWidth="179.0"
+                                   pickOnBounds="true" preserveRatio="true">
                             <image>
                                 <Image url="@../ui/logotinymart.png" />
                             </image>
                         </ImageView>
                     </children>
                 </HBox>
+
+                <!-- Welcome -->
                 <HBox fx:id="hBoxWelcome" alignment="CENTER" prefHeight="39.0" prefWidth="168.0">
                     <children>
                         <Label fx:id="lbWelcome" text="Welcome!" />
                     </children>
                 </HBox>
+
+                <!-- Các nút menu -->
                 <HBox alignment="CENTER" prefHeight="60.0" prefWidth="169.0">
                     <children>
-                        <ToggleButton mnemonicParsing="false" onAction="#onStorage" prefHeight="40.0" prefWidth="175.0" selected="true" text="Storage">
-                            <toggleGroup>
-                                <ToggleGroup fx:id="toggleMenu" />
-                            </toggleGroup>
-                        </ToggleButton>
+                        <ToggleButton fx:id="btnStorage" text="Storage"
+                                      prefHeight="40.0" prefWidth="175.0"
+                                      onAction="#onStorage"/>
                     </children>
                 </HBox>
+
                 <HBox alignment="CENTER" prefHeight="60.0" prefWidth="168.0">
                     <children>
-                        <ToggleButton mnemonicParsing="false" onAction="#onOverView" prefHeight="40.0" prefWidth="171.0" text="OverView" toggleGroup="$toggleMenu" />
+                        <ToggleButton fx:id="btnOverview" text="OverView"
+                                      prefHeight="40.0" prefWidth="171.0"
+                                      onAction="#onOverView"/>
                     </children>
                 </HBox>
+
                 <HBox alignment="CENTER" prefHeight="60.0" prefWidth="168.0">
                     <children>
-                        <ToggleButton fx:id="lbNoti" mnemonicParsing="false" onAction="#onNotifi" prefHeight="40.0" prefWidth="171.0" text="Notification" toggleGroup="$toggleMenu" />
+                        <ToggleButton fx:id="lbNoti" text="Notification"
+                                      prefHeight="40.0" prefWidth="171.0"
+                                      onAction="#onNotifi"/>
                     </children>
                 </HBox>
+
                 <HBox alignment="CENTER" prefHeight="60.0" prefWidth="168.0">
                     <children>
-                        <ToggleButton mnemonicParsing="false" onAction="#onOverView" prefHeight="40.0" prefWidth="171.0" text="Inventory Report">
-                            <toggleGroup>
-                                <ToggleGroup fx:id="toggleMenu11" />
-                            </toggleGroup>
-                        </ToggleButton>
+                        <ToggleButton fx:id="btnInventoryReport" text="Inventory Report"
+                                      prefHeight="40.0" prefWidth="171.0"
+                                      onAction="#onInvenRep"/>
                     </children>
                 </HBox>
+
                 <HBox alignment="CENTER" prefHeight="60.0" prefWidth="168.0">
                     <children>
-                        <ToggleButton mnemonicParsing="false" onAction="#onLogout" prefHeight="40.0" prefWidth="172.0" text="LogOut" />
+                        <ToggleButton fx:id="btnLogout" text="LogOut"
+                                      prefHeight="40.0" prefWidth="172.0"
+                                      onAction="#onLogout"/>
                     </children>
                 </HBox>
             </children>

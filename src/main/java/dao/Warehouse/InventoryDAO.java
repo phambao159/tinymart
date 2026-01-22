@@ -13,8 +13,8 @@ public class InventoryDAO {
         itemCardDAO = new InventoryItemCardDAO();
     }
 
-    // Lấy toàn bộ inventory từ các Import đã Confirmed
-    public Inventory getConfirmedInventory() throws SQLException {
+    // Lấy toàn bộ inventory từ các Import đã Completed
+    public Inventory getCompletedInventory() throws SQLException {
         // Gọi searchItems với điều kiện rỗng để lấy tất cả
         List<InventoryItemCard> items = itemCardDAO.searchItems("", null, null);
         return new Inventory(items);

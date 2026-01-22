@@ -1,0 +1,46 @@
+/*
+Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+Click nbfs://nbhost/SystemFileSystem/Templates/Other/CascadeStyleSheet.css to edit this template
+*/
+/* 
+    Created on : 21 Jan 2026, 4:27:31 pm
+    Author     : ASUS
+*/
+/* Toàn bộ nền */
+#root {
+    -fx-background-image: url("background.png");     /* đường dẫn ảnh */
+    -fx-background-size: cover;                      /* phủ toàn bộ khung */
+    -fx-background-repeat: no-repeat;                /* không lặp lại */
+    -fx-background-position: center center;          /* căn giữa */
+    -fx-padding: 0;
+}
+
+/* Button màu cam, bo tròn */
+.button {
+    -fx-background-color: #e67e22;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-background-radius: 8;
+    -fx-padding: 6 12 6 12;
+}
+.button:hover {
+    -fx-background-color: #d35400;
+}
+
+/* Tiêu đề chính: Inventory Report */
+.label-title {
+    -fx-font-weight: bold;
+    -fx-text-fill: #ecf0f1;
+}
+
+/* Tiêu đề phụ: Alerts */
+.label-alert {
+    -fx-font-weight: bold;
+    -fx-text-fill: #ff7f7f; /* đỏ */
+}
+
+/* Tiêu đề phụ: Logs */
+.label-logs {
+    -fx-font-weight: bold;
+    -fx-text-fill: #ffd700; /* vàng */
+}

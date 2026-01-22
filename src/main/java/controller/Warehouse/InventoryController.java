@@ -33,12 +33,12 @@ public class InventoryController {
 
     @FXML
     public void initialize() {
-        loadConfirmedInventory();
+        loadCompletedInventory();
     }
 
-    private void loadConfirmedInventory() {
+    private void loadCompletedInventory() {
         try {
-            Inventory inventory = inventoryDAO.getConfirmedInventory();
+            Inventory inventory = inventoryDAO.getCompletedInventory();
             displayItems(inventory.getItems());
         } catch (Exception e) {
             e.printStackTrace();

@@ -145,7 +145,7 @@ public class NotificationDAO {
     public List<Notification> getSentNoti() throws Exception {
         List<Notification> list = new ArrayList<>();
         // Câu lệnh lấy các thông báo do EmployeeID = 1 gửi đi, sắp xếp mới nhất lên đầu
-        String sql = "SELECT * FROM Notification WHERE EmployeeID = 1 ORDER BY SentDate DESC";
+        String sql = "SELECT * FROM Notification WHERE EmployeeID = 1 AND SentDate <= NOW() ORDER BY SentDate DESC";
 
         try (Connection conn = dc.getConnect(); PreparedStatement pstmt = conn.prepareStatement(sql); ResultSet rs = pstmt.executeQuery()) {
 

@@ -11,6 +11,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -21,6 +22,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
@@ -36,23 +38,38 @@ import model.manager.supplier.Supplier;
 
 public class AddImportController implements Initializable {
 
-    @FXML private ComboBox<Supplier> cbSupplier;
-    @FXML private ComboBox<Employee> cbEmployee;
-    @FXML private ComboBox<String> cbStatus;
-    @FXML private DatePicker dpReceiptDate;
-    
-    @FXML private TableView<ImportDetail> tbDetails;
-    @FXML private TableColumn<ImportDetail, String> colProductName;
-    @FXML private TableColumn<ImportDetail, String> colSize;
-    @FXML private TableColumn<ImportDetail, Long> colQuantity;       // Tổng nhập
-    @FXML private TableColumn<ImportDetail, Integer> colShelfQuantity; // Số lượng lên kệ
-    @FXML private TableColumn<ImportDetail, Double> colPrice;
-    @FXML private TableColumn<ImportDetail, LocalDate> colExpireDay;
-    @FXML private TableColumn<ImportDetail, Double> colTotal;
-    
-    @FXML private Label lblTotalCost;
-    @FXML private TextField txtSearchProduct;
-    @FXML private FlowPane productContainer;
+    @FXML
+    private ComboBox<Supplier> cbSupplier;
+    @FXML
+    private ComboBox<Employee> cbEmployee;
+    @FXML
+    private ComboBox<String> cbStatus;
+    @FXML
+    private DatePicker dpReceiptDate;
+
+    @FXML
+    private TableView<ImportDetail> tbDetails;
+    @FXML
+    private TableColumn<ImportDetail, String> colProductName;
+    @FXML
+    private TableColumn<ImportDetail, String> colSize;
+    @FXML
+    private TableColumn<ImportDetail, Long> colQuantity;       // Tổng nhập
+    @FXML
+    private TableColumn<ImportDetail, Integer> colShelfQuantity; // Số lượng lên kệ
+    @FXML
+    private TableColumn<ImportDetail, Double> colPrice;
+    @FXML
+    private TableColumn<ImportDetail, LocalDate> colExpireDay;
+    @FXML
+    private TableColumn<ImportDetail, Double> colTotal;
+
+    @FXML
+    private Label lblTotalCost;
+    @FXML
+    private TextField txtSearchProduct;
+    @FXML
+    private FlowPane productContainer;
 
     private final ObservableList<ImportDetail> detailList = FXCollections.observableArrayList();
     private final SupplierDAO supplierDAO = new SupplierDAO();
@@ -66,7 +83,7 @@ public class AddImportController implements Initializable {
         setupTable();
         loadComboBoxData();
         loadProduct();
-        
+
         // Tìm kiếm sản phẩm thời gian thực
         txtSearchProduct.textProperty().addListener((obs, oldVal, newVal) -> loadProduct());
     }
@@ -75,7 +92,7 @@ public class AddImportController implements Initializable {
         // 1. Gán giá trị cho các cột
         colProductName.setCellValueFactory(new PropertyValueFactory<>("productName"));
         colSize.setCellValueFactory(new PropertyValueFactory<>("sizeName"));
-        
+
         // 2. Cột Tổng số lượng (Có thể sửa trực tiếp)
         colQuantity.setCellValueFactory(new PropertyValueFactory<>("quantity"));
         colQuantity.setCellFactory(TextFieldTableCell.forTableColumn(new LongStringConverter()));
@@ -167,11 +184,53 @@ public class AddImportController implements Initializable {
                 if (importDAO.saveImport(imp, detailList)) {
                     new Alert(Alert.AlertType.INFORMATION, "Saved successfully!").showAndWait();
                     onCancel(event);
+                    Platform.runLater(() -> {
+                        sendNotificationToWarehouse(imp, supplier, employee);
+                    });
                 } else {
                     showAlert("Database Error", "Failed to save import receipt.");
                 }
             }
         });
+    }
+
+    private void sendNotificationToWarehouse(Import imp, Supplier supplier, Employee creator) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/manager/notification/createnoti.fxml"));
+            AnchorPane pane = loader.load();
+
+            // Lấy chính xác controller bạn vừa sửa ở trên
+            controller.manager.notification.CreateNotiController notiCtrl = loader.getController();
+
+            String title = "New Stock Inbound: " + supplier.getName();
+
+            StringBuilder sb = new StringBuilder();
+            sb.append("Dear Warehouse Team,\n\n");
+            sb.append("A new import has been confirmed:\n");
+            sb.append("- Import ID: ").append(imp.getImportID()).append("\n");
+            sb.append("- Supplier: ").append(supplier.getName()).append("\n");
+            sb.append("- Date: ").append(LocalDate.now()).append("\n\n");
+            sb.append("Items List:\n");
+
+            for (ImportDetail d : detailList) {
+                sb.append(String.format(" + %s [%s]: %d units\n",
+                        d.getProductName(), d.getSizeName(), d.getQuantity()));
+            }
+
+            sb.append("\nPlease prepare for stock inspection and shelf replenishment.");
+
+            // Gọi hàm truyền dữ liệu
+            notiCtrl.setExternalData(title, sb.toString(), "Warehouse");
+
+            Stage stage = new Stage();
+            stage.setTitle("Confirm Notification");
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.setScene(new Scene(pane));
+            stage.show();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private void calculateTotal() {
@@ -197,21 +256,34 @@ public class AddImportController implements Initializable {
     private void loadComboBoxData() {
         cbSupplier.setItems(FXCollections.observableArrayList(supplierDAO.getAllSuppliers()));
         cbEmployee.setItems(FXCollections.observableArrayList(
-            employeeDAO.getData().stream().filter(e -> "Warehouse".equalsIgnoreCase(e.getRole())).collect(Collectors.toList())
+                employeeDAO.getData().stream().filter(e -> "Warehouse".equalsIgnoreCase(e.getRole())).collect(Collectors.toList())
         ));
         cbStatus.setItems(FXCollections.observableArrayList("Pending", "Completed", "Cancelled"));
 
         cbStatus.setValue("Pending");
 
-
         // Set hiển thị tên
         cbSupplier.setConverter(new javafx.util.StringConverter<>() {
-            @Override public String toString(Supplier s) { return s == null ? "" : s.getName(); }
-            @Override public Supplier fromString(String string) { return null; }
+            @Override
+            public String toString(Supplier s) {
+                return s == null ? "" : s.getName();
+            }
+
+            @Override
+            public Supplier fromString(String string) {
+                return null;
+            }
         });
         cbEmployee.setConverter(new javafx.util.StringConverter<>() {
-            @Override public String toString(Employee e) { return e == null ? "" : e.getFullName(); }
-            @Override public Employee fromString(String string) { return null; }
+            @Override
+            public String toString(Employee e) {
+                return e == null ? "" : e.getFullName();
+            }
+
+            @Override
+            public Employee fromString(String string) {
+                return null;
+            }
         });
     }
 
@@ -220,11 +292,15 @@ public class AddImportController implements Initializable {
             @Override
             protected void updateItem(LocalDate item, boolean empty) {
                 super.updateItem(item, empty);
-                if (empty || item == null) setText(null);
-                else {
+                if (empty || item == null) {
+                    setText(null);
+                } else {
                     setText(DateTimeFormatter.ofPattern("dd/MM/yyyy").format(item));
-                    if (item.isBefore(LocalDate.now())) setStyle("-fx-text-fill: red;");
-                    else setStyle("");
+                    if (item.isBefore(LocalDate.now())) {
+                        setStyle("-fx-text-fill: red;");
+                    } else {
+                        setStyle("");
+                    }
                 }
             }
         });
@@ -242,11 +318,14 @@ public class AddImportController implements Initializable {
                 ProductCardController ctrl = loader.getController();
                 ctrl.setData(product, this::addProductToTable);
                 productContainer.getChildren().add(card);
-            } catch (IOException e) { e.printStackTrace(); }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 
-    @FXML private void onCancel(ActionEvent event) {
+    @FXML
+    private void onCancel(ActionEvent event) {
         ((Stage) cbSupplier.getScene().getWindow()).close();
     }
 

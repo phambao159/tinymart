@@ -36,7 +36,20 @@ public class CreateNotiController implements Initializable {
     public void initialize(URL url, ResourceBundle rb) {
         loadReceiver();
     }
+    public void setExternalData(String title, String content, String targetRole) {
+        txtTitle.setText(title);
+        txtContent.setText(content);
 
+        // Tự động tìm và chọn nhân viên đầu tiên có role là targetRole trong ComboBox
+        if (cbReceiver.getItems() != null) {
+            for (Employee emp : cbReceiver.getItems()) {
+                if (targetRole.equalsIgnoreCase(emp.getRole())) {
+                    cbReceiver.getSelectionModel().select(emp);
+                    break; // Dừng lại khi tìm thấy người đầu tiên
+                }
+            }
+        }
+    }
     @FXML
     private void onSend(ActionEvent event) {
         // 1. Lấy đối tượng Employee được chọn từ ComboBox
