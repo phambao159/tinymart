@@ -22,17 +22,17 @@ public class OrderDetailController implements Initializable {
     @FXML private Label lbDate;
     @FXML private Label lbCustomer;
     @FXML private Label lbEmployee;
-    
-    @FXML private Label lbTotal;        // Tổng tiền hàng (Gốc)
-    @FXML private Label prDiscount;     // Giảm giá Voucher/Promotion
-    @FXML private Label pDiscount;      // Giảm giá Điểm (Point)
-    @FXML private Label lbActualTotal;  // Thực trả (Thêm mới nếu FXML có, hoặc dùng lbTotal tùy bạn)
+    @FXML private Label lbTotal;
 
     @FXML private TableView<OrderDetail> tbDetail;
     @FXML private TableColumn<OrderDetail, String> colProduct;
-    @FXML private TableColumn<OrderDetail, Double> colPrice;
+    @FXML private TableColumn<OrderDetail, Double> colPrice; 
     @FXML private TableColumn<OrderDetail, Integer> colQuantity;
     @FXML private TableColumn<OrderDetail, Double> colSubTotal;
+
+    // Hai nhãn giảm giá bạn đã khai báo
+    @FXML private Label prDiscount; // Promotion Discount (Giảm giá tiền mặt/khuyến mãi)
+    @FXML private Label pDiscount;  // Point Discount (Giảm giá bằng điểm)
 
     private final OrderDetailDAO detailDAO = new OrderDetailDAO();
 
@@ -42,7 +42,7 @@ public class OrderDetailController implements Initializable {
     }
 
     private void setupTableColumns() {
-        // Hiển thị ProductName (TypeName)
+        // 1. Cột sản phẩm
         colProduct.setCellFactory(column -> new TableCell<OrderDetail, String>() {
             @Override
             protected void updateItem(String item, boolean empty) {
@@ -56,8 +56,13 @@ public class OrderDetailController implements Initializable {
             }
         });
 
-        colPrice.setCellValueFactory(new PropertyValueFactory<>("unitPrice"));
+        // 2. Cột Đơn giá (sellingPrice)
+        colPrice.setCellValueFactory(new PropertyValueFactory<>("sellingPrice"));
+
+        // 3. Cột Số lượng
         colQuantity.setCellValueFactory(new PropertyValueFactory<>("quantity"));
+        
+        // 4. Cột Thành tiền (subTotal)
         colSubTotal.setCellValueFactory(new PropertyValueFactory<>("subTotal"));
 
         formatCurrencyColumn(colPrice);
@@ -65,37 +70,30 @@ public class OrderDetailController implements Initializable {
         colQuantity.setStyle("-fx-alignment: CENTER;");
     }
 
-    /**
-     * Đổ dữ liệu từ đơn hàng vào các nhãn hiển thị
-     */
     public void setData(Order order) {
-        // 1. Thông tin chung
+        // Gán dữ liệu Header
         lbOrderID.setText("#" + order.getOrderID());
-        lbDate.setText(order.getOrderDateTime().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")));
+        
+        if (order.getOrderDateTime() != null) {
+            lbDate.setText(order.getOrderDateTime().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")));
+        }
+        
         lbCustomer.setText(order.getCustomerName() != null ? order.getCustomerName() : "Guest");
         lbEmployee.setText(order.getEmployeeName());
         
-        // 2. Thông tin thanh toán chi tiết
-        // lbTotal hiển thị tổng tiền hàng chưa trừ giảm giá
-        lbTotal.setText(String.format("%,.0f", order.getTotalAmount()));
-        
-        // prDiscount hiển thị giảm giá khuyến mãi (Voucher)
+        // Hiển thị tổng tiền
+        lbTotal.setText(String.format("%,.0f VNĐ", order.getTotalAmount()));
+
+        // SỬA LỖI TẠI ĐÂY: Sử dụng đúng tên biến đã khai báo @FXML
         if (prDiscount != null) {
-            prDiscount.setText(String.format("-%,.0f", order.getDiscountAmount()));
+            prDiscount.setText(String.format("-%,.0f ", order.getDiscountAmount()));
         }
         
-        // pDiscount hiển thị giảm giá bằng điểm tích lũy
         if (pDiscount != null) {
-            pDiscount.setText(String.format("-%,.0f", order.getPointDiscount()));
+            pDiscount.setText(String.format("-%,.0f ", order.getPointDiscount()));
         }
 
-        // Nếu bạn có label hiển thị con số cuối cùng khách phải trả
-        if (lbActualTotal != null) {
-            double actualPay = order.getTotalAmount() - order.getDiscountAmount() - order.getPointDiscount();
-            lbActualTotal.setText(String.format("%,.0f", actualPay));
-        }
-
-        // 3. Tải danh sách sản phẩm chi tiết
+        // Lấy danh sách chi tiết
         List<OrderDetail> details = detailDAO.getDetailsByOrderId(order.getOrderID());
         tbDetail.setItems(FXCollections.observableArrayList(details));
     }
