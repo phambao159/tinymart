@@ -144,6 +144,20 @@ public class CashierController implements Initializable {
     private Button btnRemoveItem;
     @FXML
     private Button btnsearchCustomer;
+    @FXML
+    private Label lblPointDiscount;
+    @FXML
+    private Label lblHistorySubTotal;
+    @FXML
+    private Label lblHistoryDiscount;
+    @FXML
+    private Label lblHistoryPointDiscount;
+    @FXML
+    private Label lblHistoryTotal;
+    @FXML
+    private VBox boxCurrentOrder;
+    @FXML
+    private VBox boxHistoryInfo;
 
     private final dao.cashier.EmployeeShiftDAO shiftDAO = new dao.cashier.EmployeeShiftDAO();
     private double currentSessionSales = 0.0;
@@ -155,6 +169,7 @@ public class CashierController implements Initializable {
         setupTable();
         setupHistoryTable();
         setupUI();
+        setupShiftStatus();
         loadCategories();
         loadDataFromDB("");
         setSidebarActive(btnHome);
@@ -183,24 +198,32 @@ public class CashierController implements Initializable {
             setEmployeeName(emp.getFullName());
 
         } else {
-            setEmployeeID(2);
-        }
-        setupShiftStatus();
-        tblHistory.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
-            if (newSelection != null) {
-                loadHistoryDetails(newSelection);
-            }
-        });
-        colHistId.prefWidthProperty().bind(tblHistory.widthProperty().multiply(0.1));
-        colHistTime.prefWidthProperty().bind(tblHistory.widthProperty().multiply(0.25));
-        colHistCashier.prefWidthProperty().bind(tblHistory.widthProperty().multiply(0.2));
-        colHistCustomer.prefWidthProperty().bind(tblHistory.widthProperty().multiply(0.45));
+            javafx.application.Platform.runLater(() -> {
+                showAlert("Access Denied", "No active session found. Please login again.", Alert.AlertType.ERROR);
+                try {
+                    main.App.setRoot("ui", "login");
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            });
 
-        colName.prefWidthProperty().bind(tblCart.widthProperty().multiply(0.40));
-        colPrice.prefWidthProperty().bind(tblCart.widthProperty().multiply(0.20));
-        colQty.prefWidthProperty().bind(tblCart.widthProperty().multiply(0.15));
-        colTotal.prefWidthProperty().bind(tblCart.widthProperty().multiply(0.25));
-    }
+            tblHistory.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
+                if (newSelection != null) {
+                    loadHistoryDetails(newSelection);
+                }
+            });
+            colHistId.prefWidthProperty().bind(tblHistory.widthProperty().multiply(0.1));
+            colHistTime.prefWidthProperty().bind(tblHistory.widthProperty().multiply(0.25));
+            colHistCashier.prefWidthProperty().bind(tblHistory.widthProperty().multiply(0.2));
+            colHistCustomer.prefWidthProperty().bind(tblHistory.widthProperty().multiply(0.45));
+
+            colName.prefWidthProperty().bind(tblCart.widthProperty().multiply(0.40));
+            colPrice.prefWidthProperty().bind(tblCart.widthProperty().multiply(0.20));
+            colQty.prefWidthProperty().bind(tblCart.widthProperty().multiply(0.15));
+            colTotal.prefWidthProperty().bind(tblCart.widthProperty().multiply(0.25));
+        }
+
+    } 
 
     private void setSidebarActive(Button activeBtn) {
         btnHome.getStyleClass().remove("active");
@@ -421,9 +444,9 @@ public class CashierController implements Initializable {
                 btn.setOnAction(e -> {
                     if (btn.isSelected()) {
                         selectedSizeTemp = size;
-                        
+
                         String infoText = String.format("$%.2f (Stock: %d)", size.getPrice(), size.getStock());
-                        
+
                         if (size.getPromoDescription() != null && !size.getPromoDescription().isEmpty()) {
                             infoText += "\n " + size.getPromoDescription();
                             overlayPrice.setStyle("-fx-text-fill: #e55039; -fx-font-weight: bold; -fx-text-alignment: center;");
@@ -521,36 +544,50 @@ public class CashierController implements Initializable {
         }
 
         double subTotal = 0;
-        double totalDiscount = 0;
+        double productDiscount = 0;
 
         for (CartItem item : cartList) {
             double price = item.getPrice();
             int qty = item.getQuantity();
             double itemTotal = price * qty;
-
             subTotal += itemTotal;
 
             String promoType = item.getPromotionType();
             double promoVal = item.getPromotionValue();
-
             if (promoType != null) {
                 if ("BOGO".equalsIgnoreCase(promoType)) {
-                    int freeItems = qty / 2;
-                    totalDiscount += freeItems * price;
+                    productDiscount += (qty / 2) * price;
                 } else if (promoType.toLowerCase().contains("discount") || promoType.toLowerCase().contains("percentage")) {
                     if (promoVal > 0) {
-                        totalDiscount += itemTotal * (promoVal / 100.0);
+                        productDiscount += itemTotal * (promoVal / 100.0);
                     }
                 }
             }
         }
 
-        double finalTotal = subTotal - totalDiscount;
-        Integer custId = (currentCustomer != null) ? currentCustomer.getId() : null;
+        double pointDiscountMoney = 0;
+        int pointsUsed = 0;
+        double amountBeforePoint = subTotal - productDiscount;
 
-        int orderId = cashierDAO.createOrder(currentEmployeeID, custId, finalTotal, totalDiscount, result.paymentMethod, new ArrayList<>(cartList));
+        if (currentCustomer != null && currentCustomer.getPoints() >= 100 && amountBeforePoint >= 10) {
+            int blocksFromPoints = currentCustomer.getPoints() / 100;
+            int blocksFromBill = (int) (amountBeforePoint / 10);
+
+            int redeemableBlocks = Math.min(blocksFromPoints, blocksFromBill);
+
+            pointDiscountMoney = redeemableBlocks * 10.0;
+            pointsUsed = redeemableBlocks * 100;
+        }
+
+        double finalTotal = amountBeforePoint - pointDiscountMoney;
+        double totalDiscount = productDiscount + pointDiscountMoney;
+
+        Integer custId = (currentCustomer != null) ? currentCustomer.getId() : null;
+        int orderId = cashierDAO.createOrder(currentEmployeeID, custId, finalTotal, totalDiscount, pointDiscountMoney, result.paymentMethod, new ArrayList<>(cartList));
+
         if (orderId != -1) {
             currentSessionSales += finalTotal;
+
             for (CartItem item : cartList) {
                 try {
                     int pId = Integer.parseInt(item.getProductId());
@@ -560,13 +597,17 @@ public class CashierController implements Initializable {
             }
 
             if (currentCustomer != null) {
-                int points = (int) finalTotal;
-                cashierDAO.updateCustomerPoints(currentCustomer.getId(), currentCustomer.getPoints() + points);
+                int pointsEarned = (int) (finalTotal / 10);
+
+                int oldPoints = currentCustomer.getPoints();
+                int newPointBalance = oldPoints - pointsUsed + pointsEarned;
+                cashierDAO.updateCustomerPoints(currentCustomer.getId(), newPointBalance);
+                currentCustomer.setPoints(newPointBalance);
             }
 
             String billContent = "";
             if (result.isPrintBill) {
-                billContent = generateBillContent(orderId, finalTotal, result.paymentMethod, subTotal, totalDiscount);
+                billContent = generateBillContent(orderId, finalTotal, result.paymentMethod, subTotal, productDiscount, pointDiscountMoney);
             }
 
             isUpdatingHistory = true;
@@ -585,7 +626,9 @@ public class CashierController implements Initializable {
             } else {
                 showAlert("Success", "Transaction #" + orderId + " completed!", Alert.AlertType.INFORMATION);
             }
+
             resetCart();
+            setCustomerToBill(null);
 
         } else {
             showAlert("Error", "Transaction failed. Could not save order.", Alert.AlertType.ERROR);
@@ -642,55 +685,59 @@ public class CashierController implements Initializable {
 
     }
 
-    private String generateBillContent(int orderId, double total, String method, double subTotal, double discount) {
-        StringBuilder bill = new StringBuilder();
+    private String generateBillContent(int orderId, double finalTotal, String paymentMethod, double subTotal, double productDiscount, double pointDiscount) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("==============================\n");
+        sb.append("========== TINYMART ==========\n");
+        sb.append("==============================\n");
+        sb.append("Order ID: #").append(orderId).append("\n");
+        sb.append("Date: ").append(java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))).append("\n");
 
-        String line = "------------------------------------------------\n";
-        String doubleLine = "================================================\n";
-
-        bill.append(doubleLine);
-        bill.append(String.format("%30s\n", "TINYMART POS"));
-        bill.append(doubleLine);
-
-        bill.append(String.format("Order ID: #%d\n", orderId));
-        bill.append("Date: " + java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")) + "\n");
-
-        String cashier = lblWelcome.getText().replace("Welcome, ", "").replace("!", "");
-        bill.append("Cashier: " + cashier + "\n");
+        String cashierName = "Unknown";
+        if (util.User.getSession() != null && util.User.getSession().getEmployee() != null) {
+            cashierName = util.User.getSession().getEmployee().getFullName();
+        }
+        sb.append("Cashier:        ").append(cashierName).append("\n");
 
         if (currentCustomer != null) {
-            bill.append("Customer: " + currentCustomer.getFullName() + "\n");
-        } else {
-            bill.append("Customer: Guest\n");
+            sb.append("Customer:       ").append(currentCustomer.getFullName()).append("\n");
         }
-
-        bill.append(line);
-        bill.append(String.format("%-18s %4s %10s %12s\n", "Item", "Qty", "Price", "Total"));
-        bill.append(line);
+        sb.append("------------------------------\n");
+        sb.append(String.format("%-20s %5s %8s\n", "Item", "Qty", "Price"));
+        sb.append("------------------------------\n");
 
         for (CartItem item : cartList) {
             String name = item.getProductName();
             if (name.length() > 18) {
-                name = name.substring(0, 16) + "..";
+                name = name.substring(0, 18) + "..";
             }
-            bill.append(String.format("%-18s %4d %10.2f %12.2f\n",
-                    name,
-                    item.getQuantity(),
-                    item.getPrice(),
-                    item.getTotal()));
+            sb.append(String.format("%-18s %3d %9.2f\n", name, item.getQuantity(), item.getPrice() * item.getQuantity()));
         }
 
-        bill.append(line);
-        bill.append(String.format("Subtotal:       %28.2f\n", subTotal));
-        bill.append(String.format("Discount:       %28.2f\n", discount));
-        bill.append(line);
-        bill.append(String.format("TOTAL:          %28.2f\n", total));
-        bill.append(doubleLine);
-        bill.append("Payment Method: " + method + "\n");
-        bill.append(doubleLine);
-        bill.append(String.format("%32s\n", "Thank you & See you again!"));
+        sb.append("------------------------------\n");
+        sb.append(String.format("Subtotal:           $%.2f\n", subTotal));
 
-        return bill.toString();
+        if (productDiscount > 0) {
+            sb.append(String.format("Promo Discount:    -$%.2f\n", productDiscount));
+        }
+
+        if (pointDiscount > 0) {
+            sb.append(String.format("Point Discount:    -$%.2f\n", pointDiscount));
+        }
+
+        sb.append("------------------------------\n");
+        sb.append(String.format("TOTAL:              $%.2f\n", finalTotal));
+        sb.append("Payment:            ").append(paymentMethod).append("\n");
+
+        if (currentCustomer != null) {
+            sb.append("------------------------------\n");
+            sb.append("Points Balance:     ").append(currentCustomer.getPoints()).append(" pts\n");
+        }
+
+        sb.append("==============================\n");
+        sb.append("      Thank you for shopping!   ");
+
+        return sb.toString();
     }
 
     private void showBillAlert(String billContent) {
@@ -851,11 +898,24 @@ public class CashierController implements Initializable {
 
     private void setCustomerToBill(Customer c) {
         this.currentCustomer = c;
-        boxCustomerInfo.setVisible(true);
-        boxCustomerInfo.setManaged(true);
-        lblCustomerName.setText("Name: " + c.getFullName());
-        lblCustomerPoints.setText("Points: " + c.getPoints());
-        txtCustomerPhone.setText(c.getPhoneNumber());
+
+        if (c != null) {
+            boxCustomerInfo.setVisible(true);
+            boxCustomerInfo.setManaged(true);
+
+            lblCustomerName.setText(c.getFullName());
+            lblCustomerPoints.setText(String.valueOf(c.getPoints()));
+            txtCustomerPhone.setText(c.getPhoneNumber());
+        } else {
+            boxCustomerInfo.setVisible(true);
+            boxCustomerInfo.setManaged(true);
+
+            lblCustomerName.setText("Guest");
+            lblCustomerPoints.setText("0");
+            txtCustomerPhone.setText("");
+        }
+
+        calculateTotal();
     }
 
     private void showRegisterDialog(String prefillPhone) {
@@ -981,15 +1041,24 @@ public class CashierController implements Initializable {
     public void switchToOrder(ActionEvent event) {
         viewHistory.setVisible(false);
         viewHistory.setManaged(false);
-
         viewSelling.setVisible(true);
         viewSelling.setManaged(true);
+
         btnPaymentProcess.setVisible(true);
         btnPaymentProcess.setManaged(true);
         btnRemoveItem.setVisible(true);
         btnRemoveItem.setManaged(true);
         btnsearchCustomer.setVisible(true);
         btnsearchCustomer.setManaged(true);
+
+        if (boxCurrentOrder != null) {
+            boxCurrentOrder.setVisible(true);
+            boxCurrentOrder.setManaged(true);
+        }
+        if (boxHistoryInfo != null) {
+            boxHistoryInfo.setVisible(false);
+            boxHistoryInfo.setManaged(false);
+        }
 
         setSidebarActive(btnHome);
         resetCart();
@@ -999,9 +1068,9 @@ public class CashierController implements Initializable {
     public void switchToHistory(ActionEvent event) {
         viewSelling.setVisible(false);
         viewSelling.setManaged(false);
-
         viewHistory.setVisible(true);
         viewHistory.setManaged(true);
+
         filterHistory();
 
         btnPaymentProcess.setVisible(false);
@@ -1011,10 +1080,23 @@ public class CashierController implements Initializable {
         btnsearchCustomer.setVisible(false);
         btnsearchCustomer.setManaged(false);
 
+        if (boxCurrentOrder != null) {
+            boxCurrentOrder.setVisible(false);
+            boxCurrentOrder.setManaged(false);
+        }
+        if (boxHistoryInfo != null) {
+            boxHistoryInfo.setVisible(true);
+            boxHistoryInfo.setManaged(true);
+        }
+
         setSidebarActive(btnHistory);
         cartList.clear();
         lblOrderId.setText("#Select Order");
-        lblGrandTotal.setText("$0.00");
+
+        lblHistorySubTotal.setText("$0.00");
+        lblHistoryDiscount.setText("$0.00");
+        lblHistoryPointDiscount.setText("");
+        lblHistoryTotal.setText("$0.00");
     }
 
     private void filterHistory() {
@@ -1058,11 +1140,13 @@ public class CashierController implements Initializable {
 
     private void loadHistoryDetails(OrderViewModel order) {
         lblOrderId.setText("#" + order.getOrderId());
+
         boxCustomerInfo.setVisible(true);
         boxCustomerInfo.setManaged(true);
 
-        String custName = order.getCustomerName() == null ? "Guest" : order.getCustomerName();
-        lblCustomerName.setText("Name: " + custName);
+        String custName = (order.getCustomerName() == null || order.getCustomerName().equalsIgnoreCase("Guest"))
+                ? "Guest" : order.getCustomerName();
+        lblCustomerName.setText(custName);
 
         if (order.getCustomerPhone() != null && !order.getCustomerPhone().isEmpty()) {
             txtCustomerPhone.setText(order.getCustomerPhone());
@@ -1075,10 +1159,83 @@ public class CashierController implements Initializable {
         List<CartItem> details = cashierDAO.getOrderDetails(order.getOrderId());
         cartList.clear();
         cartList.addAll(details);
-        lblSubTotal.setText(String.format("$%.2f", order.getTotalAmount()));
-        lblGrandTotal.setText(String.format("$%.2f", order.getTotalAmount()));
-        lblDiscount.setText("0");
 
-        tblCart.refresh();
+        double calculatedSubTotal = 0;
+        for (CartItem item : details) {
+            calculatedSubTotal += item.getPrice() * item.getQuantity();
+        }
+
+        double finalTotal = order.getTotalAmount();
+        double totalDiscount = order.getTotalDiscount();
+        double pointDiscount = order.getPointDiscount();
+
+        double promoDiscount = totalDiscount - pointDiscount;
+
+        lblHistorySubTotal.setText(String.format("$%.2f", calculatedSubTotal));
+
+        if (promoDiscount > 0) {
+            lblHistoryDiscount.setText(String.format("-$%.2f", promoDiscount));
+        } else {
+            lblHistoryDiscount.setText("$0.00");
+        }
+
+        if (pointDiscount > 0) {
+            lblHistoryPointDiscount.setText(String.format("-$%.2f", pointDiscount));
+        } else {
+            lblHistoryPointDiscount.setText("-$0.00");
+        }
+
+        lblHistoryTotal.setText(String.format("$%.2f", finalTotal));
+    }
+
+    private void calculateTotal() {
+        double subTotal = 0;
+        double productDiscount = 0;
+
+        for (CartItem item : cartList) {
+            subTotal += item.getTotal();
+            String promoType = item.getPromotionType();
+            double promoVal = item.getPromotionValue();
+            double price = item.getPrice();
+            int qty = item.getQuantity();
+            double itemTotal = price * qty;
+
+            if (promoType != null) {
+                if ("BOGO".equalsIgnoreCase(promoType)) {
+                    int freeItems = qty / 2;
+                    productDiscount += freeItems * price;
+                } else if (promoType.toLowerCase().contains("discount") || promoType.toLowerCase().contains("percentage")) {
+                    if (promoVal > 0) {
+                        productDiscount += itemTotal * (promoVal / 100.0);
+                    }
+                }
+            }
+        }
+
+        double amountBeforePoint = subTotal - productDiscount;
+        double pointDiscount = 0;
+
+        if (currentCustomer != null && currentCustomer.getPoints() >= 100 && amountBeforePoint >= 10) {
+            int blocksFromPoints = currentCustomer.getPoints() / 100;
+
+            int blocksFromBill = (int) (amountBeforePoint / 10);
+            int redeemableBlocks = Math.min(blocksFromPoints, blocksFromBill);
+
+            pointDiscount = redeemableBlocks * 10.0;
+        }
+
+        double finalTotal = amountBeforePoint - pointDiscount;
+        if (finalTotal < 0) {
+            finalTotal = 0;
+        }
+
+        lblSubTotal.setText(String.format("$%.2f", subTotal));
+        if (pointDiscount > 0) {
+            lblPointDiscount.setText(String.format("-$%.0f", pointDiscount));
+        } else {
+            lblPointDiscount.setText("-$0");
+        }
+
+        lblGrandTotal.setText(String.format("$%.2f", finalTotal));
     }
 }

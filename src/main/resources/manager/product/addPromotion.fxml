@@ -1,18 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?import javafx.scene.text.*?>
-<?import java.lang.*?>
-<?import java.net.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
 
-<AnchorPane id="AnchorPane" prefHeight="500.0" prefWidth="500.0" styleClass="mainFxmlClass" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.manager.product.AddPromotionController">
+<?import java.net.URL?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane id="AnchorPane" prefHeight="500.0" prefWidth="500.0" styleClass="mainFxmlClass" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.manager.product.AddPromotionController">
     <stylesheets>
         <URL value="@addpromotion.css" />
     </stylesheets>
    <children>
       <VBox layoutX="30.0" layoutY="20.0" spacing="15.0" AnchorPane.leftAnchor="30.0" AnchorPane.rightAnchor="30.0">
          <children>
-            <Label fx:id= "title" text="Add New Promotion" textFill="#2c3e50">
+            <Label fx:id="title" text="Add New Promotion" textFill="#2c3e50">
                <font>
                   <Font name="System Bold" size="22.0" />
                </font>
@@ -40,7 +50,6 @@
                   <TextArea fx:id="txtDescription" prefHeight="200.0" prefWidth="200.0" promptText="Enter details" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                   
                   <Label text="Type:" GridPane.rowIndex="2" />
-                  <Label text="Type:" GridPane.rowIndex="2" /> <TextField fx:id="txtType" promptText="e.g. Percentage, Seasonal, Member..." GridPane.columnIndex="1" GridPane.rowIndex="2" />
                   
                   <Label text="Value:" GridPane.rowIndex="3" />
                   <TextField fx:id="txtValue" promptText="Amount or Percentage" GridPane.columnIndex="1" GridPane.rowIndex="3" />
@@ -53,6 +62,7 @@
                   
                   <Label text="Status:" GridPane.rowIndex="6" />
                   <ComboBox fx:id="cbStatus" prefWidth="320.0" GridPane.columnIndex="1" GridPane.rowIndex="6" />
+                  <ComboBox fx:id="cbType" prefHeight="28.0" prefWidth="321.0" promptText="Select Type" GridPane.columnIndex="1" GridPane.rowIndex="2" />
                </children>
             </GridPane>
             

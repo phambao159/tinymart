@@ -1,105 +1,67 @@
 
 #AnchorPane {
     -fx-background-image: url('background.png');
-    /* 🌟 THÊM THUỘC TÍNH NÀY 🌟 */
     -fx-background-size: cover; 
-    
-    /* Đảm bảo hình ảnh không bị lặp lại */
     -fx-background-repeat: no-repeat;
-    
-    /* Tùy chọn: Căn giữa hình ảnh nếu nó không vừa hoàn toàn */
     -fx-background-position: center center;
 }
 
-#mainLogin{
+/* Giảm radius của shadow xuống mức tối thiểu (10) hoặc dùng Border */
+#mainLogin {
     -fx-padding: 60px 30px;
-    -fx-effect: dropshadow(two-pass-box, rgba(0, 0, 0, 0.1), 50, 0.3, 0, 3);
     -fx-background-radius: 20px;
-
     -fx-background-color: white;
+    /* Dùng shadow rất nhẹ để không gây lag */
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.05), 10, 0, 0, 0);
 }
 
-.circle-image {
-    -fx-background-color: white;
-
+#hBoxImage {
     -fx-background-radius: 999px;
+    -fx-background-color: white;
+    /* Thay vì shadow 60, dùng viền mỏng để làm nổi bật */
+    -fx-border-color: #A9DFBF;
     -fx-border-radius: 999px;
-
-    -fx-padding: 10px;
-
-    /* Thêm bóng đổ chuyên nghiệp */
-    /* Cú pháp: dropshadow(type, color, radius, spread, offsetX, offsetY) */
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 15, 0.4, 0, 0);
+    -fx-border-width: 1px;
 }
-
-#hBoxImage{
-    -fx-effect: dropshadow(two-pass-box, rgba(30, 132, 73, 0.5), 60, 0.3, 0, 3);
-    -fx-background-radius: 999px;
-    -fx-background-color: white;
-}
-.vbox {
-
-    -fx-background-color: white;
-    -fx-padding: 30px;
-    -fx-spacing: 15px;
-    -fx-border-radius: 10px;
-    -fx-background-radius: 10px;
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 10, 0.5, 0, 0);
-}
-
-
-.label {
-    -fx-font-family: "Inter", "Arial", sans-serif;
-    -fx-font-size: 17px;
-    -fx-text-fill: #000000;
-}
-#lbLogin{
-
-    -fx-font-family: "Inter", "Arial", sans-serif;
-    -fx-font-size: 28px;
-    -fx-text-fill: #1E8449;
-    -fx-font-weight: bold;
-
-}
-
-
-.hbox .label {
-    -fx-font-size: 14px;
-    -fx-font-weight: bold;
-    -fx-text-fill: #333333;
-    -fx-padding: 0 10px 0 0;
-}
-
 
 .text-field {
-    -fx-prompt-text-fill: #999999;
-    -fx-background-color: #ffffff, #f7f7f7;
-    -fx-border-color: #A9DFBF;
-    -fx-border-radius: 5px;
-    -fx-padding: 8px;
+    -fx-background-color: #F4F7F5; /* Màu nền hơi xám nhẹ cho hiện đại */
+    -fx-background-radius: 8px;
+    -fx-border-radius: 8px;
+    -fx-border-color: transparent; /* Mặc định không viền */
+    -fx-padding: 10px;
     -fx-font-size: 14px;
-    -fx-pref-width: 220px;
     -fx-font-family: "Inter", "Arial", sans-serif;
+    -fx-transition: all 0.2s;
 }
 
+/* Hiệu ứng khi focus: Chỉ đổi màu viền và màu nền, KHÔNG dùng shadow */
 .text-field:focused {
-
+    -fx-background-color: #ffffff;
     -fx-border-color: #27AE60;
-    -fx-effect: dropshadow(gaussian, #27AE60, 5, 0.2, 0, 0);
+    -fx-border-width: 1.5px;
+    -fx-effect: null; 
 }
-
 
 .button {
     -fx-font-family: "Inter", "Arial", sans-serif;
-    -fx-background-color: linear-gradient(to bottom, #4CAF50, #1E8449);
-    -fx-text-fill: #ffffff;
-    -fx-font-size: 14px;
-    -fx-padding: 8px 30px;
-    -fx-background-radius: 6px;
+    -fx-background-color: #27AE60;
+    -fx-text-fill: white;
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+    -fx-padding: 10px 40px;
+    -fx-background-radius: 8px;
     -fx-cursor: hand;
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 5, 0, 0, 2);
 }
 
 .button:hover {
     -fx-background-color: #1E8449;
+    /* Hiệu ứng phóng to nhẹ thay vì bóng đổ */
+    -fx-scale-x: 1.02;
+    -fx-scale-y: 1.02;
+}
+
+.button:pressed {
+    -fx-scale-x: 0.98;
+    -fx-scale-y: 0.98;
 }

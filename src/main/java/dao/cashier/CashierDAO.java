@@ -16,7 +16,6 @@ public class CashierDAO {
     DBConnection dc = new DBConnection();
 
     public List<Product> getAllProducts() {
-
         return searchProducts("");
     }
 
@@ -230,30 +229,39 @@ public class CashierDAO {
         }
     }
 
-    public List<OrderViewModel> getOrderHistory() {
+    public List<OrderViewModel> getOrderHistory(String keyword) {
         List<OrderViewModel> list = new ArrayList<>();
-        String sql = "SELECT o.OrderID, o.OrderDateTime, "
-                + "e.FullName AS CashierName, "
-                + "COALESCE(c.FullName, 'Guest') AS CustomerName, "
-                + "COALESCE(c.PhoneNumber, '') AS PhoneNumber, "
-                + "COALESCE(c.Points, 0) AS Points, "
-                + "o.TotalAmount, o.PaymentMethod "
+        String sql = "SELECT o.OrderID, o.OrderDateTime, e.FullName as CashierName, c.FullName as CustomerName, "
+                + "c.PhoneNumber, c.Points, o.TotalAmount, "
+                + "o.PointDiscount, "
+                + "o.DiscountAmount AS TotalDiscount, "
+                + "p.PaymentMethod "
                 + "FROM `Order` o "
-                + "JOIN Employee e ON o.EmployeeID = e.EmployeeID "
+                + "LEFT JOIN Employee e ON o.EmployeeID = e.EmployeeID "
                 + "LEFT JOIN Customer c ON o.CustomerID = c.CustomerID "
-                + "ORDER BY o.OrderID DESC";
+                + "JOIN Payment p ON o.PaymentID = p.PaymentID "
+                + "WHERE (c.PhoneNumber LIKE ? OR o.OrderID LIKE ?) "
+                + "ORDER BY o.OrderDateTime DESC";
 
-        try (Connection conn = dc.getConnect(); PreparedStatement pstmt = conn.prepareStatement(sql); ResultSet rs = pstmt.executeQuery()) {
-
+        try (Connection conn = dc.getConnect(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, "%" + keyword + "%");
+            pstmt.setString(2, "%" + keyword + "%");
+            ResultSet rs = pstmt.executeQuery();
             while (rs.next()) {
+                String fullDateTime = rs.getString("OrderDateTime");
+                if (fullDateTime != null && fullDateTime.endsWith(".0")) {
+                    fullDateTime = fullDateTime.substring(0, fullDateTime.length() - 2);
+                }
                 list.add(new OrderViewModel(
                         rs.getInt("OrderID"),
-                        rs.getString("OrderDateTime"),
+                        fullDateTime,
                         rs.getString("CashierName"),
                         rs.getString("CustomerName"),
                         rs.getString("PhoneNumber"),
                         rs.getInt("Points"),
                         rs.getDouble("TotalAmount"),
+                        rs.getDouble("TotalDiscount"),
+                        rs.getDouble("PointDiscount"),
                         rs.getString("PaymentMethod")
                 ));
             }
@@ -270,13 +278,15 @@ public class CashierDAO {
                 + "e.FullName AS CashierName, "
                 + "COALESCE(c.FullName, 'Guest') AS CustomerName, "
                 + "COALESCE(c.PhoneNumber, '') AS PhoneNumber, "
-                + "COALESCE(c.Points, 0) AS Points,"
-                + "o.TotalAmount, o.PaymentMethod "
+                + "COALESCE(c.Points, 0) AS Points, "
+                + "o.TotalAmount, "
+                + "o.DiscountAmount AS TotalDiscount, "
+                + "o.PointDiscount, "
+                + "o.PaymentMethod "
                 + "FROM `Order` o "
                 + "JOIN Employee e ON o.EmployeeID = e.EmployeeID "
                 + "LEFT JOIN Customer c ON o.CustomerID = c.CustomerID "
-                + "WHERE 1=1 "
-        );
+                + "WHERE 1=1 ");
 
         if (date != null) {
             sql.append(" AND DATE(o.OrderDateTime) = ? ");
@@ -286,7 +296,7 @@ public class CashierDAO {
             sql.append(" AND (c.FullName LIKE ? OR c.PhoneNumber LIKE ?) ");
         }
 
-        sql.append("ORDER BY o.OrderID DESC");
+        sql.append(" ORDER BY o.OrderDateTime DESC");
 
         try (Connection conn = dc.getConnect(); PreparedStatement pstmt = conn.prepareStatement(sql.toString())) {
             int index = 1;
@@ -303,14 +313,21 @@ public class CashierDAO {
 
             try (ResultSet rs = pstmt.executeQuery()) {
                 while (rs.next()) {
+                    String fullTime = rs.getString("OrderDateTime");
+                    if (fullTime != null && fullTime.endsWith(".0")) {
+                        fullTime = fullTime.substring(0, fullTime.length() - 2);
+                    }
+
                     list.add(new OrderViewModel(
                             rs.getInt("OrderID"),
-                            rs.getString("OrderDateTime"),
+                            fullTime,
                             rs.getString("CashierName"),
                             rs.getString("CustomerName"),
                             rs.getString("PhoneNumber"),
                             rs.getInt("Points"),
                             rs.getDouble("TotalAmount"),
+                            rs.getDouble("TotalDiscount"),
+                            rs.getDouble("PointDiscount"),
                             rs.getString("PaymentMethod")
                     ));
                 }
@@ -321,7 +338,7 @@ public class CashierDAO {
         return list;
     }
 
-    public int createOrder(int employeeId, Integer customerId, double totalAmount, double discount, String paymentMethod, List<model.cashier.CartItem> cartItems) {
+    public int createOrder(int employeeId, Integer customerId, double totalAmount, double totalDiscount, double pointDiscount, String paymentMethod, List<model.cashier.CartItem> cartItems) {
         int generatedOrderId = -1;
         Connection conn = null;
         PreparedStatement psOrder = null;
@@ -332,7 +349,7 @@ public class CashierDAO {
             conn = dc.getConnect();
             conn.setAutoCommit(false);
 
-            String sqlOrder = "INSERT INTO `Order` (OrderDateTime, EmployeeID, CustomerID, TotalAmount, DiscountAmount, PaymentMethod) VALUES (NOW(), ?, ?, ?, ?, ?)";
+            String sqlOrder = "INSERT INTO `Order` (OrderDateTime, EmployeeID, CustomerID, TotalAmount, DiscountAmount, PointDiscount, PaymentMethod) VALUES (NOW(), ?, ?, ?, ?, ?, ?)";
             psOrder = conn.prepareStatement(sqlOrder, Statement.RETURN_GENERATED_KEYS);
 
             psOrder.setInt(1, employeeId);
@@ -342,8 +359,9 @@ public class CashierDAO {
                 psOrder.setNull(2, java.sql.Types.INTEGER);
             }
             psOrder.setDouble(3, totalAmount);
-            psOrder.setDouble(4, discount);
-            psOrder.setString(5, paymentMethod);
+            psOrder.setDouble(4, totalDiscount);
+            psOrder.setDouble(5, pointDiscount);
+            psOrder.setString(6, paymentMethod);
 
             int affectedRows = psOrder.executeUpdate();
 
@@ -384,6 +402,7 @@ public class CashierDAO {
             generatedOrderId = -1;
         } finally {
             try {
+
                 if (rs != null) {
                     rs.close();
                 }
@@ -393,6 +412,7 @@ public class CashierDAO {
                 if (psDetail != null) {
                     psDetail.close();
                 }
+
                 if (conn != null) {
                     conn.setAutoCommit(true);
                     conn.close();
@@ -465,4 +485,5 @@ public class CashierDAO {
         }
         return list;
     }
+
 }

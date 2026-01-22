@@ -14,14 +14,11 @@ public class ProductSizeDAO {
 
     private final DBConnection dc = new DBConnection();
 
-    /**
-     * Lấy số lượng tồn kho dựa trên các lô hàng đã nhập thành công
-     */
-    private int getStockQuantity(int productSizeID) {
-        String sql = "SELECT COALESCE(SUM(id.Quantity), 0) AS qty "
-                   + "FROM ImportDetail id "
-                   + "JOIN Import i ON id.ImportID = i.ImportID "
-                   + "WHERE id.ProductSizeID = ? AND i.Status = 'Completed'";
+    public int getStockQuantity(int productSizeID) {
+        String sql = "SELECT COALESCE(SUM(id.Quantity + id.ShelfQuantity), 0) AS qty "
+                + "FROM ImportDetail id "
+                + "JOIN Import i ON id.ImportID = i.ImportID "
+                + "WHERE id.ProductSizeID = ? AND i.Status = 'Completed'";
 
         try (Connection con = dc.getConnect(); PreparedStatement pst = con.prepareStatement(sql)) {
             pst.setInt(1, productSizeID);
@@ -43,10 +40,10 @@ public class ProductSizeDAO {
         List<ProductSize> list = new ArrayList<>();
         // Bổ sung ps.PromotionID vào SELECT
         String sql = "SELECT ps.ProductSizeID, ps.ProductID, ps.SizeID, ps.PromotionID, "
-                   + "s.Type AS SizeType, ps.CostPrice, ps.SellingPrice "
-                   + "FROM ProductSize ps "
-                   + "JOIN Size s ON ps.SizeID = s.SizeID "
-                   + "WHERE ps.ProductID = ?";
+                + "s.Type AS SizeType, ps.CostPrice, ps.SellingPrice "
+                + "FROM ProductSize ps "
+                + "JOIN Size s ON ps.SizeID = s.SizeID "
+                + "WHERE ps.ProductID = ?";
 
         try (Connection con = dc.getConnect(); PreparedStatement pst = con.prepareStatement(sql)) {
             pst.setInt(1, productID);
@@ -60,7 +57,7 @@ public class ProductSizeDAO {
                     ps.setSizeType(rs.getString("SizeType"));
                     ps.setCostPrice(rs.getDouble("CostPrice"));
                     ps.setSellingPrice(rs.getDouble("SellingPrice"));
-                    
+
                     ps.setStockQuantity(getStockQuantity(ps.getProductSizeID()));
                     list.add(ps);
                 }
@@ -76,19 +73,19 @@ public class ProductSizeDAO {
      */
     public boolean insert(ProductSize ps) {
         String sql = "INSERT INTO ProductSize (ProductID, SizeID, PromotionID, CostPrice, SellingPrice) "
-                   + "VALUES (?, ?, ?, ?, ?)";
+                + "VALUES (?, ?, ?, ?, ?)";
 
         try (Connection con = dc.getConnect(); PreparedStatement pst = con.prepareStatement(sql)) {
             pst.setInt(1, ps.getProductID());
             pst.setInt(2, ps.getSizeID());
-            
+
             // Xử lý nếu không có PromotionID (tránh lỗi khóa ngoại nếu truyền 0)
             if (ps.getPromotionID() > 0) {
                 pst.setInt(3, ps.getPromotionID());
             } else {
                 pst.setNull(3, Types.INTEGER);
             }
-            
+
             pst.setDouble(4, ps.getCostPrice());
             pst.setDouble(5, ps.getSellingPrice());
 
@@ -104,18 +101,18 @@ public class ProductSizeDAO {
      */
     public boolean update(ProductSize ps) {
         String sql = "UPDATE ProductSize "
-                   + "SET SizeID = ?, PromotionID = ?, CostPrice = ?, SellingPrice = ? "
-                   + "WHERE ProductSizeID = ?";
+                + "SET SizeID = ?, PromotionID = ?, CostPrice = ?, SellingPrice = ? "
+                + "WHERE ProductSizeID = ?";
 
         try (Connection con = dc.getConnect(); PreparedStatement pst = con.prepareStatement(sql)) {
             pst.setInt(1, ps.getSizeID());
-            
+
             if (ps.getPromotionID() > 0) {
                 pst.setInt(2, ps.getPromotionID());
             } else {
                 pst.setNull(2, Types.INTEGER);
             }
-            
+
             pst.setDouble(3, ps.getCostPrice());
             pst.setDouble(4, ps.getSellingPrice());
             pst.setInt(5, ps.getProductSizeID());

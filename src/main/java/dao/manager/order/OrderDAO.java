@@ -12,23 +12,24 @@ public class OrderDAO {
     private final DBConnection dc = new DBConnection();
 
     /**
-     * Lấy danh sách tất cả hóa đơn
+     * Lấy danh sách tất cả hóa đơn (bao gồm pointDiscount)
      */
     public List<Order> getAllOrders() {
         List<Order> orders = new ArrayList<>();
-        // JOIN để lấy FullName của Nhân viên và Khách hàng
         String sql = "SELECT o.*, c.FullName as CustomerName, e.FullName as EmployeeName "
             + "FROM `Order` o "
             + "LEFT JOIN Customer c ON o.CustomerID = c.CustomerID "
             + "JOIN Employee e ON o.EmployeeID = e.EmployeeID "
-            + "WHERE DATE(o.OrderDateTime) <= CURDATE() " // WHERE phải đứng trước ORDER BY
+            + "WHERE o.OrderDateTime <= NOW() " 
             + "ORDER BY o.OrderDateTime DESC";
 
-        try (Connection conn = dc.getConnect(); PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
+        try (Connection conn = dc.getConnect(); 
+             PreparedStatement ps = conn.prepareStatement(sql); 
+             ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
                 Order order = mapResultSetToOrder(rs);
-                // Gán thêm tên vào object
+                // Gán thêm tên hiển thị từ kết quả JOIN
                 order.setCustomerName(rs.getString("CustomerName") != null ? rs.getString("CustomerName") : "Guest");
                 order.setEmployeeName(rs.getString("EmployeeName"));
                 orders.add(order);
@@ -40,13 +41,14 @@ public class OrderDAO {
     }
 
     /**
-     * Thêm mới một hóa đơn
+     * Thêm mới một hóa đơn (Cập nhật cột PointDiscount)
      */
     public boolean insert(Order order) {
-        String sql = "INSERT INTO `Order` (OrderDateTime, EmployeeID, CustomerID, TotalAmount, DiscountAmount, PaymentMethod) "
-                + "VALUES (?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO `Order` (OrderDateTime, EmployeeID, CustomerID, TotalAmount, DiscountAmount, PointDiscount, PaymentMethod) "
+                + "VALUES (?, ?, ?, ?, ?, ?, ?)";
 
-        try (Connection conn = dc.getConnect(); PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+        try (Connection conn = dc.getConnect(); 
+             PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             ps.setTimestamp(1, Timestamp.valueOf(order.getOrderDateTime()));
             ps.setInt(2, order.getEmployeeID());
@@ -59,7 +61,8 @@ public class OrderDAO {
 
             ps.setDouble(4, order.getTotalAmount());
             ps.setDouble(5, order.getDiscountAmount());
-            ps.setString(6, order.getPaymentMethod());
+            ps.setDouble(6, order.getPointDiscount()); // Cột mới
+            ps.setString(7, order.getPaymentMethod());
 
             int affectedRows = ps.executeUpdate();
             if (affectedRows > 0) {
@@ -77,12 +80,11 @@ public class OrderDAO {
     }
 
     /**
-     * Tìm kiếm hóa đơn theo ID hoặc tên khách hàng (cần JOIN)
+     * Tìm kiếm hóa đơn nâng cao
      */
     public List<Order> searchOrdersAdvanced(String keyword, Integer employeeID, LocalDate fromDate, LocalDate toDate) {
         List<Order> orders = new ArrayList<>();
 
-        // Base SQL với JOIN để lấy tên thay vì ID
         StringBuilder sql = new StringBuilder(
                 "SELECT o.*, c.FullName as CustomerName, e.FullName as EmployeeName "
                 + "FROM `Order` o "
@@ -91,7 +93,6 @@ public class OrderDAO {
                 + "WHERE 1=1 "
         );
 
-        // Cộng dồn điều kiện filter
         if (keyword != null && !keyword.trim().isEmpty()) {
             sql.append("AND (o.OrderID LIKE ? OR c.FullName LIKE ?) ");
         }
@@ -107,7 +108,8 @@ public class OrderDAO {
 
         sql.append("ORDER BY o.OrderDateTime DESC");
 
-        try (Connection conn = dc.getConnect(); PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+        try (Connection conn = dc.getConnect(); 
+             PreparedStatement ps = conn.prepareStatement(sql.toString())) {
 
             int index = 1;
             if (keyword != null && !keyword.trim().isEmpty()) {
@@ -127,7 +129,6 @@ public class OrderDAO {
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     Order order = mapResultSetToOrder(rs);
-                    // Gán thêm thông tin tên từ kết quả JOIN
                     order.setCustomerName(rs.getString("CustomerName") != null ? rs.getString("CustomerName") : "Guest");
                     order.setEmployeeName(rs.getString("EmployeeName"));
                     orders.add(order);
@@ -140,7 +141,7 @@ public class OrderDAO {
     }
 
     /**
-     * Helper method để map dữ liệu từ ResultSet sang Object
+     * Ánh xạ ResultSet sang Object Order (Bao gồm PointDiscount)
      */
     private Order mapResultSetToOrder(ResultSet rs) throws SQLException {
         Order order = new Order();
@@ -153,32 +154,32 @@ public class OrderDAO {
 
         order.setTotalAmount(rs.getDouble("TotalAmount"));
         order.setDiscountAmount(rs.getDouble("DiscountAmount"));
+        order.setPointDiscount(rs.getDouble("PointDiscount")); // Lấy trường mới
         order.setPaymentMethod(rs.getString("PaymentMethod"));
         return order;
     }
 
+    /**
+     * Lấy các hóa đơn gần đây cho Dashboard
+     */
     public List<Order> getRecentOrders(int limit) {
         List<Order> orders = new ArrayList<>();
-
         String sql = "SELECT * FROM `Order` "
                 + "WHERE TotalAmount > 0 "
                 + "AND OrderDateTime <= NOW() "
                 + "AND OrderDateTime >= DATE_SUB(NOW(), INTERVAL 30 DAY) "
                 + "ORDER BY OrderDateTime DESC LIMIT ?";
 
-        try (Connection conn = dc.getConnect(); PreparedStatement ps = conn.prepareStatement(sql)) {
-
+        try (Connection conn = dc.getConnect(); 
+             PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, limit);
-
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
-
                     orders.add(mapResultSetToOrder(rs));
                 }
             }
         } catch (SQLException e) {
             System.err.println("Lỗi khi lấy danh sách đơn hàng gần đây: " + e.getMessage());
-            e.printStackTrace();
         }
         return orders;
     }

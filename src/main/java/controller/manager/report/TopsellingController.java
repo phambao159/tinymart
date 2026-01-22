@@ -1,7 +1,9 @@
 package controller.manager.report;
 
 import dao.manager.report.ReportDAO;
+import model.manager.report.Report;
 import java.net.URL;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.ResourceBundle;
 import javafx.collections.FXCollections;
@@ -10,11 +12,8 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.chart.PieChart;
 import javafx.scene.control.ComboBox;
-import model.manager.report.Report;
 
 public class TopsellingController implements Initializable {
-
-    private ReportDAO reportDAO = new ReportDAO();
 
     @FXML
     private PieChart pieChartProducts;
@@ -23,111 +22,119 @@ public class TopsellingController implements Initializable {
     @FXML
     private ComboBox<String> periodmonth;
 
+    private final ReportDAO reportDAO = new ReportDAO();
+    private boolean isUpdating = false; // Cờ chặn refresh vòng lặp
+
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         setupComboBoxes();
-        refreshDashboard(); // Gọi lần đầu để hiển thị dữ liệu mặc định
     }
 
     private void setupComboBoxes() {
-        // 1. Lấy thời gian thực từ hệ thống
-        java.time.LocalDate now = java.time.LocalDate.now();
+        LocalDate now = LocalDate.now();
         int currentYear = now.getYear();
         int currentMonth = now.getMonthValue();
 
-        // 2. Setup ComboBox Năm (từ 2023 đến hiện tại)
+        // 1. Nạp danh sách năm
         periodyear.getItems().clear();
         for (int y = 2023; y <= currentYear; y++) {
             periodyear.getItems().add(String.valueOf(y));
         }
 
-        // 3. Lắng nghe sự kiện thay đổi Năm để cập nhật danh sách Tháng/Quý
-        periodyear.getSelectionModel().selectedItemProperty().addListener((obs, oldYear, newYearStr) -> {
-            if (newYearStr != null) {
-                int selectedYear = Integer.parseInt(newYearStr);
+        // 2. Listener cho Năm: Cập nhật lại danh sách Kỳ
+        periodyear.getSelectionModel().selectedItemProperty().addListener((obs, oldV, newYear) -> {
+            if (newYear != null) {
+                updatePeriodOptions(Integer.parseInt(newYear));
+            }
+        });
 
-                // Lưu lại giá trị đang chọn ở ComboBox Kỳ để tránh bị reset mất dấu
-                String currentSelectedPeriod = periodmonth.getValue();
-
-                // Xóa và nạp lại danh sách Kỳ dựa trên Năm được chọn
-                periodmonth.getItems().clear();
-                periodmonth.getItems().add("All");
-
-                int maxMonth;
-                int maxQuarter;
-
-                if (selectedYear < currentYear) {
-                    // Nếu là năm cũ: Hiển thị đủ 12 tháng và 4 quý
-                    maxMonth = 12;
-                    maxQuarter = 4;
-                } else {
-                    // Nếu là năm hiện tại: Giới hạn theo thời gian thực
-                    maxMonth = currentMonth;
-                    maxQuarter = (currentMonth - 1) / 3 + 1;
-                }
-
-                // Nạp Quý
-                for (int q = 1; q <= maxQuarter; q++) {
-                    periodmonth.getItems().add("Quarter " + q);
-                }
-                // Nạp Tháng
-                for (int m = 1; m <= maxMonth; m++) {
-                    periodmonth.getItems().add("Month " + m);
-                }
-
-                // Khôi phục lại giá trị chọn cũ nếu nó vẫn tồn tại trong danh sách mới
-                if (periodmonth.getItems().contains(currentSelectedPeriod)) {
-                    periodmonth.setValue(currentSelectedPeriod);
-                } else {
-                    periodmonth.setValue("Month " + (selectedYear < currentYear ? "1" : maxMonth));
-                }
-
+        // 3. Listener cho Kỳ: Vẽ lại biểu đồ
+        periodmonth.getSelectionModel().selectedItemProperty().addListener((obs, oldV, newPeriod) -> {
+            if (newPeriod != null && !isUpdating) {
                 refreshDashboard();
             }
         });
 
-        // 4. Lắng nghe sự kiện thay đổi Kỳ (Tháng/Quý)
-        periodmonth.getSelectionModel().selectedItemProperty().addListener((obs, oldV, newV) -> {
-            if (newV != null) {
-                refreshDashboard();
-            }
-        });
-
-        // 5. Thiết lập mặc định ban đầu (Trigger listener ở bước 3)
+        // 4. Giá trị mặc định ban đầu
         periodyear.setValue(String.valueOf(currentYear));
+        String currentMonthLabel = "Month " + currentMonth;
+        if (periodmonth.getItems().contains(currentMonthLabel)) {
+            periodmonth.setValue(currentMonthLabel);
+        }
+    }
+
+    private void updatePeriodOptions(int selectedYear) {
+        isUpdating = true; // Bắt đầu cập nhật, tạm dừng refresh biểu đồ
+
+        String currentSelect = periodmonth.getValue();
+        periodmonth.getItems().clear();
+        periodmonth.getItems().add("All");
+
+        LocalDate now = LocalDate.now();
+        int currentYear = now.getYear();
+
+        // Tính toán giới hạn thời gian thực
+        int maxMonth = (selectedYear < currentYear) ? 12 : now.getMonthValue();
+        int maxQuarter = (selectedYear < currentYear) ? 4 : (maxMonth - 1) / 3 + 1;
+
+        for (int q = 1; q <= maxQuarter; q++) {
+            periodmonth.getItems().add("Quarter " + q);
+        }
+        for (int m = 1; m <= maxMonth; m++) {
+            periodmonth.getItems().add("Month " + m);
+        }
+
+        // Khôi phục lựa chọn cũ hoặc mặc định là "All"
+        if (periodmonth.getItems().contains(currentSelect)) {
+            periodmonth.setValue(currentSelect);
+        } else {
+            periodmonth.setValue("All");
+        }
+
+        isUpdating = false; // Kết thúc cập nhật
+        refreshDashboard(); // Gọi vẽ lại sau khi ComboBox đã ổn định
     }
 
     private void refreshDashboard() {
         String year = periodyear.getValue();
         String period = periodmonth.getValue();
 
-        String filter;
-        if (period.equals("All")) {
-            filter = "Year " + year;
-        } else {
-            filter = year + " - " + period;
+        if (year == null || period == null) {
+            return;
         }
 
+        // Định dạng filter khớp với logic xử lý chuỗi của ReportDAO
+        String filter = period.equals("All") ? "Year " + year : year + " - " + period;
         drawTopProductsPieChart(filter);
     }
 
     private void drawTopProductsPieChart(String filter) {
-        ObservableList<PieChart.Data> pieData = FXCollections.observableArrayList();
+        // 1. Xóa dữ liệu cũ để tránh lỗi render đè dữ liệu
+        pieChartProducts.getData().clear();
 
-        // Gọi DAO với tham số filter
         List<Report> data = reportDAO.getTopSellingProducts(filter);
 
-        if (data.isEmpty()) {
-            pieChartProducts.setTitle("No data for this period");
-        } else {
-            pieChartProducts.setTitle("Top Selling Products");
+        if (data == null || data.isEmpty()) {
+            pieChartProducts.setTitle("No data available for: " + filter);
+            return;
         }
 
-        for (Report r : data) {
-            // Hiển thị tên sản phẩm và số lượng bán được trên label
-            String labelWithQty = String.format("%s (%.0f)", r.getLabel(), r.getValue());
-            pieData.add(new PieChart.Data(labelWithQty, r.getValue()));
-        }
-        pieChartProducts.setData(pieData);
+        // 2. Sử dụng Platform.runLater để thực hiện thay đổi UI sau khi lấy data xong
+        javafx.application.Platform.runLater(() -> {
+            ObservableList<PieChart.Data> pieData = FXCollections.observableArrayList();
+
+            for (Report r : data) {
+                // Hiển thị nhãn kèm số lượng để người dùng dễ nhìn
+                String label = String.format("%s (%.0f)", r.getLabel(), r.getValue());
+                pieData.add(new PieChart.Data(label, r.getValue()));
+            }
+
+            pieChartProducts.setData(pieData);
+            pieChartProducts.setTitle("Top Selling Products (" + filter + ")");
+
+            // Cấu hình thêm để nhãn không bị dính vào nhau
+            pieChartProducts.setLabelLineLength(20);
+            pieChartProducts.setLabelsVisible(true);
+        });
     }
 }
