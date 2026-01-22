@@ -7,9 +7,11 @@ public class CartItem {
     private String productName;
     private int quantity;
     private double price;
-    private double total;
     private String promotionType;
     private double promotionValue;
+    private Double total;
+
+    private double sellingPrice;
 
     public CartItem(String productId, int sizeId, String productName, int quantity, double price, String promotionType, double promotionValue) {
         this.productId = productId;
@@ -17,38 +19,44 @@ public class CartItem {
         this.productName = productName;
         this.quantity = quantity;
         this.price = price;
-        this.total = price * quantity;
         this.promotionType = promotionType;
         this.promotionValue = promotionValue;
+        this.total = price * quantity;
+        this.sellingPrice = price;
     }
 
-    public int getSizeId() {
-        return sizeId;
+    public CartItem(String productId, int sizeId, String productName, int quantity, double price, String promotionType, double promotionValue, double sellingPrice) {
+        this(productId, sizeId, productName, quantity, price, promotionType, promotionValue);
+        this.sellingPrice = sellingPrice;
     }
 
     public String getProductId() {
         return productId;
     }
 
-    public String getProductName() {
-        return productName;
+    public int getSizeId() {
+        return sizeId;
     }
 
-    public double getPrice() {
-        return price;
+    public String getProductName() {
+        return productName;
     }
 
     public int getQuantity() {
         return quantity;
     }
 
-    public double getTotal() {
-        return total;
-    }
-
     public void setQuantity(int quantity) {
         this.quantity = quantity;
         this.total = this.price * this.quantity;
+    }
+
+    public double getPrice() {
+        return price;
+    }
+
+    public void setPrice(double price) {
+        this.price = price;
     }
 
     public String getPromotionType() {
@@ -57,5 +65,21 @@ public class CartItem {
 
     public double getPromotionValue() {
         return promotionValue;
+    }
+
+    public Double getTotal() {
+        return total;
+    }
+
+    public void setTotal(Double total) {
+        this.total = total;
+    }
+
+    public double getSellingPrice() {
+        return sellingPrice;
+    }
+
+    public void setSellingPrice(double sellingPrice) {
+        this.sellingPrice = sellingPrice;
     }
 }

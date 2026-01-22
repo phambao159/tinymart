@@ -351,7 +351,6 @@ public class CashierDAO {
 
             String sqlOrder = "INSERT INTO `Order` (OrderDateTime, EmployeeID, CustomerID, TotalAmount, DiscountAmount, PointDiscount, PaymentMethod) VALUES (NOW(), ?, ?, ?, ?, ?, ?)";
             psOrder = conn.prepareStatement(sqlOrder, Statement.RETURN_GENERATED_KEYS);
-
             psOrder.setInt(1, employeeId);
             if (customerId != null) {
                 psOrder.setInt(2, customerId);
@@ -363,9 +362,7 @@ public class CashierDAO {
             psOrder.setDouble(5, pointDiscount);
             psOrder.setString(6, paymentMethod);
 
-            int affectedRows = psOrder.executeUpdate();
-
-            if (affectedRows > 0) {
+            if (psOrder.executeUpdate() > 0) {
                 rs = psOrder.getGeneratedKeys();
                 if (rs.next()) {
                     generatedOrderId = rs.getInt(1);
@@ -375,20 +372,26 @@ public class CashierDAO {
                 return -1;
             }
 
-            String sqlDetail = "INSERT INTO OrderDetail (OrderID, ProductSizeID, Quantity) VALUES (?, ?, ?)";
+            String sqlDetail = "INSERT INTO OrderDetail (OrderID, ProductSizeID, Quantity, original_price, selling_price, unit_cost) VALUES (?, ?, ?, ?, ?, ?)";
             psDetail = conn.prepareStatement(sqlDetail);
 
             for (model.cashier.CartItem item : cartItems) {
                 psDetail.setInt(1, generatedOrderId);
                 int productSizeId = getProductSizeID(conn, Integer.parseInt(item.getProductId()), item.getSizeId());
-
                 psDetail.setInt(2, productSizeId);
                 psDetail.setInt(3, item.getQuantity());
+
+                double originalPrice = item.getPrice();
+                double sellingPrice = item.getSellingPrice();
+                double unitCost = getCurrentCostPrice(conn, productSizeId);
+
+                psDetail.setDouble(4, originalPrice);
+                psDetail.setDouble(5, sellingPrice);
+                psDetail.setDouble(6, unitCost);
+
                 psDetail.addBatch();
             }
-
             psDetail.executeBatch();
-
             conn.commit();
 
         } catch (Exception e) {
@@ -402,7 +405,6 @@ public class CashierDAO {
             generatedOrderId = -1;
         } finally {
             try {
-
                 if (rs != null) {
                     rs.close();
                 }
@@ -412,7 +414,6 @@ public class CashierDAO {
                 if (psDetail != null) {
                     psDetail.close();
                 }
-
                 if (conn != null) {
                     conn.setAutoCommit(true);
                     conn.close();
@@ -455,7 +456,11 @@ public class CashierDAO {
 
     public List<model.cashier.CartItem> getOrderDetails(int orderId) {
         List<model.cashier.CartItem> list = new ArrayList<>();
-        String sql = "SELECT p.ProductID, p.Name, s.Type, od.Quantity, ps.SellingPrice "
+        String sql = "SELECT p.ProductID, p.Name, s.Type, od.Quantity, "
+                + "CASE "
+                + "   WHEN od.selling_price > 0 THEN od.selling_price "
+                + "   ELSE ps.SellingPrice "
+                + "END AS FinalPrice " 
                 + "FROM OrderDetail od "
                 + "JOIN ProductSize ps ON od.ProductSizeID = ps.ProductSizeID "
                 + "JOIN Product p ON ps.ProductID = p.ProductID "
@@ -469,13 +474,13 @@ public class CashierDAO {
 
             while (rs.next()) {
                 String fullName = rs.getString("Name") + " (" + rs.getString("Type") + ")";
-
+                double finalPrice = rs.getDouble("FinalPrice");
                 list.add(new model.cashier.CartItem(
                         String.valueOf(rs.getInt("ProductID")),
                         0,
                         fullName,
                         rs.getInt("Quantity"),
-                        rs.getDouble("SellingPrice"),
+                        finalPrice,
                         null,
                         0.0
                 ));
@@ -486,4 +491,18 @@ public class CashierDAO {
         return list;
     }
 
+    private double getCurrentCostPrice(Connection conn, int productSizeId) {
+        String sql = "SELECT ImportPrice FROM ImportDetail WHERE ProductSizeID = ? AND ShelfQuantity > 0 ORDER BY ExpiryDate ASC LIMIT 1";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, productSizeId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getDouble("ImportPrice");
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0.0;
+    }
 }

@@ -223,7 +223,7 @@ public class CashierController implements Initializable {
             colTotal.prefWidthProperty().bind(tblCart.widthProperty().multiply(0.25));
         }
 
-    } 
+    }
 
     private void setSidebarActive(Button activeBtn) {
         btnHome.getStyleClass().remove("active");
@@ -542,27 +542,34 @@ public class CashierController implements Initializable {
         if (result == null) {
             return;
         }
-
         double subTotal = 0;
         double productDiscount = 0;
 
         for (CartItem item : cartList) {
-            double price = item.getPrice();
+            double originalPrice = item.getPrice();
             int qty = item.getQuantity();
-            double itemTotal = price * qty;
+            double itemTotal = originalPrice * qty;
+
             subTotal += itemTotal;
 
+            double itemDiscountAmt = 0;
             String promoType = item.getPromotionType();
             double promoVal = item.getPromotionValue();
+
             if (promoType != null) {
                 if ("BOGO".equalsIgnoreCase(promoType)) {
-                    productDiscount += (qty / 2) * price;
+                    int freeItems = qty / 2;
+                    itemDiscountAmt = freeItems * originalPrice;
                 } else if (promoType.toLowerCase().contains("discount") || promoType.toLowerCase().contains("percentage")) {
                     if (promoVal > 0) {
-                        productDiscount += itemTotal * (promoVal / 100.0);
+                        itemDiscountAmt = itemTotal * (promoVal / 100.0);
                     }
                 }
             }
+            productDiscount += itemDiscountAmt;
+            double finalLineTotal = itemTotal - itemDiscountAmt;
+            double sellingPrice = (qty > 0) ? (finalLineTotal / qty) : 0;
+            item.setSellingPrice(sellingPrice);
         }
 
         double pointDiscountMoney = 0;
@@ -572,9 +579,7 @@ public class CashierController implements Initializable {
         if (currentCustomer != null && currentCustomer.getPoints() >= 100 && amountBeforePoint >= 10) {
             int blocksFromPoints = currentCustomer.getPoints() / 100;
             int blocksFromBill = (int) (amountBeforePoint / 10);
-
             int redeemableBlocks = Math.min(blocksFromPoints, blocksFromBill);
-
             pointDiscountMoney = redeemableBlocks * 10.0;
             pointsUsed = redeemableBlocks * 100;
         }
@@ -1028,13 +1033,24 @@ public class CashierController implements Initializable {
             String name = cellData.getValue().getCustomerName();
             return new SimpleStringProperty(name == null ? "Guest" : name);
         });
+
         colHistTotal.setVisible(false);
         colHistMethod.setVisible(false);
+
         if (tblOrderDetail != null) {
+            tblOrderDetail.setItems(cartList);
+
             colDetailItem.setCellValueFactory(new PropertyValueFactory<>("productName"));
             colDetailQty.setCellValueFactory(new PropertyValueFactory<>("quantity"));
+
             colDetailTotal.setCellValueFactory(new PropertyValueFactory<>("total"));
         }
+
+        tblHistory.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
+            if (newSelection != null) {
+                loadHistoryDetails(newSelection);
+            }
+        });
     }
 
     @FXML
@@ -1139,10 +1155,17 @@ public class CashierController implements Initializable {
     }
 
     private void loadHistoryDetails(OrderViewModel order) {
-        lblOrderId.setText("#" + order.getOrderId());
+        if (order == null) {
+            return;
+        }
+        if (lblOrderId != null) {
+            lblOrderId.setText("#" + order.getOrderId());
+        }
 
-        boxCustomerInfo.setVisible(true);
-        boxCustomerInfo.setManaged(true);
+        if (boxCustomerInfo != null) {
+            boxCustomerInfo.setVisible(true);
+            boxCustomerInfo.setManaged(true);
+        }
 
         String custName = (order.getCustomerName() == null || order.getCustomerName().equalsIgnoreCase("Guest"))
                 ? "Guest" : order.getCustomerName();
@@ -1157,12 +1180,13 @@ public class CashierController implements Initializable {
         }
 
         List<CartItem> details = cashierDAO.getOrderDetails(order.getOrderId());
+
         cartList.clear();
         cartList.addAll(details);
 
         double calculatedSubTotal = 0;
         for (CartItem item : details) {
-            calculatedSubTotal += item.getPrice() * item.getQuantity();
+            calculatedSubTotal += item.getSellingPrice() * item.getQuantity();
         }
 
         double finalTotal = order.getTotalAmount();
@@ -1170,6 +1194,9 @@ public class CashierController implements Initializable {
         double pointDiscount = order.getPointDiscount();
 
         double promoDiscount = totalDiscount - pointDiscount;
+        if (promoDiscount < 0) {
+            promoDiscount = 0;
+        }
 
         lblHistorySubTotal.setText(String.format("$%.2f", calculatedSubTotal));
 
