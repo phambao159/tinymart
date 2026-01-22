@@ -80,7 +80,7 @@
                 <!-- Action Buttons -->
                 <HBox alignment="CENTER_RIGHT" spacing="10">
                     <children>
-                        <Button fx:id="btnConfirm" onAction="#onConfirm" text="Confirm" />
+                        <Button fx:id="btnConfirm" onAction="#onConfirm" text="Completed" />
                     </children>
                 </HBox>
 

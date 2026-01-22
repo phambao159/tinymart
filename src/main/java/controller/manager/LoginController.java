@@ -1,8 +1,10 @@
 package controller.manager;
 
 import dao.manager.employee.EmployeeDAO;
-import main.App; 
-import model.manager.employee.Employee; 
+import dao.Warehouse.EmployeeShiftDAO;   // ✅ đổi sang dao.Warehouse
+import main.App;
+import model.manager.employee.Employee;
+import model.Warehouse.EmployeeShift;   // ✅ nếu cần dùng model EmployeeShift
 
 import java.io.IOException;
 import java.net.URL;
@@ -10,13 +12,12 @@ import java.util.ResourceBundle;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Alert; 
+import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
-
 
 public class LoginController implements Initializable {
 
@@ -27,24 +28,23 @@ public class LoginController implements Initializable {
     @FXML
     private Label lbLogin;
     @FXML
-    private TextField user; 
+    private TextField user;
     @FXML
-    private PasswordField password; 
+    private PasswordField password;
 
-    private EmployeeDAO employeeDAO; 
-
+    private EmployeeDAO employeeDAO;
+    private EmployeeShiftDAO employeeShiftDAO; // ✅ dùng DAO của Warehouse
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-
         employeeDAO = new EmployeeDAO();
-    }    
+        employeeShiftDAO = new EmployeeShiftDAO(); // ✅ khởi tạo DAO Warehouse
+    }
 
     @FXML
     private void onLogin(ActionEvent event) {
         String username = user.getText().trim();
         String pwd = password.getText().trim();
-
 
         if (username.isEmpty() || pwd.isEmpty()) {
             showAlert("Error Login", "Please enter username and password fully!", AlertType.WARNING);
@@ -52,35 +52,41 @@ public class LoginController implements Initializable {
         }
 
         try {
-
             Employee employee = employeeDAO.authenticate(username, pwd);
 
             if (employee != null) {
                 util.User.setSession(employee);
-                if(employee.getRole().toLowerCase().equals("manager")){
-                    App.setRoot("manager","layout"); 
-                } else if (employee.getRole().toLowerCase().equals("cashier")){
-                    App.setRoot("cashier","cashier");
+
+                String role = employee.getRole().toLowerCase();
+
+                if (role.equals("manager")) {
+                    App.setRoot("manager", "layout");
+                } else if (role.equals("cashier")) {
+                    App.setRoot("cashier", "cashier");
+                } else if (role.equals("warehouse")) {
+                    try {
+                        java.time.LocalDate workDate = java.time.LocalDate.now();
+                        employeeShiftDAO.checkIn(employee, workDate); // ✅ chỉ ghi lần đầu
+                    } catch (Exception ex) {
+                        showAlert("Error Shift", "Cannot record warehouse check-in!", AlertType.ERROR);
+                        ex.printStackTrace();
+                    }
+                    App.setRoot("Warehouse", "layoutStorage");
                 }
 
             } else {
-
                 showAlert("Error Login", "Username or Password is not correct.", AlertType.ERROR);
-
                 password.clear();
             }
 
         } catch (IOException e) {
-
-            showAlert("Error System", "Not found Manager Dashboard", AlertType.ERROR);
+            showAlert("Error System", "Not found Dashboard", AlertType.ERROR);
             e.printStackTrace();
         } catch (Exception e) {
-
             showAlert("Error Database", "Cannot connect to Database!", AlertType.ERROR);
             e.printStackTrace();
         }
     }
-
 
     private void showAlert(String title, String message, AlertType type) {
         Alert alert = new Alert(type);

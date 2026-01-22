@@ -1,0 +1,64 @@
+/* Font mặc định */
+.label {
+    -fx-font-family: "Segoe UI", sans-serif;
+    -fx-text-fill: #333333;
+}
+
+/* Header */
+#productNameLabel {
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #222222;
+}
+
+#sizeTypeLabel {
+    -fx-font-size: 14px;
+    -fx-text-fill: #666666;
+}
+
+#statusLabel {
+    -fx-font-size: 14px;
+    -fx-text-fill: green;
+    -fx-font-weight: bold;
+}
+
+/* Tem hạn sử dụng */
+.expiry-card {
+    -fx-background-color: rgba(255,255,255,0.8);
+    -fx-border-color: #cccccc;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-padding: 10;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 4, 0.3, 2, 2);
+    -fx-transition: all 0.3s ease;
+}
+
+.expiry-card:hover {
+    -fx-background-color: #e6f7ff;
+    -fx-border-color: #3399ff;
+    -fx-effect: dropshadow(gaussian, rgba(51,153,255,0.3), 6, 0.4, 2, 2);
+}
+
+/* Nội dung bên trong mỗi card */
+.expiry-label {
+    -fx-font-size: 13px;
+    -fx-text-fill: #333333;
+}
+
+.expiry-label-bold {
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #222222;
+}
+
+/* Nút Close */
+.button {
+    -fx-font-size: 13px;
+    -fx-background-color: #3399ff;
+    -fx-text-fill: white;
+    -fx-background-radius: 5;
+}
+
+.button:hover {
+    -fx-background-color: #2672cc;
+}

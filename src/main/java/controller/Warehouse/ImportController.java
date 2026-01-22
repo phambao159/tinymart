@@ -162,12 +162,5 @@ public class ImportController implements Initializable {
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-    @FXML
-    private void onNotifClick() {
-        LayoutWareHouseController layout = LayoutWareHouseController.getInstance();
-        layout.openNotificationView();   // hiển thị Notification.fxml trong StackPane view
-        notifDot.setVisible(false);      // ẩn chấm đỏ sau khi mở
-    }
+    }   
 }

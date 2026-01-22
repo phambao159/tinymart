@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml"
+            fx:controller="controller.Warehouse.InventoryItemDetailController"
+            fx:id="cardRoot"
+            prefWidth="600" prefHeight="400"
+            stylesheets="@ItemCard.css"
+            style="-fx-background-color: #ffffff; -fx-padding: 15;">
+
+    <!-- Header -->
+    <top>
+        <VBox spacing="5" alignment="CENTER">
+            <Label fx:id="productNameLabel" styleClass="header-label"/>
+            <Label fx:id="sizeTypeLabel" styleClass="sub-label"/>
+            <Label fx:id="statusLabel" styleClass="status-label"/>
+        </VBox>
+    </top>
+
+    <!-- Body -->
+    <center>
+        <ScrollPane fitToWidth="true" prefHeight="280" style="-fx-background-color: transparent;">
+            <FlowPane fx:id="expiryFlowPane"
+                      hgap="15" vgap="15"
+                      alignment="TOP_LEFT"
+                      style="-fx-padding: 10;">
+            </FlowPane>
+        </ScrollPane>
+    </center>
+
+    <!-- Footer -->
+    <bottom>
+        <HBox spacing="10" alignment="CENTER_RIGHT" style="-fx-padding: 10 0 0 0;">
+            <Button text="Close" onAction="#onClose" styleClass="button"/>
+        </HBox>
+    </bottom>
+</BorderPane>
