@@ -1,33 +1,76 @@
 package model.manager.report;
 
 public class Report {
-    private String label; 
-    private double value; 
 
-    // Constructor mặc định
-    public Report() {
-    }
 
-    // Constructor dùng cho cả doanh thu và số lượng
+    // Thuộc tính cũ (Dùng cho biểu đồ và Top 10)
+    private String label;
+    private double value;
+
+    // Thuộc tính mới (Dùng cho Dashboard tổng lực)
+    private double rev30;
+    private double revPrev30;
+    private int ordersToday;
+    private int ordersYesterday;
+    private int custMonth;
+    private int custPrevMonth;
+    private String topCategory;
+
     public Report(String label, double value) {
         this.label = label;
         this.value = value;
     }
 
-    // Getters và Setters
-    public String getLabel() {
-        return label;
+
+    // CONSTRUCTOR 2: Dùng cho Dashboard tổng quát
+    public Report(double rev30, double revPrev30, int ordersToday,
+            int ordersYesterday, int custMonth, int custPrevMonth, String topCategory) {
+        this.rev30 = rev30;
+        this.revPrev30 = revPrev30;
+        this.ordersToday = ordersToday;
+        this.ordersYesterday = ordersYesterday;
+        this.custMonth = custMonth;
+        this.custPrevMonth = custPrevMonth;
+        this.topCategory = topCategory;
     }
 
-    public void setLabel(String label) {
-        this.label = label;
+    // --- Getters cho thuộc tính cũ ---
+    public String getLabel() {
+        return label;
     }
 
     public double getValue() {
         return value;
     }
 
-    public void setValue(double value) {
-        this.value = value;
+
+    // --- Getters cho Dashboard ---
+    public double getRev30() {
+        return rev30;
+    }
+
+    public double getRevPrev30() {
+        return revPrev30;
+    }
+
+    public int getOrdersToday() {
+        return ordersToday;
+    }
+
+    public int getOrdersYesterday() {
+        return ordersYesterday;
+    }
+
+    public int getCustMonth() {
+        return custMonth;
+    }
+
+    public int getCustPrevMonth() {
+        return custPrevMonth;
+    }
+
+    public String getTopCategory() {
+        return topCategory;
     }
 }
+

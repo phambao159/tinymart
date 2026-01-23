@@ -23,8 +23,6 @@ public class EditPromotionController implements Initializable {
     @FXML
     private TextArea txtDescription;
     @FXML
-    private TextField txtType; // Chuyển thành TextField
-    @FXML
     private TextField txtValue;
     @FXML
     private DatePicker dpStart;
@@ -35,11 +33,17 @@ public class EditPromotionController implements Initializable {
 
     private final PromotionDAO promotionDAO = new PromotionDAO();
     private Promotion selectedPromotion;
+    
+    @FXML
+    private Label title;
+    @FXML
+    private ComboBox<String> cbType;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         // Khởi tạo các lựa chọn cho trạng thái
         cbStatus.setItems(FXCollections.observableArrayList("Active", "Inactive", "Expired"));
+        cbType.setItems(FXCollections.observableArrayList("Fixed Discount", "BOGO"));
     }
 
     /**
@@ -51,7 +55,7 @@ public class EditPromotionController implements Initializable {
         txtID.setText(String.valueOf(promotion.getPromotionID()));
         txtName.setText(promotion.getName());
         txtDescription.setText(promotion.getDescription());
-        txtType.setText(promotion.getType()); // Gán giá trị vào TextField
+        cbType.setValue(promotion.getType()); 
         txtValue.setText(String.valueOf(promotion.getValue()));
         dpStart.setValue(promotion.getStartDate());
         dpEnd.setValue(promotion.getEndDate());
@@ -63,12 +67,12 @@ public class EditPromotionController implements Initializable {
         try {
             // 1. Kiểm tra dữ liệu
             String name = txtName.getText().trim();
-            String type = txtType.getText().trim();
+            String type = cbType.getValue();
             String valueStr = txtValue.getText().trim();
             LocalDate start = dpStart.getValue();
             LocalDate end = dpEnd.getValue();
 
-            if (name.isEmpty() || type.isEmpty() || valueStr.isEmpty() || start == null || end == null) {
+            if (name.isEmpty() || type == null || type.isEmpty() || valueStr.isEmpty() || start == null || end == null) {
                 showAlert(Alert.AlertType.ERROR, "Form Error", "Please fill in all required fields!");
                 return;
             }

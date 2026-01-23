@@ -2,8 +2,14 @@
 
 <?import java.net.URL?>
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
 <VBox prefWidth="700.0" spacing="15.0" style="-fx-background-color: white;" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.manager.order.OrderDetailController">
@@ -20,13 +26,17 @@
             </font>
         </Label>
         
-        <GridPane hgap="10.0" vgap="10.0" style="-fx-background-color: #f8f9fa; -fx-padding: 15; -fx-background-radius: 10;">
+        <GridPane hgap="10.0" style="-fx-background-color: #f8f9fa; -fx-padding: 15; -fx-background-radius: 10;" vgap="10.0">
             <columnConstraints>
                 <ColumnConstraints prefWidth="120.0" />
                 <ColumnConstraints hgrow="ALWAYS" />
                 <ColumnConstraints prefWidth="120.0" />
                 <ColumnConstraints hgrow="ALWAYS" />
             </columnConstraints>
+            <rowConstraints>
+                <RowConstraints minHeight="10.0" prefHeight="30.0" />
+                <RowConstraints minHeight="10.0" prefHeight="30.0" />
+            </rowConstraints>
             <children>
                 <Label text="Order ID:" GridPane.columnIndex="0" GridPane.rowIndex="0" />
                 <Label fx:id="lbOrderID" style="-fx-font-weight: bold;" GridPane.columnIndex="1" GridPane.rowIndex="0" />
@@ -54,13 +64,27 @@
             </columnResizePolicy>
         </TableView>
 
-        <HBox alignment="CENTER_RIGHT" spacing="20.0">
+        <VBox alignment="CENTER_RIGHT" spacing="10.0">
             <children>
-                <VBox alignment="CENTER_RIGHT" spacing="5.0">
-                    <Label text="Total Amount:" style="-fx-font-size: 16px; -fx-font-weight: bold;" />
-                    <Label fx:id="lbTotal" text="0.00" textFill="#e74c3c" style="-fx-font-size: 20px; -fx-font-weight: bold;" />
-                </VBox>
+                <HBox alignment="CENTER_RIGHT" spacing="15.0">
+                    <children>
+                        <Label style="-fx-font-size: 14px;" text="Product Discount:" />
+                        <Label fx:id="prDiscount" style="-fx-font-size: 16px; -fx-font-weight: bold;" text="0.00" textFill="#e74c3c" />
+                    </children>
+                </HBox>
+            <HBox alignment="CENTER_RIGHT" spacing="15.0">
+               <children>
+                  <Label style="-fx-font-size: 14px;" text="Point Discount:" />
+                  <Label fx:id="pDiscount" style="-fx-font-size: 16px; -fx-font-weight: bold;" text="0.00" textFill="#e74c3c" />
+               </children>
+            </HBox>
+                <HBox alignment="CENTER_RIGHT" spacing="15.0">
+                    <children>
+                        <Label style="-fx-font-size: 16px; -fx-font-weight: bold;" text="Total Amount:" />
+                        <Label fx:id="lbTotal" style="-fx-font-size: 22px; -fx-font-weight: bold;" text="0.00" textFill="#1e8449" />
+                    </children>
+                </HBox>
             </children>
-        </HBox>
+        </VBox>
     </children>
 </VBox>

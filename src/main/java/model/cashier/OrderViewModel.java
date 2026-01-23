@@ -9,9 +9,11 @@ public class OrderViewModel {
     private String customerPhone;
     private int customerPoints;
     private double totalAmount;
+    private double totalDiscount;
     private String paymentMethod;
+    private double pointDiscount;
 
-    public OrderViewModel(int orderId, String orderTime, String cashierName, String customerName, String customerPhone, int customerPoints, double totalAmount, String paymentMethod) {
+    public OrderViewModel(int orderId, String orderTime, String cashierName, String customerName, String customerPhone, int customerPoints, double totalAmount, double totalDiscount, double pointDiscount, String paymentMethod) {
         this.orderId = orderId;
         this.orderTime = orderTime;
         this.cashierName = cashierName;
@@ -19,6 +21,8 @@ public class OrderViewModel {
         this.customerPhone = customerPhone;
         this.customerPoints = customerPoints;
         this.totalAmount = totalAmount;
+        this.totalDiscount = totalDiscount;
+        this.pointDiscount = pointDiscount;
         this.paymentMethod = paymentMethod;
     }
 
@@ -52,5 +56,13 @@ public class OrderViewModel {
 
     public String getPaymentMethod() {
         return paymentMethod;
+    }
+
+    public double getTotalDiscount() {
+        return totalDiscount;
+    }
+
+    public double getPointDiscount() {
+        return pointDiscount;
     }
 }

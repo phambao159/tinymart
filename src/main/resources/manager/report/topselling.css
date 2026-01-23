@@ -8,7 +8,6 @@
 .label {
     -fx-text-fill: #34495e;
     -fx-font-size: 14px;
-
 }
 
 .combo-box {
@@ -26,7 +25,6 @@
 .chart-title {
     -fx-text-fill: #2c3e50;
     -fx-font-size: 20px;
-
 }
 
 /* Định dạng các miếng bánh (Pie Slices) */
@@ -58,7 +56,6 @@
 .chart-pie-label {
     -fx-fill: #4b6584;
     -fx-font-size: 12px;
-
 }
 
 .chart-pie-label-line {

@@ -5,6 +5,7 @@ import model.manager.report.Report;
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.time.LocalDate;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -16,115 +17,95 @@ import javafx.scene.control.Label;
 
 public class RevenueController implements Initializable {
 
-    @FXML
-    private BarChart<String, Number> barChartRevenue;
-
-    @FXML
-    private ComboBox<String> periodyear; // Kiểu String để dễ xử lý
-
-    @FXML
-    private ComboBox<String> periodmonth;
+    @FXML private BarChart<String, Number> barChartRevenue;
+    @FXML private ComboBox<String> periodyear;
+    @FXML private ComboBox<String> periodmonth;
 
     private final ReportDAO reportDAO = new ReportDAO();
+    private boolean isUpdating = false; // Biến cờ ngăn chặn gọi refresh liên tục
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         setupComboBoxes();
-        // Khởi tạo mặc định: Năm hiện tại và "All" (tương ứng với xem cả năm)
-        refreshDashboard();
     }
 
     private void setupComboBoxes() {
-        // 1. Lấy thời gian thực từ hệ thống
-        java.time.LocalDate now = java.time.LocalDate.now();
+        LocalDate now = LocalDate.now();
         int currentYear = now.getYear();
         int currentMonth = now.getMonthValue();
 
-        // 2. Setup ComboBox Năm (từ 2023 đến hiện tại)
+        // 1. Nạp năm (từ 2023 đến nay)
         periodyear.getItems().clear();
         for (int y = 2023; y <= currentYear; y++) {
             periodyear.getItems().add(String.valueOf(y));
         }
 
-        // 3. Lắng nghe sự kiện thay đổi Năm để cập nhật danh sách Tháng/Quý
-        periodyear.getSelectionModel().selectedItemProperty().addListener((obs, oldYear, newYearStr) -> {
-            if (newYearStr != null) {
-                int selectedYear = Integer.parseInt(newYearStr);
+        // 2. Lắng nghe thay đổi năm
+        periodyear.getSelectionModel().selectedItemProperty().addListener((obs, oldV, newYear) -> {
+            if (newYear != null) updatePeriodOptions(Integer.parseInt(newYear));
+        });
 
-                // Lưu lại giá trị đang chọn ở ComboBox Kỳ để tránh bị reset mất dấu
-                String currentSelectedPeriod = periodmonth.getValue();
-
-                // Xóa và nạp lại danh sách Kỳ dựa trên Năm được chọn
-                periodmonth.getItems().clear();
-                periodmonth.getItems().add("All");
-
-                int maxMonth;
-                int maxQuarter;
-
-                if (selectedYear < currentYear) {
-                    // Nếu là năm cũ: Hiển thị đủ 12 tháng và 4 quý
-                    maxMonth = 12;
-                    maxQuarter = 4;
-                } else {
-                    // Nếu là năm hiện tại: Giới hạn theo thời gian thực
-                    maxMonth = currentMonth;
-                    maxQuarter = (currentMonth - 1) / 3 + 1;
-                }
-
-                // Nạp Quý
-                for (int q = 1; q <= maxQuarter; q++) {
-                    periodmonth.getItems().add("Quarter " + q);
-                }
-                // Nạp Tháng
-                for (int m = 1; m <= maxMonth; m++) {
-                    periodmonth.getItems().add("Month " + m);
-                }
-
-                // Khôi phục lại giá trị chọn cũ nếu nó vẫn tồn tại trong danh sách mới
-                if (periodmonth.getItems().contains(currentSelectedPeriod)) {
-                    periodmonth.setValue(currentSelectedPeriod);
-                } else {
-                    periodmonth.setValue("Month " + (selectedYear < currentYear ? "1" : maxMonth));
-                }
-
+        // 3. Lắng nghe thay đổi kỳ
+        periodmonth.getSelectionModel().selectedItemProperty().addListener((obs, oldV, newPeriod) -> {
+            if (newPeriod != null && !isUpdating) {
                 refreshDashboard();
             }
         });
 
-        // 4. Lắng nghe sự kiện thay đổi Kỳ (Tháng/Quý)
-        periodmonth.getSelectionModel().selectedItemProperty().addListener((obs, oldV, newV) -> {
-            if (newV != null) {
-                refreshDashboard();
-            }
-        });
-
-        // 5. Thiết lập mặc định ban đầu (Trigger listener ở bước 3)
+        // 4. Mặc định chọn năm hiện tại
         periodyear.setValue(String.valueOf(currentYear));
+        
+        String currentMonthLabel = "Month " + currentMonth;
+        if (periodmonth.getItems().contains(currentMonthLabel)) {
+            periodmonth.setValue(currentMonthLabel);
+        }
+    }
+
+    private void updatePeriodOptions(int selectedYear) {
+        isUpdating = true; // Bật cờ bắt đầu cập nhật ComboBox kỳ
+        
+        String previousSelection = periodmonth.getValue();
+        periodmonth.getItems().clear();
+        periodmonth.getItems().add("All");
+
+        LocalDate now = LocalDate.now();
+        int currentYear = now.getYear();
+        
+        // Tính toán giới hạn theo thời gian thực
+        int maxMonth = (selectedYear < currentYear) ? 12 : now.getMonthValue();
+        int maxQuarter = (selectedYear < currentYear) ? 4 : (maxMonth - 1) / 3 + 1;
+
+        for (int q = 1; q <= maxQuarter; q++) periodmonth.getItems().add("Quarter " + q);
+        for (int m = 1; m <= maxMonth; m++) periodmonth.getItems().add("Month " + m);
+
+        // Khôi phục lựa chọn hoặc đặt mặc định
+        if (periodmonth.getItems().contains(previousSelection)) {
+            periodmonth.setValue(previousSelection);
+        } else {
+            periodmonth.setValue("All"); 
+        }
+
+        isUpdating = false; // Tắt cờ
+        refreshDashboard();
     }
 
     private void refreshDashboard() {
         String year = periodyear.getValue();
         String period = periodmonth.getValue();
+        if (year == null || period == null) return;
 
-        String filterType;
-        if (period.equals("All")) {
-            filterType = "Year " + year; // Ví dụ: "Year 2024"
-        } else {
-            filterType = year + " - " + period; // Ví dụ: "2024 - Month 5" hoặc "2024 - Quarter 1"
-        }
-
-        loadChartData(filterType);
+        // Tạo filter theo định dạng ReportDAO yêu cầu
+        String filter = period.equals("All") ? "Year " + year : year + " - " + period;
+        loadChartData(filter);
     }
 
-    private void loadChartData(String filterType) {
+    private void loadChartData(String filter) {
         barChartRevenue.getData().clear();
         XYChart.Series<String, Number> series = new XYChart.Series<>();
-        series.setName("Revenue: " + filterType);
+        series.setName("Revenue: " + filter);
 
-        List<Report> data = reportDAO.getRevenueByFilter(filterType);
-        if (data == null || data.isEmpty()) {
-            return;
-        }
+        List<Report> data = reportDAO.getRevenueByFilter(filter);
+        if (data == null || data.isEmpty()) return;
 
         for (Report r : data) {
             series.getData().add(new XYChart.Data<>(r.getLabel(), r.getValue()));
@@ -134,28 +115,30 @@ public class RevenueController implements Initializable {
         Platform.runLater(() -> addLabelsToBars(series));
     }
 
-    // Giữ nguyên hàm addLabelsToBars của bạn...
     private void addLabelsToBars(XYChart.Series<String, Number> series) {
         for (XYChart.Data<String, Number> entry : series.getData()) {
-            Node node = entry.getNode();
-            if (node != null) {
-                Label label = new Label(String.format("$%.0f", entry.getYValue().doubleValue()));
-                label.setStyle("-fx-font-weight: bold; -fx-text-fill: #e67e22; -fx-font-size: 11px;");
-                label.setMouseTransparent(true);
+            Node barNode = entry.getNode();
+            if (barNode == null) continue;
 
-                javafx.scene.Parent parent = node.getParent();
-                if (parent instanceof javafx.scene.Group) {
-                    ((javafx.scene.Group) parent).getChildren().add(label);
-                }
+            Label label = new Label(String.format("$%.0f", entry.getYValue().doubleValue()));
+            label.setStyle("-fx-font-weight: bold; -fx-text-fill: #e67e22; -fx-font-size: 11px;");
+            label.setMouseTransparent(true);
 
-                Runnable updatePosition = () -> {
-                    javafx.geometry.Bounds bounds = node.getBoundsInParent();
-                    label.setLayoutX(bounds.getMinX() + (bounds.getWidth() / 2) - (label.getLayoutBounds().getWidth() / 2));
-                    label.setLayoutY(bounds.getMinY() - 15);
-                };
-                Platform.runLater(updatePosition);
-                node.boundsInParentProperty().addListener((obs, oldV, newV) -> updatePosition.run());
+            // Thêm label vào Parent của barNode
+            javafx.scene.Parent parent = barNode.getParent();
+            if (parent instanceof javafx.scene.Group) {
+                ((javafx.scene.Group) parent).getChildren().add(label);
             }
+
+            // Hàm cập nhật vị trí label
+            Runnable posUpdater = () -> {
+                javafx.geometry.Bounds b = barNode.getBoundsInParent();
+                label.setLayoutX(b.getMinX() + (b.getWidth() / 2) - (label.getLayoutBounds().getWidth() / 2));
+                label.setLayoutY(b.getMinY() - 15);
+            };
+
+            Platform.runLater(posUpdater);
+            barNode.boundsInParentProperty().addListener((obs, oldV, newV) -> posUpdater.run());
         }
     }
 }

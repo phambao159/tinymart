@@ -13,8 +13,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.layout.FlowPane;
-import javafx.scene.layout.HBox;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -23,98 +22,138 @@ import model.manager.notification.Notification;
 
 public class SentNotiController implements Initializable {
 
-    @FXML private HBox NotiTool;
     @FXML private ScrollPane viewSent;
     @FXML private VBox sentContainer;
-    
+    @FXML private TextField tfSearch;
+
     private final NotificationDAO nDAO = new NotificationDAO();
-    private final EmployeeDAO edao = new EmployeeDAO();
+    private final EmployeeDAO eDAO = new EmployeeDAO();
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         loadSent();
+        
+        // Tính năng tìm kiếm real-time (khi đang gõ)
+        if (tfSearch != null) {
+            tfSearch.textProperty().addListener((observable, oldValue, newValue) -> {
+                performSearch(newValue);
+            });
+        }
+    }
+
+    /**
+     * Tải toàn bộ danh sách thông báo đã gửi
+     */
+    private void loadSent() {
+        try {
+            List<Notification> list = nDAO.getSentNoti(); 
+            renderNotiCards(list);
+        } catch (Exception e) {
+            System.err.println("Lỗi load danh sách đã gửi: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Hiển thị danh sách Notification lên giao diện VBox
+     */
+    private void renderNotiCards(List<Notification> list) {
+        sentContainer.getChildren().clear();
+        
+        if (list == null || list.isEmpty()) {
+            return;
+        }
+
+        for (Notification n : list) {
+            try {
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/manager/notification/notiCard.fxml"));
+                Parent card = loader.load();
+
+                // Lấy thông tin người nhận
+                Employee receiver = eDAO.getEmployeeById(n.getReceiverID());
+                String displayName = (receiver != null) 
+                        ? "To: " + receiver.getRole() + " " + receiver.getFullName() 
+                        : "To: Unknown User";
+
+                // Setup Controller của Card
+                NotiCardController cardController = loader.getController();
+                cardController.setData(n, displayName);
+
+                // Sự kiện xem chi tiết
+                card.setOnMouseClicked(event -> showDetail(n, displayName));
+
+                sentContainer.getChildren().add(card);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     @FXML
     private void onCreate(ActionEvent event) {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/manager/notification/createNoti.fxml"));
-            Parent root = loader.load();
-            
-            Stage stage = new Stage();
-            stage.initModality(Modality.APPLICATION_MODAL);
-            stage.setTitle("Create New Notification");
-            stage.setScene(new Scene(root));
-            
-            // Đợi đóng popup xong mới thực thi tiếp (vì dùng showAndWait)
-            stage.showAndWait(); 
-            
-            // Load lại danh sách sau khi tạo mới để thấy noti vừa gửi
-            loadSent();
-            
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        openPopup("/manager/notification/createNoti.fxml", "Create New Notification");
     }
 
-    private void loadSent() {
-        sentContainer.getChildren().clear(); 
+    /**
+     * Xử lý tìm kiếm thủ công (khi bấm nút Search)
+     */
+    @FXML
+    private void onSearch(ActionEvent event) {
+        performSearch(tfSearch.getText().trim());
+    }
+
+    private void performSearch(String keyword) {
         try {
-            // Sử dụng hàm getSentNoti() - Giả sử SQL: WHERE EmployeeID = 1
-            List<Notification> list = nDAO.getSentNoti(); 
-
-            for (Notification n : list) {
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("/manager/notification/notiCard.fxml"));
-                Parent card = loader.load();
-
-                NotiCardController cardController = loader.getController();
-                Employee e = edao.getEmployeeById(n.getReceiverID());
-                // logic lấy tên người nhận (vì đây là mục Sent)
-                String receiverName = "To " +e.getRole()+ " " + e.getFullName();
-                
-                cardController.setData(n, receiverName);
-                
-                // Khi click vào card đã gửi
-                card.setOnMouseClicked(event -> {
-                    showDetail(n, receiverName);
-                });
-                
-                sentContainer.getChildren().add(card);
+            List<Notification> results;
+            if (keyword == null || keyword.isEmpty()) {
+                results = nDAO.getSentNoti();
+            } else {
+                results = nDAO.searchsentNotification(keyword); 
             }
+            renderNotiCards(results);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    private void showDetail(Notification n, String senderOrReceiver) {
+    private void showDetail(Notification n, String receiverInfo) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/manager/notification/detailNoti.fxml"));
             Parent root = loader.load();
 
             DetailNotiController controller = loader.getController();
             
-            // TRUYỀN CALLBACK: Khi bên Detail bấm DELETE, hàm loadSent sẽ chạy lại
-            controller.setDetailData(n, senderOrReceiver, () -> {
-                loadSent();
-            });
+            // Truyền Callback để refresh khi xóa/sửa thành công
+            controller.setDetailData(n, receiverInfo, this::loadSent);
 
             Stage stage = new Stage();
             stage.initModality(Modality.APPLICATION_MODAL);
             stage.setTitle("Notification Detail");
             stage.setScene(new Scene(root));
             
-            // Khi đóng popup thông thường cũng nên refresh để cập nhật nếu có thay đổi
-            stage.setOnHiding(e -> loadSent());
-
+            // Refresh sau khi đóng detail đề phòng có thay đổi trạng thái
+            stage.setOnHidden(e -> loadSent()); 
             stage.show();
 
-        } catch (Exception e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    @FXML
-    private void onSearch(ActionEvent event) {
-        // Bạn có thể thêm logic search tương tự NotificationController ở đây
+    /**
+     * Hàm tiện ích mở Popup và refresh danh sách khi đóng
+     */
+    private void openPopup(String fxmlPath, String title) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
+            Parent root = loader.load();
+            Stage stage = new Stage();
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.setTitle(title);
+            stage.setScene(new Scene(root));
+            stage.showAndWait();
+            loadSent(); // Refresh sau khi đóng popup
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
