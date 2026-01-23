@@ -216,10 +216,10 @@ public class CashierController implements Initializable {
             colHistTime.prefWidthProperty().bind(tblHistory.widthProperty().multiply(0.25));
             colHistCashier.prefWidthProperty().bind(tblHistory.widthProperty().multiply(0.2));
             colHistCustomer.prefWidthProperty().bind(tblHistory.widthProperty().multiply(0.45));
-
-            colName.prefWidthProperty().bind(tblCart.widthProperty().multiply(0.40));
+            
+            colName.prefWidthProperty().bind(tblCart.widthProperty().multiply(0.30));
             colPrice.prefWidthProperty().bind(tblCart.widthProperty().multiply(0.20));
-            colQty.prefWidthProperty().bind(tblCart.widthProperty().multiply(0.15));
+            colQty.prefWidthProperty().bind(tblCart.widthProperty().multiply(0.25));
             colTotal.prefWidthProperty().bind(tblCart.widthProperty().multiply(0.25));
         }
 

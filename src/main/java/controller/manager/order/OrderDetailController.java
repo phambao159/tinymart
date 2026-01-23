@@ -82,7 +82,7 @@ public class OrderDetailController implements Initializable {
         lbEmployee.setText(order.getEmployeeName());
         
         // Hiển thị tổng tiền
-        lbTotal.setText(String.format("%,.0f VNĐ", order.getTotalAmount()));
+        lbTotal.setText(String.format("%,.0f $", order.getTotalAmount()));
 
         // SỬA LỖI TẠI ĐÂY: Sử dụng đúng tên biến đã khai báo @FXML
         if (prDiscount != null) {
