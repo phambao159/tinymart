@@ -286,7 +286,7 @@ public class CashierDAO {
                 + "FROM `Order` o "
                 + "JOIN Employee e ON o.EmployeeID = e.EmployeeID "
                 + "LEFT JOIN Customer c ON o.CustomerID = c.CustomerID "
-                + "WHERE 1=1 ");
+                + "WHERE o.OrderDateTime <= NOW() ");
 
         if (date != null) {
             sql.append(" AND DATE(o.OrderDateTime) = ? ");
