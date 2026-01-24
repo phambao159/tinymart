@@ -460,7 +460,7 @@ public class CashierDAO {
                 + "CASE "
                 + "   WHEN od.selling_price > 0 THEN od.selling_price "
                 + "   ELSE ps.SellingPrice "
-                + "END AS FinalPrice " 
+                + "END AS FinalPrice "
                 + "FROM OrderDetail od "
                 + "JOIN ProductSize ps ON od.ProductSizeID = ps.ProductSizeID "
                 + "JOIN Product p ON ps.ProductID = p.ProductID "
@@ -504,5 +504,62 @@ public class CashierDAO {
             e.printStackTrace();
         }
         return 0.0;
+    }
+
+    public java.util.Map<String, String> getShiftStatistics(int employeeId) {
+        java.util.Map<String, String> stats = new java.util.HashMap<>();
+        stats.put("StartTime", "N/A");
+        stats.put("TotalOrders", "0");
+        stats.put("TotalRevenue", "0.00");
+
+        Connection conn = null;
+        try {
+            conn = dc.getConnect();
+
+            String sqlShift = "SELECT StartTime FROM EmployeeShift "
+                    + "WHERE EmployeeID = ? AND EndTime IS NULL "
+                    + "ORDER BY StartTime DESC LIMIT 1";
+
+            Timestamp startTime = null;
+            try (PreparedStatement ps = conn.prepareStatement(sqlShift)) {
+                ps.setInt(1, employeeId);
+                ResultSet rs = ps.executeQuery();
+                if (rs.next()) {
+                    startTime = rs.getTimestamp("StartTime");
+                    java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("HH:mm:ss dd/MM/yyyy");
+                    stats.put("StartTime", sdf.format(startTime));
+                }
+            }
+
+            if (startTime == null) {
+                startTime = new Timestamp(System.currentTimeMillis());
+            }
+
+            String sqlStats = "SELECT COUNT(*) as TotalOrd, SUM(TotalAmount) as TotalRev "
+                    + "FROM `Order` "
+                    + "WHERE EmployeeID = ? AND OrderDateTime >= ?";
+
+            try (PreparedStatement ps2 = conn.prepareStatement(sqlStats)) {
+                ps2.setInt(1, employeeId);
+                ps2.setTimestamp(2, startTime);
+                ResultSet rs2 = ps2.executeQuery();
+                if (rs2.next()) {
+                    stats.put("TotalOrders", String.valueOf(rs2.getInt("TotalOrd")));
+                    double rev = rs2.getDouble("TotalRev");
+                    stats.put("TotalRevenue", String.format("%.2f", rev));
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException ex) {
+            }
+        }
+        return stats;
     }
 }
