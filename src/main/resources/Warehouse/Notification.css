@@ -64,7 +64,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/CascadeStyleSheet.css to ed
     -fx-text-fill: white;                 /* chữ màu trắng */
     -fx-font-size: 20px;                  /* hơi lớn hơn để nổi bật */
     -fx-font-weight: bold;                /* chữ đậm */
-    -fx-font-family: "Brush Script MT", "Lucida Handwriting", "Segoe Script", cursive; /* font nghệ thuật */
+     -fx-font-family: "Segoe UI", sans-serif;
     -fx-effect: dropshadow( gaussian , rgba(0,0,0,0.6) , 4,0,0,1 ); /* thêm bóng nhẹ */
 }
 /* Tab mặc định */

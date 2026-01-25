@@ -66,7 +66,8 @@ public class InventoryItemCardController {
 
             // Set dữ liệu cho controller chi tiết
             InventoryItemDetailController controller = loader.getController();
-            controller.setData(item.getProductName(), item.getSizeType(), "active", details); 
+            controller.setData(item.getProductName(), item.getSizeType(), "active",
+                   item.getProductSizeId(), details);
             // ✅ status có thể bỏ, hoặc set mặc định "active"
 
             // Mở cửa sổ mới

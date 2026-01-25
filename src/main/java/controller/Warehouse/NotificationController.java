@@ -23,29 +23,48 @@ import java.util.stream.Collectors;
 
 public class NotificationController {
 
-    @FXML private TableView<Notification> tbReceived;
-    @FXML private TableView<Notification> tbSent;
+    @FXML
+    private TableView<Notification> tbReceived;
+    @FXML
+    private TableView<Notification> tbSent;
 
-    @FXML private TableColumn<Notification, String> colRecvTitle;
-    @FXML private TableColumn<Notification, String> colRecvContent;
-    @FXML private TableColumn<Notification, LocalDateTime> colRecvDate;
-    @FXML private TableColumn<Notification, String> colRecvStatus;
+    @FXML
+    private TableColumn<Notification, String> colRecvTitle;
+    @FXML
+    private TableColumn<Notification, String> colRecvContent;
+    @FXML
+    private TableColumn<Notification, LocalDateTime> colRecvDate;
+    @FXML
+    private TableColumn<Notification, String> colRecvStatus;
 
-    @FXML private TableColumn<Notification, String> colSentTitle;
-    @FXML private TableColumn<Notification, String> colSentContent;
-    @FXML private TableColumn<Notification, LocalDateTime> colSentDate;
-    @FXML private TableColumn<Notification, String> colSentReceiver;
+    @FXML
+    private TableColumn<Notification, String> colSentTitle;
+    @FXML
+    private TableColumn<Notification, String> colSentContent;
+    @FXML
+    private TableColumn<Notification, LocalDateTime> colSentDate;
+    @FXML
+    private TableColumn<Notification, String> colSentReceiver;
 
-    @FXML private DatePicker dpFromDate;
-    @FXML private DatePicker dpToDate;
-    @FXML private ComboBox<String> cbFilterStatus;
+    @FXML
+    private DatePicker dpFromDate;
+    @FXML
+    private DatePicker dpToDate;
+    @FXML
+    private ComboBox<String> cbFilterStatus;
 
-    @FXML private TextField txtTitle;
-    @FXML private TextArea txtContent;
-    @FXML private ComboBox<String> cbReceiver;
-    @FXML private Button btnSend;
-    @FXML private Button btnFilter;
-    @FXML private BorderPane root;
+    @FXML
+    private TextField txtTitle;
+    @FXML
+    private TextArea txtContent;
+    @FXML
+    private ComboBox<String> cbReceiver;
+    @FXML
+    private Button btnSend;
+    @FXML
+    private Button btnFilter;
+    @FXML
+    private BorderPane root;
 
     private NotificationDAO dao;
     private final int currentEmployeeID = 3; // giả định nhân viên đang đăng nhập
@@ -70,8 +89,8 @@ public class NotificationController {
         colRecvTitle.setCellValueFactory(new PropertyValueFactory<>("title"));
         colRecvContent.setCellValueFactory(new PropertyValueFactory<>("content"));
         colRecvDate.setCellValueFactory(new PropertyValueFactory<>("sentDate"));
-        colRecvStatus.setCellValueFactory(cell ->
-                new SimpleStringProperty(cell.getValue().isRead() ? "Read" : "Unread"));
+        colRecvStatus.setCellValueFactory(cell
+                -> new SimpleStringProperty(cell.getValue().isRead() ? "Read" : "Unread"));
 
         // Cột Sent
         colSentTitle.setCellValueFactory(new PropertyValueFactory<>("title"));
@@ -123,7 +142,8 @@ public class NotificationController {
     @FXML
     private void onFilter() {
         try {
-            List<Notification> all = dao.getAllNotifications();
+            // Lấy 20 thông báo mới nhất từ DAO
+            List<Notification> all = dao.getLatestNotifications(20);
 
             LocalDate fromDate = dpFromDate.getValue();
             LocalDate toDate = dpToDate.getValue();
@@ -133,12 +153,14 @@ public class NotificationController {
                     .filter(n -> n.getEmployeeID() == currentEmployeeID)
                     .filter(n -> filterByDate(n, fromDate, toDate))
                     .filter(n -> filterByStatus(n, status))
+                    .sorted((a, b) -> b.getSentDate().compareTo(a.getSentDate())) // mới nhất lên đầu
                     .collect(Collectors.toList());
 
             List<Notification> received = all.stream()
                     .filter(n -> n.getReceiverID() != null && n.getReceiverID() == currentEmployeeID)
                     .filter(n -> filterByDate(n, fromDate, toDate))
                     .filter(n -> filterByStatus(n, status))
+                    .sorted((a, b) -> b.getSentDate().compareTo(a.getSentDate())) // mới nhất lên đầu
                     .collect(Collectors.toList());
 
             tbSent.getItems().setAll(sent);
@@ -161,9 +183,15 @@ public class NotificationController {
     }
 
     private boolean filterByStatus(Notification n, String status) {
-        if (status == null) return true;
-        if ("Read".equals(status)) return n.isRead();
-        if ("Unread".equals(status)) return !n.isRead();
+        if (status == null) {
+            return true;
+        }
+        if ("Read".equals(status)) {
+            return n.isRead();
+        }
+        if ("Unread".equals(status)) {
+            return !n.isRead();
+        }
         return true;
     }
 
@@ -188,8 +216,11 @@ public class NotificationController {
             }
 
             Integer receiverID = null;
-            if ("Manager".equals(receiver)) receiverID = 1;
-            else if ("Cashier".equals(receiver)) receiverID = 2;
+            if ("Manager".equals(receiver)) {
+                receiverID = 1;
+            } else if ("Cashier".equals(receiver)) {
+                receiverID = 2;
+            }
 
             Notification n = new Notification(
                     0,

@@ -1,0 +1,46 @@
+/*
+Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+Click nbfs://nbhost/SystemFileSystem/Templates/Other/CascadeStyleSheet.css to edit this template
+*/
+/* 
+    Created on : 25 Jan 2026, 11:09:13 am
+    Author     : ASUS
+*/
+/* Container chung cho card */
+.card-container {
+    -fx-background-color: #ffffff;
+    -fx-background-radius: 8;
+    -fx-border-color: #dcdcdc;
+    -fx-border-radius: 8;
+    -fx-padding: 12;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 6, 0, 0, 2);
+}
+
+/* Tiêu đề thông báo */
+.card-title {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #2c3e50; /* xanh đậm */
+}
+
+/* Ngày gửi */
+.card-date {
+    -fx-font-size: 12px;
+    -fx-text-fill: #868686; /* xám nhạt */
+}
+
+/* Người gửi */
+.card-sender {
+    -fx-font-size: 13px;
+    -fx-font-style: italic;
+    -fx-text-fill: #2980b9; /* xanh dương nhấn mạnh */
+}
+
+/* Nội dung thông báo */
+.card-content {
+    -fx-font-size: 14px;
+    -fx-text-fill: #333333; /* màu chữ dễ đọc */
+    -fx-wrap-text: true;
+    -fx-padding: 5 0 0 0;
+    -fx-line-spacing: 3px;
+}
