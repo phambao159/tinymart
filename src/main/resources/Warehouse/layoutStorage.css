@@ -1,6 +1,5 @@
 
 .mainFxmlClass {
-
     -fx-background-color: #F8F8F8; 
 }
 
@@ -23,17 +22,13 @@
 
 
 
-#menu .toggle-button {
-   
+#menu .toggle-button {  
     -fx-max-width: infinity; 
     -fx-min-height: 40px;
-    
     -fx-background-color: transparent; 
-    -fx-text-fill: #E0E0E0; 
-    
+    -fx-text-fill: #E0E0E0;    
     -fx-font-weight: bold;
     -fx-font-size: 14px;
-
     -fx-transition: -fx-background-color 0.2s ease;
 }
 

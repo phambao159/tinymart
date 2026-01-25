@@ -102,3 +102,39 @@
     -fx-background-color: #D5DBDB;
     -fx-background-radius: 5;
 }
+
+/* 5. Định dạng RadioButton */
+.radio-button {
+    -fx-text-fill: #34495E;
+    -fx-font-size: 13px;
+    -fx-cursor: hand;
+    -fx-padding: 5;
+}
+
+/* Vòng tròn bên ngoài */
+.radio-button .radio {
+    -fx-border-width: 1px;
+    -fx-border-color: #D5DBDB;
+    -fx-background-color: white;
+    -fx-background-image: null;
+    -fx-border-radius: 15px;
+    -fx-background-radius: 15px;
+    -fx-padding: 3px; /* Độ lớn của vòng tròn */
+}
+
+/* Khi di chuột qua */
+.radio-button:hover .radio {
+    -fx-border-color: #1E8449;
+}
+
+/* Chấm tròn bên trong khi được chọn */
+.radio-button:selected .radio .dot {
+    -fx-background-color: #1E8449;
+    -fx-background-insets: 0;
+}
+
+/* Màu chữ khi được chọn */
+.radio-button:selected {
+    -fx-text-fill: #1E8449;
+    -fx-font-weight: bold;
+}

@@ -33,6 +33,9 @@
     <!-- Footer -->
     <bottom>
         <HBox spacing="10" alignment="CENTER_RIGHT" style="-fx-padding: 10 0 0 0;">
+            <!-- Nhập số lượng để chuyển lên kệ -->
+            <TextField fx:id="shelfInput" promptText="Enter quantity"/>
+            <Button fx:id="btnAddToShelf" text="Add to Shelf" onAction="#onAddToShelf" styleClass="button"/>
             <Button text="Close" onAction="#onClose" styleClass="button"/>
         </HBox>
     </bottom>

@@ -14,7 +14,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/CascadeStyleSheet.css to ed
 /* Tiêu đề */
 .label-title {
     -fx-text-fill: #FF8C00; /* màu cam nổi bật */
-    -fx-font-family: "Segoe UI Semibold";
+     -fx-font-family: "Segoe UI", sans-serif;
     -fx-font-size: 26px;
     -fx-font-weight: bold;
     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.4), 4, 0, 0, 2);
@@ -56,7 +56,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/CascadeStyleSheet.css to ed
 }
 .label-info {
     -fx-text-fill: #2ecc71;          /* xanh lá cây tươi */
-    -fx-font-family: "Brush Script MT", "Lucida Handwriting", "Segoe Script", cursive; /* font nghệ thuật */
+     -fx-font-family: "Segoe UI", sans-serif;
     -fx-font-size: 16px;
     -fx-font-weight: bold;
 }

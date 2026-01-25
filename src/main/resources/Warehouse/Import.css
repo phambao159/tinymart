@@ -18,8 +18,8 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/CascadeStyleSheet.css to ed
 /* Style cho tiêu đề */
 .label-title {
     -fx-text-fill: white; /* màu chữ trắng */
-    -fx-font-family: "Brush Script MT", "Lucida Handwriting", "Segoe Script", cursive; /* font nghệ thuật */
     -fx-font-size: 28px; /* tăng kích thước cho nổi bật */
+    -fx-font-family: "Segoe UI", sans-serif;
     -fx-font-weight: bold;
     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.5), 4, 0, 0, 2); /* đổ bóng nhẹ */
 }

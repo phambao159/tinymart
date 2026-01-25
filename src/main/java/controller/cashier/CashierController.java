@@ -538,7 +538,7 @@ public class CashierController implements Initializable {
             showAlert("Empty Cart", "Please add items before payment.", Alert.AlertType.WARNING);
             return;
         }
-        paymentDialogResult payResult = showPaymentDialog(); 
+        paymentDialogResult payResult = showPaymentDialog();
         if (payResult == null) {
             return;
         }
@@ -557,9 +557,9 @@ public class CashierController implements Initializable {
                     double cashGiven = Double.parseDouble(cashInput.get());
                     if (cashGiven < amountDue) {
                         showAlert("Insufficient Amount", "Cash received is less than total amount!", Alert.AlertType.ERROR);
-                        return; 
+                        return;
                     }
-                    
+
                     double change = cashGiven - amountDue;
                     Alert changeAlert = new Alert(Alert.AlertType.INFORMATION);
                     changeAlert.setTitle("Transaction Success");
@@ -569,10 +569,10 @@ public class CashierController implements Initializable {
 
                 } catch (NumberFormatException e) {
                     showAlert("Invalid Input", "Please enter a valid number.", Alert.AlertType.ERROR);
-                    return; 
+                    return;
                 }
             } else {
-                return; 
+                return;
             }
         }
 
@@ -889,10 +889,10 @@ public class CashierController implements Initializable {
                 + "------------------------------------------------\n"
                 + "Start Time:   " + startTime + "\n"
                 + "Total Orders: " + totalOrders + "\n"
-                + "Total Sales:  $" + strTotalRevenue + " (All methods)\n" 
+                + "Total Sales:  $" + strTotalRevenue + " (All methods)\n"
                 + "------------------------------------------------\n"
                 + "Start Cash:   $" + String.format("%.2f", startCash) + "\n"
-                + "Cash Sales:   $" + String.format("%.2f", cashRevenue) + "\n" 
+                + "Cash Sales:   $" + String.format("%.2f", cashRevenue) + "\n"
                 + "------------------------------------------------\n"
                 + "Expected Drawer: $" + String.format("%.2f", expectedCash) + "\n"
                 + "------------------------------------------------\n"

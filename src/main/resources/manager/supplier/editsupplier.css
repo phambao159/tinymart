@@ -86,3 +86,16 @@
     -fx-background-color: #F8F9F9;
     -fx-border-color: #ADB5BD;
 }
+/* Khi TextField hoặc TextArea bị lỗi bỏ trống (bạn có thể set style class này trong Java) */
+.text-input.error {
+    -fx-border-color: #e74c3c;
+    -fx-border-width: 1px;
+    -fx-border-radius: 4;
+}
+
+/* Kiểu chữ cho các nhãn chung */
+.grid-pane .label {
+    -fx-font-size: 13px;
+    -fx-text-fill: #2c3e50;
+    -fx-font-weight: bold;
+}

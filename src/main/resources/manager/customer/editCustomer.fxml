@@ -6,14 +6,14 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane id="AnchorPane" prefHeight="450.0" prefWidth="550.0" styleClass="mainFxmlClass" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.manager.customer.EditCustomerController">
+<AnchorPane id="AnchorPane" prefHeight="480.0" prefWidth="550.0" styleClass="mainFxmlClass" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.manager.customer.EditCustomerController">
     <stylesheets>
         <URL value="@editcustomer.css" />
     </stylesheets>
    <children>
       <VBox alignment="TOP_CENTER" spacing="25.0" AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="35.0" AnchorPane.rightAnchor="35.0" AnchorPane.topAnchor="25.0">
          <children>
-            <Label fx:id = "title" text="EDIT CUSTOMER INFORMATION" textFill="#4527a0">
+            <Label fx:id="title" text="EDIT CUSTOMER INFORMATION" textFill="#4527a0">
                <font>
                   <Font name="System Bold" size="22.0" />
                </font>
@@ -36,13 +36,28 @@
                   <Label text="Customer ID:" />
                   <TextField fx:id="txtId" editable="false" prefHeight="35.0" style="-fx-background-color: #f1f3f5; -fx-border-color: #dee2e6; -fx-border-radius: 5;" GridPane.columnIndex="1" />
                   
-                  <Label text="Full Name:" GridPane.rowIndex="1" />
+                  <HBox alignment="CENTER_LEFT" spacing="3.0" GridPane.rowIndex="1">
+                     <children>
+                        <Label text="Full Name:" />
+                        
+                     </children>
+                  </HBox>
                   <TextField fx:id="txtName" prefHeight="35.0" promptText="Enter full name" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                   
-                  <Label text="Phone Number:" GridPane.rowIndex="2" />
+                  <HBox alignment="CENTER_LEFT" spacing="3.0" GridPane.rowIndex="2">
+                     <children>
+                        <Label text="Phone Number:" />
+                        <Label text="*" textFill="RED" />
+                     </children>
+                  </HBox>
                   <TextField fx:id="txtPhone" prefHeight="35.0" promptText="Enter phone number" GridPane.columnIndex="1" GridPane.rowIndex="2" />
                   
-                  <Label text="Email Address:" GridPane.rowIndex="3" />
+                  <HBox alignment="CENTER_LEFT" spacing="3.0" GridPane.rowIndex="3">
+                     <children>
+                        <Label text="Email Address:" />
+                       
+                     </children>
+                  </HBox>
                   <TextField fx:id="txtEmail" prefHeight="35.0" promptText="example@domain.com" GridPane.columnIndex="1" GridPane.rowIndex="3" />
                   
                   <Label text="Loyalty Points:" GridPane.rowIndex="4" />

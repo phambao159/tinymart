@@ -9,7 +9,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane id="AnchorPane" prefHeight="550.0" prefWidth="650.0" styleClass="mainFxmlClass" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.manager.product.AddProductController">
+<AnchorPane id="AnchorPane" prefHeight="500.0" prefWidth="650.0" styleClass="mainFxmlClass" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.manager.product.AddProductController">
     <stylesheets>
         <URL value="@addproduct.css" />
     </stylesheets>
@@ -49,21 +49,31 @@
                                 <RowConstraints minHeight="10.0" prefHeight="35.0" vgrow="SOMETIMES" />
                                 <RowConstraints minHeight="10.0" prefHeight="35.0" vgrow="SOMETIMES" />
                                 <RowConstraints minHeight="10.0" prefHeight="35.0" vgrow="SOMETIMES" />
-                                <RowConstraints minHeight="10.0" prefHeight="35.0" vgrow="SOMETIMES" />
                             </rowConstraints>
                             <children>
-                                <Label text="Name:" />
+                                <HBox alignment="CENTER_LEFT" spacing="3.0">
+                                    <children>
+                                        <Label text="Name:" />
+                                        <Label text="*" textFill="#e74c3c"><font><Font name="System Bold" size="14.0" /></font></Label>
+                                    </children>
+                                </HBox>
                                 <TextField fx:id="txtName" prefHeight="35.0" promptText="Enter product name" GridPane.columnIndex="1" />
       
-                                <Label text="Category:" GridPane.rowIndex="1" />
+                                <HBox alignment="CENTER_LEFT" spacing="3.0" GridPane.rowIndex="1">
+                                    <children>
+                                        <Label text="Category:" />
+                                        <Label text="*" textFill="#e74c3c"><font><Font name="System Bold" size="14.0" /></font></Label>
+                                    </children>
+                                </HBox>
                                 <ComboBox fx:id="cbCategory" maxWidth="1.7976931348623157E308" prefHeight="35.0" promptText="Select Category" GridPane.columnIndex="1" GridPane.rowIndex="1" />
       
-                                <Label text="Unit:" GridPane.rowIndex="2" />
-                                <TextField fx:id="txtUnit" prefHeight="35.0" promptText="e.g. Bottle, Cup" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-      
-                                <Label text="Status:" GridPane.rowIndex="3" />
-                                <ComboBox fx:id="cbStatus" maxWidth="1.7976931348623157E308" prefHeight="35.0" GridPane.columnIndex="1" GridPane.rowIndex="3" />
-      
+                                <HBox alignment="CENTER_LEFT" spacing="3.0" GridPane.rowIndex="2">
+                                    <children>
+                                        <Label text="Status:" />
+                                        <Label text="*" textFill="#e74c3c"><font><Font name="System Bold" size="14.0" /></font></Label>
+                                    </children>
+                                </HBox>
+                                <ComboBox fx:id="cbStatus" maxWidth="1.7976931348623157E308" prefHeight="35.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
                             </children>
                         </GridPane>
                     </children>

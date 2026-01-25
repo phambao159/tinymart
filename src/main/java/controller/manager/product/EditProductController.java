@@ -27,7 +27,9 @@ import javafx.util.StringConverter;
 public class EditProductController implements Initializable {
 
     @FXML
-    private TextField txtID, txtName, txtUnit;
+    private TextField txtID; // Đảm bảo @FXML để tránh NullPointerException
+    @FXML
+    private TextField txtName; // txtUnit đã xóa khỏi FXML
     @FXML
     private ComboBox<Category> cbCategory;
     @FXML
@@ -48,54 +50,37 @@ public class EditProductController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        // Initialization handled in initData hoặc setupComboBoxes
+        // Initialization handled in initData
     }
 
     private void setupComboBoxes() {
-        // 1. Setup Category Converter
         cbCategory.setConverter(new StringConverter<Category>() {
             @Override
             public String toString(Category c) {
                 return (c == null) ? "" : c.getName();
             }
-
             @Override
-            public Category fromString(String s) {
-                return null;
-            }
+            public Category fromString(String s) { return null; }
         });
-
-        // 2. Load Data from DB
         loadCategoryData();
-
-        // 3. Load Status
         cbStatus.setItems(FXCollections.observableArrayList("Active", "Inactive"));
     }
 
     private void loadCategoryData() {
-        try {
-            List<Category> list = categoryDAO.getData();
-            if (list != null) {
-                cbCategory.setItems(FXCollections.observableArrayList(list));
-            }
-        } catch (Exception e) {
-            System.err.println("Error loading categories: " + e.getMessage());
+        List<Category> list = categoryDAO.getData();
+        if (list != null) {
+            cbCategory.setItems(FXCollections.observableArrayList(list));
         }
     }
 
-    /**
-     * Nhận dữ liệu từ màn hình danh sách truyền sang
-     */
     public void initData(ProductSummary summary) {
-        setupComboBoxes(); // Khởi tạo các ComboBox trước khi set value
+        setupComboBoxes();
 
         txtID.setText(String.valueOf(summary.getProductID()));
         txtName.setText(summary.getName());
-        txtUnit.setText(summary.getUnit());
         cbStatus.setValue(summary.getStatus());
         currentImageName = summary.getImage();
 
-        // Set default Category dựa trên ID
         if (cbCategory.getItems() != null) {
             for (Category cat : cbCategory.getItems()) {
                 if (cat.getCategoryID() == summary.getCategoryID()) {
@@ -104,58 +89,75 @@ public class EditProductController implements Initializable {
                 }
             }
         }
-
         loadProductImage(currentImageName);
     }
 
     @FXML
     private void onUpdate(ActionEvent event) {
+        resetStyles();
+
+        int id = Integer.parseInt(txtID.getText());
         String name = txtName.getText().trim();
-        String unit = txtUnit.getText().trim();
         Category selectedCat = cbCategory.getValue();
         String status = cbStatus.getValue();
+        String unit = null; // Gán null theo yêu cầu
 
-        if (name.isEmpty() || unit.isEmpty() || selectedCat == null || status == null) {
-            showAlert(Alert.AlertType.WARNING, "Validation Error", "Please fill in all information!");
+        // 1. Kiểm tra Not Null
+        if (name.isEmpty()) {
+            showError(txtName, "Product name cannot be empty!");
             return;
         }
 
-        // Xử lý tên file ảnh: Nếu có chọn mới thì lưu file mới, nếu không giữ lại tên cũ
+        // 2. Kiểm tra trùng tên (Loại trừ sản phẩm hiện tại)
+        if (productDAO.isNameExistsForEdit(name, id)) {
+            showError(txtName, "This product name is already taken by another product!");
+            return;
+        }
+
+        if (selectedCat == null) {
+            showError(cbCategory, "Please select a category!");
+            return;
+        }
+
+        if (status == null) {
+            showError(cbStatus, "Please select a status!");
+            return;
+        }
+
+        // 3. Xử lý ảnh
         String fileName = (selectedFile != null) ? saveImageToProject(selectedFile) : currentImageName;
 
-        // Tạo object Product (Sử dụng constructor 6 tham số: ID, Name, CatID, Unit, Status, Image)
-        Product p = new Product(
-                Integer.parseInt(txtID.getText()),
-                name,
-                selectedCat.getCategoryID(),
-                unit,
-                status,
-                fileName
-        );
+        Product p = new Product(id, name, selectedCat.getCategoryID(), unit, status, fileName);
 
         if (productDAO.update(p)) {
             showAlert(Alert.AlertType.INFORMATION, "Success", "Product updated successfully!");
-            if (refreshCallback != null) {
-                refreshCallback.run();
-            }
+            if (refreshCallback != null) refreshCallback.run();
             closeWindow(event);
         } else {
-            showAlert(Alert.AlertType.ERROR, "Update Failed", "Check database connection.");
+            showAlert(Alert.AlertType.ERROR, "Update Failed", "Database error occurred.");
         }
+    }
+
+    // --- Helpers ---
+
+    private void showError(Control control, String message) {
+        control.setStyle("-fx-border-color: #e74c3c; -fx-border-width: 1.5px;");
+        control.requestFocus();
+        showAlert(Alert.AlertType.ERROR, "Validation Error", message);
+    }
+
+    private void resetStyles() {
+        txtName.setStyle("");
+        cbCategory.setStyle("");
+        cbStatus.setStyle("");
     }
 
     private void loadProductImage(String imageName) {
         try {
-            // Đảm bảo đường dẫn chính xác tới thư mục tài nguyên
-            String imagePath = "/image/manager/" + imageName;
+            String imagePath = "/image/manager/" + (imageName == null ? "default-product.png" : imageName);
             URL imgUrl = getClass().getResource(imagePath);
-            
             if (imgUrl != null) {
                 imgPreview.setImage(new Image(imgUrl.toExternalForm()));
-            } else {
-                // Fallback nếu không tìm thấy ảnh
-                URL defaultUrl = getClass().getResource("/image/manager/default-product.png");
-                if (defaultUrl != null) imgPreview.setImage(new Image(defaultUrl.toExternalForm()));
             }
         } catch (Exception e) {
             System.err.println("Error loading image: " + e.getMessage());
@@ -166,13 +168,10 @@ public class EditProductController implements Initializable {
         try {
             String fileName = System.currentTimeMillis() + "_" + file.getName();
             File srcDir = new File(System.getProperty("user.dir") + "/src/main/resources/image/manager");
-            if (!srcDir.exists()) {
-                srcDir.mkdirs();
-            }
+            if (!srcDir.exists()) srcDir.mkdirs();
             Files.copy(file.toPath(), new File(srcDir, fileName).toPath(), StandardCopyOption.REPLACE_EXISTING);
             return fileName;
         } catch (IOException e) {
-            System.err.println("Save image error: " + e.getMessage());
             return currentImageName;
         }
     }
@@ -180,9 +179,7 @@ public class EditProductController implements Initializable {
     @FXML
     private void onChooseImage(ActionEvent event) {
         FileChooser fc = new FileChooser();
-        fc.setTitle("Select Product Image");
-        fc.getExtensionFilters().add(new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.jpeg"));
-
+        fc.getExtensionFilters().add(new FileChooser.ExtensionFilter("Images", "*.png", "*.jpg", "*.jpeg"));
         File file = fc.showOpenDialog(((Node) event.getSource()).getScene().getWindow());
         if (file != null) {
             selectedFile = file;
@@ -192,31 +189,19 @@ public class EditProductController implements Initializable {
 
     @FXML
     private void onDelete(ActionEvent event) {
-        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION,
-                "Are you sure you want to disable this product?", ButtonType.YES, ButtonType.NO);
-        confirm.setTitle("Confirm Disable");
-        confirm.setHeaderText(null);
-
+        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION, "Disable this product?", ButtonType.YES, ButtonType.NO);
         confirm.showAndWait().ifPresent(response -> {
             if (response == ButtonType.YES) {
-                int id = Integer.parseInt(txtID.getText());
-                // Logic soft delete: Cập nhật status thành Inactive
-                if (productDAO.delete(id)) { 
-                    if (refreshCallback != null) {
-                        refreshCallback.run();
-                    }
+                if (productDAO.delete(Integer.parseInt(txtID.getText()))) {
+                    if (refreshCallback != null) refreshCallback.run();
                     closeWindow(event);
-                } else {
-                    showAlert(Alert.AlertType.ERROR, "Error", "Failed to disable the product.");
                 }
             }
         });
     }
 
     @FXML
-    private void onCancel(ActionEvent e) {
-        closeWindow(e);
-    }
+    private void onCancel(ActionEvent e) { closeWindow(e); }
 
     private void closeWindow(ActionEvent e) {
         ((Stage) ((Node) e.getSource()).getScene().getWindow()).close();

@@ -8,7 +8,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<AnchorPane id="AnchorPane" prefHeight="300.0" prefWidth="450.0" styleClass="mainFxmlClass" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.manager.product.AddCategoryController">
+<AnchorPane id="AnchorPane" prefHeight="320.0" prefWidth="450.0" styleClass="mainFxmlClass" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.manager.product.AddCategoryController">
     <stylesheets>
         <URL value="@addcategory.css" />
     </stylesheets>
@@ -31,18 +31,27 @@
                         <RowConstraints minHeight="10.0" prefHeight="80.0" vgrow="SOMETIMES" />
                     </rowConstraints>
                     <children>
-                        <Label text="Name:" />
+                        <HBox alignment="CENTER_LEFT" spacing="3.0">
+                           <children>
+                              <Label text="Name:" />
+                              <Label text="*" textFill="#e74c3c">
+                                 <font>
+                                    <Font name="System Bold" size="14.0" />
+                                 </font>
+                              </Label>
+                           </children>
+                        </HBox>
                         <TextField fx:id="txtName" promptText="Enter category name..." GridPane.columnIndex="1" />
                         
                         <Label text="Description:" GridPane.rowIndex="1" />
-                        <TextArea fx:id="txtDescription" prefHeight="200.0" prefWidth="200.0" promptText="Enter description..." wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                        <TextArea fx:id="txtDescription" prefHeight="200.0" prefWidth="200.0" promptText="Enter description (optional)..." wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                     </children>
                 </GridPane>
                 
                 <HBox alignment="CENTER_RIGHT" spacing="10.0">
                     <children>
-                        <Button mnemonicParsing="false" onAction="#onCancel" prefWidth="80.0" text="Cancel" style="-fx-background-color: #bdc3c7;" />
-                        <Button mnemonicParsing="false" onAction="#onSave" prefWidth="80.0" text="Save" style="-fx-background-color: #27ae60; -fx-text-fill: white;" />
+                        <Button mnemonicParsing="false" onAction="#onCancel" prefWidth="80.0" style="-fx-background-color: #bdc3c7;" text="Cancel" />
+                        <Button mnemonicParsing="false" onAction="#onSave" prefWidth="80.0" style="-fx-background-color: #27ae60; -fx-text-fill: white;" text="Save" />
                     </children>
                 </HBox>
             </children>

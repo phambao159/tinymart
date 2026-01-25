@@ -15,7 +15,6 @@
 /* 3. Kiểu cho các nhãn Label trong GridPane */
 .label {
     -fx-font-family: "Segoe UI", Arial;
-    -fx-text-fill: #2C3E50;
     -fx-font-size: 14px;
 }
 

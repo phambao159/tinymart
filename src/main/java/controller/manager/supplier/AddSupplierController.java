@@ -8,47 +8,80 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
-import javafx.scene.control.Alert;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.stage.Stage;
 
 public class AddSupplierController implements Initializable {
 
-    @FXML
-    private TextField txtName;
-    @FXML
-    private TextField txtContactPerson;
-    @FXML
-    private TextField txtPhone;
-    @FXML
-    private TextArea txtAddress;
+    @FXML private TextField txtName;
+    @FXML private TextField txtContactPerson;
+    @FXML private TextField txtPhone;
+    @FXML private TextArea txtAddress;
 
     private SupplierDAO supplierDAO;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         supplierDAO = new SupplierDAO();
-    }    
+        
+        // Thêm Listeners để tự động xóa viền đỏ khi người dùng gõ lại
+        addTextListener(txtName);
+        addTextListener(txtContactPerson);
+        addTextListener(txtPhone);
+        addTextListener(txtAddress);
+    }
+
+    private void addTextListener(Control field) {
+        if (field instanceof TextField) {
+            ((TextField) field).textProperty().addListener((obs, oldV, newV) -> field.setStyle(""));
+        } else if (field instanceof TextArea) {
+            ((TextArea) field).textProperty().addListener((obs, oldV, newV) -> field.setStyle(""));
+        }
+    }
 
     @FXML
     private void onSave(ActionEvent event) {
-        // 1. Lấy dữ liệu từ các trường nhập liệu
+        // Xóa style lỗi cũ
+        resetStyles();
+
         String name = txtName.getText().trim();
         String contact = txtContactPerson.getText().trim();
         String phone = txtPhone.getText().trim();
         String address = txtAddress.getText().trim();
 
-        // 2. Kiểm tra dữ liệu (Validation)
-        if (name.isEmpty() || phone.isEmpty()) {
-            showAlert(Alert.AlertType.ERROR, "Validation Error", "Supplier Name and Phone Number are required!");
+        // 1. Kiểm tra Not Null / Empty cho từng trường
+        if (name.isEmpty()) {
+            showError(txtName, "Supplier Name cannot be empty!");
+            return;
+        }
+        if (contact.isEmpty()) {
+            showError(txtContactPerson, "Contact Person cannot be empty!");
+            return;
+        }
+        if (phone.isEmpty()) {
+            showError(txtPhone, "Phone Number cannot be empty!");
+            return;
+        }
+        if (address.isEmpty()) {
+            showError(txtAddress, "Address cannot be empty!");
             return;
         }
 
-        // 3. Tạo đối tượng Supplier mới (Dùng Constructor không có ID)
-        Supplier newSupplier = new Supplier(name, contact, phone, address);
+        // 2. Kiểm tra định dạng số điện thoại (9-11 chữ số)
+        if (!phone.matches("\\d{9,11}")) {
+            showError(txtPhone, "Phone number must be numeric and between 9-11 digits!");
+            return;
+        }
 
-        // 4. Gọi DAO để lưu vào Database
+        // 3. Kiểm tra trùng số điện thoại trong Database
+        // Vì là Add New nên ID truyền vào là -1 (hoặc 0) để hàm isPhoneExists chỉ check phone
+        if (supplierDAO.isPhoneExists(phone, -1)) {
+            showError(txtPhone, "This phone number is already registered to another supplier!");
+            return;
+        }
+
+        // 4. Tiến hành lưu
+        Supplier newSupplier = new Supplier(name, contact, phone, address);
         try {
             boolean success = supplierDAO.addSupplier(newSupplier);
             if (success) {
@@ -67,14 +100,26 @@ public class AddSupplierController implements Initializable {
         closeStage(event);
     }
 
-    // Hàm hỗ trợ đóng cửa sổ hiện tại
+    // Hàm hiển thị lỗi chuyên nghiệp
+    private void showError(Control field, String message) {
+        field.setStyle("-fx-border-color: #e74c3c; -fx-border-width: 2px; -fx-border-radius: 3px;");
+        showAlert(Alert.AlertType.WARNING, "Validation Error", message);
+        field.requestFocus();
+    }
+
+    private void resetStyles() {
+        txtName.setStyle("");
+        txtContactPerson.setStyle("");
+        txtPhone.setStyle("");
+        txtAddress.setStyle("");
+    }
+
     private void closeStage(ActionEvent event) {
         Node source = (Node) event.getSource();
         Stage stage = (Stage) source.getScene().getWindow();
         stage.close();
     }
 
-    // Hàm hỗ trợ hiển thị thông báo
     private void showAlert(Alert.AlertType type, String title, String content) {
         Alert alert = new Alert(type);
         alert.setTitle(title);

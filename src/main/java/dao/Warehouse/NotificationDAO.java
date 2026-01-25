@@ -79,4 +79,23 @@ public class NotificationDAO {
             e.printStackTrace();
         }
     }
+    // Lấy 20 thông báo mới nhất
+
+    public List<Notification> getLatestNotifications(int limit) throws SQLException {
+        List<Notification> list = new ArrayList<>();
+        String sql = "SELECT n.*, s.FullName AS SenderName, r.FullName AS ReceiverName "
+                + "FROM Notification n "
+                + "JOIN Employee s ON n.EmployeeID = s.EmployeeID "
+                + "LEFT JOIN Employee r ON n.ReceiverID = r.EmployeeID "
+                + "ORDER BY n.SentDate DESC LIMIT ?";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, limit);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    list.add(mapRow(rs));
+                }
+            }
+        }
+        return list;
+    }
 }

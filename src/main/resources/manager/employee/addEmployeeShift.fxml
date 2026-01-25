@@ -24,7 +24,7 @@
    <children>
       <VBox alignment="TOP_CENTER" spacing="20.0" AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="30.0" AnchorPane.rightAnchor="30.0" AnchorPane.topAnchor="20.0">
          <children>
-            <Label text="ADD NEW ASSIGNMENT">
+            <Label text="ADD NEW ASSIGNMENT" textFill="#2c3e50">
                <font>
                   <Font name="System Bold" size="22.0" />
                </font>
@@ -32,7 +32,7 @@
             
             <GridPane hgap="15.0" vgap="15.0">
               <columnConstraints>
-                <ColumnConstraints hgrow="SOMETIMES" maxWidth="150.0" minWidth="10.0" prefWidth="130.0" />
+                <ColumnConstraints hgrow="SOMETIMES" maxWidth="150.0" minWidth="10.0" prefWidth="140.0" />
                 <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="300.0" />
               </columnConstraints>
               <rowConstraints>
@@ -44,19 +44,44 @@
                 <RowConstraints minHeight="10.0" prefHeight="35.0" vgrow="SOMETIMES" />
               </rowConstraints>
                <children>
-                  <Label text="Select Employee:" />
+                  <HBox alignment="CENTER_LEFT" spacing="3.0" GridPane.rowIndex="0">
+                     <children>
+                        <Label text="Select Employee:" />
+                        <Label text="*" textFill="RED" />
+                     </children>
+                  </HBox>
                   <ComboBox fx:id="cbEmployee" prefWidth="300.0" promptText="-- Choose Employee --" GridPane.columnIndex="1" />
                   
-                  <Label text="Select Shift:" GridPane.rowIndex="1" />
+                  <HBox alignment="CENTER_LEFT" spacing="3.0" GridPane.rowIndex="1">
+                     <children>
+                        <Label text="Select Shift:" />
+                        <Label text="*" textFill="RED" />
+                     </children>
+                  </HBox>
                   <ComboBox fx:id="cbShift" prefWidth="300.0" promptText="-- Choose Shift --" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                   
-                  <Label text="From Date:" GridPane.rowIndex="2" />
+                  <HBox alignment="CENTER_LEFT" spacing="3.0" GridPane.rowIndex="2">
+                     <children>
+                        <Label text="From Date:" />
+                        <Label text="*" textFill="RED" />
+                     </children>
+                  </HBox>
                   <DatePicker fx:id="dpFromDate" prefWidth="300.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
                   
-                  <Label text="To Date:" GridPane.rowIndex="3" />
+                  <HBox alignment="CENTER_LEFT" spacing="3.0" GridPane.rowIndex="3">
+                     <children>
+                        <Label text="To Date:" />
+                        <Label text="*" textFill="RED" />
+                     </children>
+                  </HBox>
                   <DatePicker fx:id="dpToDate" prefWidth="300.0" GridPane.columnIndex="1" GridPane.rowIndex="3" />
                   
-                  <Label text="Repeat on:" GridPane.rowIndex="4" />
+                  <HBox alignment="CENTER_LEFT" spacing="3.0" GridPane.rowIndex="4">
+                     <children>
+                        <Label text="Repeat on:" />
+                        <Label text="*" textFill="RED" />
+                     </children>
+                  </HBox>
                   <FlowPane hgap="10.0" vgap="8.0" GridPane.columnIndex="1" GridPane.rowIndex="4">
                      <children>
                         <CheckBox fx:id="chkMon" selected="true" text="Mon" />
@@ -79,8 +104,8 @@
             
             <HBox alignment="CENTER" spacing="25.0">
                <children>
-                  <Button mnemonicParsing="false" onAction="#onSave" prefHeight="40.0" prefWidth="140.0" style="-fx-background-color: #28a745; -fx-text-fill: white; -fx-font-weight: bold;" text="GENERATE SHIFTS" />
-                  <Button mnemonicParsing="false" onAction="#onClose" prefHeight="40.0" prefWidth="100.0" style="-fx-background-color: #6c757d; -fx-text-fill: white;" text="CANCEL" />
+                  <Button mnemonicParsing="false" onAction="#onSave" prefHeight="40.0" prefWidth="160.0" style="-fx-background-color: #28a745; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand;" text="GENERATE SHIFTS" />
+                  <Button mnemonicParsing="false" onAction="#onClose" prefHeight="40.0" prefWidth="100.0" style="-fx-background-color: #6c757d; -fx-text-fill: white; -fx-cursor: hand;" text="CANCEL" />
                </children>
                <padding>
                   <Insets top="10.0" />
