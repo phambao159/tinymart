@@ -18,15 +18,13 @@ public class SizeDAO {
         List<Size> sizes = new ArrayList<>();
         String sql = "SELECT SizeID, Type, Status FROM Size WHERE Status = 'Active'";
 
-        try (Connection conn = dc.getConnect();
-             PreparedStatement ps = conn.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
+        try (Connection conn = dc.getConnect(); PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
                 Size size = new Size(
-                    rs.getInt("SizeID"),
-                    rs.getString("Type"),
-                    rs.getString("Status") // Giả định Model Size đã thêm field Status
+                        rs.getInt("SizeID"),
+                        rs.getString("Type"),
+                        rs.getString("Status") // Giả định Model Size đã thêm field Status
                 );
                 sizes.add(size);
             }
@@ -40,12 +38,11 @@ public class SizeDAO {
     // 2. CREATE: Thêm mới mặc định Status là 'Active'
     public boolean insert(Size size) {
         String sql = "INSERT INTO Size (Type, Status) VALUES (?, 'Active')";
-        try (Connection conn = dc.getConnect();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            
+        try (Connection conn = dc.getConnect(); PreparedStatement ps = conn.prepareStatement(sql)) {
+
             ps.setString(1, size.getType());
             return ps.executeUpdate() > 0;
-            
+
         } catch (SQLException e) {
             System.err.println("SQL Error when inserting size: " + e.getMessage());
             e.printStackTrace();
@@ -56,13 +53,12 @@ public class SizeDAO {
     // 3. UPDATE: Cập nhật thông tin Type
     public boolean update(Size size) {
         String sql = "UPDATE Size SET Type = ? WHERE SizeID = ?";
-        try (Connection conn = dc.getConnect();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            
+        try (Connection conn = dc.getConnect(); PreparedStatement ps = conn.prepareStatement(sql)) {
+
             ps.setString(1, size.getType());
             ps.setInt(2, size.getSizeID());
             return ps.executeUpdate() > 0;
-            
+
         } catch (SQLException e) {
             System.err.println("SQL Error when updating size: " + e.getMessage());
             e.printStackTrace();
@@ -74,12 +70,11 @@ public class SizeDAO {
     public boolean delete(int sizeID) {
         // Thay vì DELETE thực sự, ta UPDATE cột Status
         String sql = "UPDATE Size SET Status = 'Inactive' WHERE SizeID = ?";
-        try (Connection conn = dc.getConnect();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            
+        try (Connection conn = dc.getConnect(); PreparedStatement ps = conn.prepareStatement(sql)) {
+
             ps.setInt(1, sizeID);
             return ps.executeUpdate() > 0;
-            
+
         } catch (SQLException e) {
             System.err.println("SQL Error when soft deleting size: " + e.getMessage());
             e.printStackTrace();
@@ -91,17 +86,16 @@ public class SizeDAO {
     public List<Size> searchByType(String keyword) {
         List<Size> sizes = new ArrayList<>();
         String sql = "SELECT SizeID, Type, Status FROM Size WHERE Type LIKE ? AND Status = 'Active'";
-        
-        try (Connection conn = dc.getConnect();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            
+
+        try (Connection conn = dc.getConnect(); PreparedStatement ps = conn.prepareStatement(sql)) {
+
             ps.setString(1, "%" + keyword + "%");
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     sizes.add(new Size(
-                        rs.getInt("SizeID"),
-                        rs.getString("Type"),
-                        rs.getString("Status")
+                            rs.getInt("SizeID"),
+                            rs.getString("Type"),
+                            rs.getString("Status")
                     ));
                 }
             }
@@ -110,5 +104,20 @@ public class SizeDAO {
             e.printStackTrace();
         }
         return sizes;
+    }
+
+    public boolean isTypeExists(String type) {
+        String sql = "SELECT COUNT(*) FROM Size WHERE Type = ?";
+        try (Connection conn = dc.getConnect(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, type);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error checking unique type: " + e.getMessage());
+        }
+        return false;
     }
 }

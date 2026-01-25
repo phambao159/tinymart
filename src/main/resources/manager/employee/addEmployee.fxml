@@ -6,14 +6,14 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane id="AnchorPane" prefHeight="550.0" prefWidth="500.0" styleClass="mainFxmlClass" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.manager.employee.AddEmployeeController">
+<AnchorPane id="AnchorPane" prefHeight="580.0" prefWidth="550.0" styleClass="mainFxmlClass" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.manager.employee.AddEmployeeController">
     <stylesheets>
         <URL value="@addemployee.css" />
     </stylesheets>
    <children>
       <VBox alignment="TOP_CENTER" spacing="15.0" AnchorPane.bottomAnchor="15.0" AnchorPane.leftAnchor="30.0" AnchorPane.rightAnchor="30.0" AnchorPane.topAnchor="15.0">
          <children>
-            <Label text="ADD NEW EMPLOYEE">
+            <Label text="ADD NEW EMPLOYEE" textFill="#2c3e50">
                <font>
                   <Font name="System Bold" size="22.0" />
                </font>
@@ -21,8 +21,8 @@
             
             <GridPane hgap="10.0" vgap="12.0">
               <columnConstraints>
-                <ColumnConstraints hgrow="SOMETIMES" maxWidth="150.0" minWidth="10.0" prefWidth="120.0" />
-                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="240.0" />
+                <ColumnConstraints hgrow="SOMETIMES" maxWidth="150.0" minWidth="10.0" prefWidth="140.0" />
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="300.0" />
               </columnConstraints>
               <rowConstraints>
                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
@@ -36,39 +36,84 @@
                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
               </rowConstraints>
                <children>
-                  <Label text="Full Name:" />
-                  <TextField fx:id="txtName" promptText="Nguyen Van A" GridPane.columnIndex="1" />
+                  <HBox alignment="CENTER_LEFT" spacing="3.0" GridPane.rowIndex="0">
+                     <children>
+                        <Label text="Full Name:" />
+                        <Label text="*" textFill="RED" />
+                     </children>
+                  </HBox>
+                  <TextField fx:id="txtName" promptText="e.g. Nguyen Van A" GridPane.columnIndex="1" />
                   
-                  <Label text="Birth Date:" GridPane.rowIndex="1" />
-                  <DatePicker fx:id="dpDob" prefWidth="250.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                  <HBox alignment="CENTER_LEFT" spacing="3.0" GridPane.rowIndex="1">
+                     <children>
+                        <Label text="Birth Date:" />
+                        <Label text="*" textFill="RED" />
+                     </children>
+                  </HBox>
+                  <DatePicker fx:id="dpDob" prefWidth="350.0" promptText="Select birthday" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                   
-                  <Label text="Phone:" GridPane.rowIndex="2" />
-                  <TextField fx:id="txtPhone" promptText="090..." GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                  <HBox alignment="CENTER_LEFT" spacing="3.0" GridPane.rowIndex="2">
+                     <children>
+                        <Label text="Phone:" />
+                        <Label text="*" textFill="RED" />
+                     </children>
+                  </HBox>
+                  <TextField fx:id="txtPhone" promptText="e.g. 0901234567" GridPane.columnIndex="1" GridPane.rowIndex="2" />
                   
-                  <Label text="Address:" GridPane.rowIndex="3" />
-                  <TextField fx:id="txtAddress" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                  <HBox alignment="CENTER_LEFT" spacing="3.0" GridPane.rowIndex="3">
+                     <children>
+                        <Label text="Address:" />
+                        <Label text="*" textFill="RED" />
+                     </children>
+                  </HBox>
+                  <TextField fx:id="txtAddress" promptText="Enter street address" GridPane.columnIndex="1" GridPane.rowIndex="3" />
                   
-                  <Label text="Role:" GridPane.rowIndex="4" />
-                  <ComboBox fx:id="cbRole" prefWidth="250.0" promptText="Select role" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                  <HBox alignment="CENTER_LEFT" spacing="3.0" GridPane.rowIndex="4">
+                     <children>
+                        <Label text="Role:" />
+                        <Label text="*" textFill="RED" />
+                     </children>
+                  </HBox>
+                  <ComboBox fx:id="cbRole" prefWidth="350.0" promptText="-- Select Role --" GridPane.columnIndex="1" GridPane.rowIndex="4" />
                   
-                  <Label text="Base Salary:" GridPane.rowIndex="5" />
+                  <HBox alignment="CENTER_LEFT" spacing="3.0" GridPane.rowIndex="5">
+                     <children>
+                        <Label text="Base Salary:" />
+                        <Label text="*" textFill="RED" />
+                     </children>
+                  </HBox>
                   <TextField fx:id="txtSalary" promptText="e.g. 5000000" GridPane.columnIndex="1" GridPane.rowIndex="5" />
                   
-                  <Label text="Username:" GridPane.rowIndex="6" />
-                  <TextField fx:id="txtUser" GridPane.columnIndex="1" GridPane.rowIndex="6" />
+                  <HBox alignment="CENTER_LEFT" spacing="3.0" GridPane.rowIndex="6">
+                     <children>
+                        <Label text="Username:" />
+                        <Label text="*" textFill="RED" />
+                     </children>
+                  </HBox>
+                  <TextField fx:id="txtUser" promptText="Login ID" GridPane.columnIndex="1" GridPane.rowIndex="6" />
                   
-                  <Label text="Password:" GridPane.rowIndex="7" />
-                  <PasswordField fx:id="txtPassword" GridPane.columnIndex="1" GridPane.rowIndex="7" />
+                  <HBox alignment="CENTER_LEFT" spacing="3.0" GridPane.rowIndex="7">
+                     <children>
+                        <Label text="Password:" />
+                        <Label text="*" textFill="RED" />
+                     </children>
+                  </HBox>
+                  <PasswordField fx:id="txtPassword" promptText="Secret key" GridPane.columnIndex="1" GridPane.rowIndex="7" />
                   
-                  <Label text="Hire Date:" GridPane.rowIndex="8" />
-                  <DatePicker fx:id="dpHireDate" prefWidth="250.0" GridPane.columnIndex="1" GridPane.rowIndex="8" />
+                  <HBox alignment="CENTER_LEFT" spacing="3.0" GridPane.rowIndex="8">
+                     <children>
+                        <Label text="Hire Date:" />
+                        <Label text="*" textFill="RED" />
+                     </children>
+                  </HBox>
+                  <DatePicker fx:id="dpHireDate" prefWidth="350.0" GridPane.columnIndex="1" GridPane.rowIndex="8" />
                </children>
             </GridPane>
             
             <HBox alignment="CENTER" spacing="25.0">
                <children>
-                  <Button mnemonicParsing="false" onAction="#onSave" prefHeight="35.0" prefWidth="100.0" style="-fx-background-color: #28a745; -fx-text-fill: white; -fx-font-weight: bold;" text="SAVE" />
-                  <Button mnemonicParsing="false" onAction="#onClose" prefHeight="35.0" prefWidth="100.0" style="-fx-background-color: #6c757d; -fx-text-fill: white;" text="CANCEL" />
+                  <Button mnemonicParsing="false" onAction="#onSave" prefHeight="40.0" prefWidth="120.0" style="-fx-background-color: #28a745; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand;" text="SAVE" />
+                  <Button mnemonicParsing="false" onAction="#onClose" prefHeight="40.0" prefWidth="100.0" style="-fx-background-color: #6c757d; -fx-text-fill: white; -fx-cursor: hand;" text="CANCEL" />
                </children>
                <padding>
                   <Insets top="15.0" />

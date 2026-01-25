@@ -36,6 +36,7 @@ public class CreateNotiController implements Initializable {
     public void initialize(URL url, ResourceBundle rb) {
         loadReceiver();
     }
+
     public void setExternalData(String title, String content, String targetRole) {
         txtTitle.setText(title);
         txtContent.setText(content);
@@ -50,30 +51,52 @@ public class CreateNotiController implements Initializable {
             }
         }
     }
+
     @FXML
     private void onSend(ActionEvent event) {
-        // 1. Lấy đối tượng Employee được chọn từ ComboBox
+        // 1. Reset style trước khi check (xóa màu đỏ cũ nếu có)
+        resetValidationStyles();
+
+        // 2. Lấy dữ liệu
         Employee selectedEmp = cbReceiver.getSelectionModel().getSelectedItem();
         String title = txtTitle.getText().trim();
         String content = txtContent.getText().trim();
 
-        // 2. Kiểm tra dữ liệu trống
-        if (selectedEmp == null || title.isEmpty() || content.isEmpty()) {
-            showAlert(Alert.AlertType.WARNING, "Validation Error", "Please fill in all fields.");
+        // 3. Kiểm tra từng field (Validation)
+        StringBuilder errorMsg = new StringBuilder();
+
+        if (selectedEmp == null) {
+            errorMsg.append("- Please select a receiver.\n");
+            cbReceiver.setStyle("-fx-border-color: red; -fx-border-width: 2px;");
+        }
+
+        if (title.isEmpty()) {
+            errorMsg.append("- Subject (Title) cannot be empty.\n");
+            txtTitle.setStyle("-fx-border-color: red; -fx-border-width: 2px;");
+        }
+
+        if (content.isEmpty()) {
+            errorMsg.append("- Content cannot be empty.\n");
+            txtContent.setStyle("-fx-border-color: red; -fx-border-width: 2px;");
+        }
+
+        // Nếu có lỗi thì hiện Alert và dừng lại
+        if (errorMsg.length() > 0) {
+            showAlert(Alert.AlertType.WARNING, "Validation Error",
+                    "The following fields are required:\n" + errorMsg.toString());
             return;
         }
 
+        // 4. Logic lưu vào Database (Giữ nguyên phần xử lý của bạn)
         try {
-            // 3. Tạo đối tượng Notification trực tiếp từ dữ liệu đã chọn
             Notification n = new Notification();
-            n.setEmployeeID(1); // ID người gửi (Manager)
-            n.setReceiverID(selectedEmp.getEmployeeID()); // Lấy ID từ đối tượng Employee
+            n.setEmployeeID(1); // Manager
+            n.setReceiverID(selectedEmp.getEmployeeID());
             n.setTitle(title);
             n.setContent(content);
             n.setSentDate(new Date());
             n.setIsRead(false);
 
-            // 4. Lưu vào Database
             dao.insert(n);
 
             showAlert(Alert.AlertType.INFORMATION, "Success", "Notification sent successfully!");
@@ -81,8 +104,17 @@ public class CreateNotiController implements Initializable {
 
         } catch (Exception e) {
             e.printStackTrace();
-            showAlert(Alert.AlertType.ERROR, "Database Error", "Could not send notification: " + e.getMessage());
+            showAlert(Alert.AlertType.ERROR, "Database Error", "Could not send notification.");
         }
+    }
+
+    /**
+     * Xóa các cảnh báo màu đỏ trên giao diện
+     */
+    private void resetValidationStyles() {
+        cbReceiver.setStyle(null);
+        txtTitle.setStyle(null);
+        txtContent.setStyle(null);
     }
 
     @FXML

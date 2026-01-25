@@ -1,21 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import java.net.URL?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.ComboBox?>
-<?import javafx.scene.control.DatePicker?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.TextArea?>
-<?import javafx.scene.control.TextField?>
-<?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.ColumnConstraints?>
-<?import javafx.scene.layout.GridPane?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.RowConstraints?>
-<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane id="AnchorPane" prefHeight="500.0" prefWidth="500.0" styleClass="mainFxmlClass" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.manager.product.AddPromotionController">
+<AnchorPane id="AnchorPane" prefHeight="550.0" prefWidth="500.0" styleClass="mainFxmlClass" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.manager.product.AddPromotionController">
     <stylesheets>
         <URL value="@addpromotion.css" />
     </stylesheets>
@@ -43,26 +33,61 @@
                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
               </rowConstraints>
                <children>
-                  <Label text="Name:" />
+                  <HBox alignment="CENTER_LEFT" spacing="3.0">
+                     <children>
+                        <Label text="Name:" />
+                        <Label text="*" textFill="#e74c3c"><font><Font name="System Bold" size="14.0" /></font></Label>
+                     </children>
+                  </HBox>
                   <TextField fx:id="txtName" promptText="Promotion name" GridPane.columnIndex="1" />
                   
-                  <Label text="Description:" GridPane.rowIndex="1" />
+                  <HBox alignment="CENTER_LEFT" spacing="3.0" GridPane.rowIndex="1">
+                     <children>
+                        <Label text="Description:" />
+                        
+                     </children>
+                  </HBox>
                   <TextArea fx:id="txtDescription" prefHeight="200.0" prefWidth="200.0" promptText="Enter details" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                   
-                  <Label text="Type:" GridPane.rowIndex="2" />
+                  <HBox alignment="CENTER_LEFT" spacing="3.0" GridPane.rowIndex="2">
+                     <children>
+                        <Label text="Type:" />
+                        <Label text="*" textFill="#e74c3c"><font><Font name="System Bold" size="14.0" /></font></Label>
+                     </children>
+                  </HBox>
+                  <ComboBox fx:id="cbType" prefHeight="28.0" prefWidth="321.0" promptText="Select Type" GridPane.columnIndex="1" GridPane.rowIndex="2" />
                   
-                  <Label text="Value:" GridPane.rowIndex="3" />
+                  <HBox alignment="CENTER_LEFT" spacing="3.0" GridPane.rowIndex="3">
+                     <children>
+                        <Label text="Value:" />
+                        <Label text="*" textFill="#e74c3c"><font><Font name="System Bold" size="14.0" /></font></Label>
+                     </children>
+                  </HBox>
                   <TextField fx:id="txtValue" promptText="Amount or Percentage" GridPane.columnIndex="1" GridPane.rowIndex="3" />
                   
-                  <Label text="Start Date:" GridPane.rowIndex="4" />
+                  <HBox alignment="CENTER_LEFT" spacing="3.0" GridPane.rowIndex="4">
+                     <children>
+                        <Label text="Start Date:" />
+                        <Label text="*" textFill="#e74c3c"><font><Font name="System Bold" size="14.0" /></font></Label>
+                     </children>
+                  </HBox>
                   <DatePicker fx:id="dpStart" prefWidth="320.0" GridPane.columnIndex="1" GridPane.rowIndex="4" />
                   
-                  <Label text="End Date:" GridPane.rowIndex="5" />
+                  <HBox alignment="CENTER_LEFT" spacing="3.0" GridPane.rowIndex="5">
+                     <children>
+                        <Label text="End Date:" />
+                        <Label text="*" textFill="#e74c3c"><font><Font name="System Bold" size="14.0" /></font></Label>
+                     </children>
+                  </HBox>
                   <DatePicker fx:id="dpEnd" prefWidth="320.0" GridPane.columnIndex="1" GridPane.rowIndex="5" />
                   
-                  <Label text="Status:" GridPane.rowIndex="6" />
+                  <HBox alignment="CENTER_LEFT" spacing="3.0" GridPane.rowIndex="6">
+                     <children>
+                        <Label text="Status:" />
+                        <Label text="*" textFill="#e74c3c"><font><Font name="System Bold" size="14.0" /></font></Label>
+                     </children>
+                  </HBox>
                   <ComboBox fx:id="cbStatus" prefWidth="320.0" GridPane.columnIndex="1" GridPane.rowIndex="6" />
-                  <ComboBox fx:id="cbType" prefHeight="28.0" prefWidth="321.0" promptText="Select Type" GridPane.columnIndex="1" GridPane.rowIndex="2" />
                </children>
             </GridPane>
             

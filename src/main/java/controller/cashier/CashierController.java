@@ -212,14 +212,15 @@ public class CashierController implements Initializable {
                     loadHistoryDetails(newSelection);
                 }
             });
+
             colHistId.prefWidthProperty().bind(tblHistory.widthProperty().multiply(0.1));
             colHistTime.prefWidthProperty().bind(tblHistory.widthProperty().multiply(0.25));
             colHistCashier.prefWidthProperty().bind(tblHistory.widthProperty().multiply(0.2));
             colHistCustomer.prefWidthProperty().bind(tblHistory.widthProperty().multiply(0.45));
-
-            colName.prefWidthProperty().bind(tblCart.widthProperty().multiply(0.40));
+            
+            colName.prefWidthProperty().bind(tblCart.widthProperty().multiply(0.30));
             colPrice.prefWidthProperty().bind(tblCart.widthProperty().multiply(0.20));
-            colQty.prefWidthProperty().bind(tblCart.widthProperty().multiply(0.15));
+            colQty.prefWidthProperty().bind(tblCart.widthProperty().multiply(0.25));
             colTotal.prefWidthProperty().bind(tblCart.widthProperty().multiply(0.25));
         }
 
@@ -600,7 +601,8 @@ public class CashierController implements Initializable {
                 } catch (Exception e) {
                 }
             }
-
+            
+            
             if (currentCustomer != null) {
                 int pointsEarned = (int) (finalTotal / 10);
 
@@ -818,27 +820,69 @@ public class CashierController implements Initializable {
 
     @FXML
     public void ShiftEnd(ActionEvent event) {
-        TextInputDialog dialog = new TextInputDialog("0");
-        dialog.setTitle("End Shift");
-        dialog.setHeaderText("Session Sales: " + String.format("$%.2f", currentSessionSales));
-        dialog.setContentText("End Cash:");
+        java.util.Map<String, String> stats = cashierDAO.getShiftStatistics(currentEmployeeID);
 
-        dialog.getDialogPane().getStylesheets().add(getClass().getResource("/cashier/cashier.css").toExternalForm());
+        String startTime = stats.get("StartTime");
+        String totalOrders = stats.get("TotalOrders");
+        String strRevenue = stats.get("TotalRevenue");
 
-        Optional<String> result = dialog.showAndWait();
-        if (result.isPresent()) {
+        double dbRevenue = 0;
+        try {
+            dbRevenue = Double.parseDouble(strRevenue);
+        } catch (Exception e) {
+        }
+
+        Alert reportAlert = new Alert(Alert.AlertType.CONFIRMATION);
+        reportAlert.setTitle("End Shift Report (Z-Report)");
+        reportAlert.setHeaderText("Session Summary");
+
+        String content = "Cashier: " + lblWelcome.getText().replace("Welcome, ", "") + "\n"
+                + "------------------------------------------------\n"
+                + "Start Time:   " + startTime + "\n"
+                + "Total Orders: " + totalOrders + "\n"
+                + "System Sales: $" + strRevenue + "\n"
+                + "------------------------------------------------\n"
+                + "Confirm to Close Shift?";
+
+        reportAlert.setContentText(content);
+        reportAlert.getDialogPane().setStyle("-fx-font-family: 'Monospaced';");
+
+        Optional<ButtonType> reportResult = reportAlert.showAndWait();
+        if (reportResult.isPresent() && reportResult.get() == ButtonType.OK) {
+
+            TextInputDialog dialog = new TextInputDialog("0");
+            dialog.setTitle("End Shift - Cash Count");
+            dialog.setHeaderText("System calculated: $" + strRevenue);
+            dialog.setContentText("Enter Actual Cash in Drawer:");
+
             try {
-                double endCash = Double.parseDouble(result.get());
-                int empId = currentEmployeeID;
+                dialog.getDialogPane().getStylesheets().add(getClass().getResource("/cashier/cashier.css").toExternalForm());
+            } catch (Exception e) {
+            }
 
-                if (shiftDAO.checkOut(empId, currentShiftID, currentSessionSales, endCash)) {
-                    showAlert("Shift Ended", "Shift ended successfully. See you next time!", Alert.AlertType.INFORMATION);
-                    logout(event);
-                } else {
-                    showAlert("Error", "Check-out failed.", Alert.AlertType.ERROR);
+            Optional<String> cashResult = dialog.showAndWait();
+            if (cashResult.isPresent()) {
+                try {
+                    double endCash = Double.parseDouble(cashResult.get());
+                    if (shiftDAO.checkOut(currentEmployeeID, currentShiftID, dbRevenue, endCash)) {
+
+                        double variance = endCash - dbRevenue;
+                        String msg = "Shift closed successfully.\n";
+                        if (Math.abs(variance) > 0.01) {
+                            msg += String.format("Variance: $%.2f", variance);
+                        } else {
+                            msg += "Balance: Perfect Match!";
+                        }
+
+                        showAlert("Shift Ended", msg, Alert.AlertType.INFORMATION);
+                        logout(event);
+
+                    } else {
+                        showAlert("Error", "Check-out failed. Database error.", Alert.AlertType.ERROR);
+                    }
+                } catch (NumberFormatException e) {
+                    showAlert("Invalid Input", "Please enter a valid number.", Alert.AlertType.ERROR);
                 }
-            } catch (NumberFormatException e) {
-                showAlert("Invalid Input", "Please enter a valid number.", Alert.AlertType.ERROR);
             }
         }
     }
@@ -908,8 +952,8 @@ public class CashierController implements Initializable {
             boxCustomerInfo.setVisible(true);
             boxCustomerInfo.setManaged(true);
 
-            lblCustomerName.setText(c.getFullName());
-            lblCustomerPoints.setText(String.valueOf(c.getPoints()));
+            lblCustomerName.setText("Customer Name: " + c.getFullName());
+            lblCustomerPoints.setText("Point: " + String.valueOf(c.getPoints()));
             txtCustomerPhone.setText(c.getPhoneNumber());
         } else {
             boxCustomerInfo.setVisible(true);
@@ -1035,7 +1079,11 @@ public class CashierController implements Initializable {
         });
 
         colHistTotal.setVisible(false);
-        colHistMethod.setVisible(false);
+        colHistMethod.setVisible(true);
+
+        colHistMethod.setCellValueFactory(cellData
+                -> new SimpleStringProperty(cellData.getValue().getPaymentMethod())
+        );
 
         if (tblOrderDetail != null) {
             tblOrderDetail.setItems(cartList);

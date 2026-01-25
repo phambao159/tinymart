@@ -113,7 +113,7 @@ public class ApplyPromotionController implements Initializable {
 
     private void loadProductCards(String keyword) {
         productContainer.getChildren().clear();
-        List<ProductSummary> products = productDAO.getProductSummaries(keyword, null, null, null);
+        List<ProductSummary> products = productDAO.getProductSummaries(keyword, null, null, null,"Active");
         for (ProductSummary p : products) {
             try {
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("/manager/product/productcard_promotion.fxml"));

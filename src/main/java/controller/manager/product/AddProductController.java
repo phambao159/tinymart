@@ -54,13 +54,13 @@ public class AddProductController implements Initializable {
         cbCategory.setItems(FXCollections.observableArrayList(categoryDAO.getData()));
         cbCategory.setConverter(new StringConverter<Category>() {
             @Override
-            public String toString(Category c) { 
-                return (c == null) ? "" : c.getName(); 
+            public String toString(Category c) {
+                return (c == null) ? "" : c.getName();
             }
-            
+
             @Override
             public Category fromString(String s) { // ĐÃ SỬA LỖI TYPO TẠI ĐÂY
-                return null; 
+                return null;
             }
         });
 
@@ -82,38 +82,62 @@ public class AddProductController implements Initializable {
 
     @FXML
     private void onSave(ActionEvent event) {
+        resetStyles();
+
         String name = txtName.getText().trim();
         Category cat = cbCategory.getValue();
-        String unit = txtUnit.getText().trim();
         String status = cbStatus.getValue();
+        String unit = null;
 
-        // Validate dữ liệu
-        if (name.isEmpty() || cat == null || unit.isEmpty()) {
-            showAlert(Alert.AlertType.ERROR, "Validation Error", "Please fill Name, Category and Unit!");
+        // 1. Kiểm tra Not Null
+        if (name.isEmpty()) {
+            showError(txtName, "Product name cannot be empty!");
             return;
         }
 
-        // Xử lý ảnh
+        // 2. Kiểm tra trùng tên trong Database
+        if (productDAO.isNameExists(name)) {
+            showError(txtName, "This product name already exists! Please choose another name.");
+            return;
+        }
+
+        if (cat == null) {
+            showError(cbCategory, "Please select a category!");
+            return;
+        }
+
+        if (status == null) {
+            showError(cbStatus, "Please select a status!");
+            return;
+        }
+
+        // 3. Xử lý ảnh và lưu (giữ nguyên logic cũ)
         String fileName = DEFAULT_IMAGE;
         if (selectedFile != null) {
             fileName = saveImageToProject(selectedFile);
         }
 
-        // Tạo đối tượng Product (Sử dụng Constructor mới không có PromotionID)
-        Product p = new Product(
-            name, 
-            cat.getCategoryID(), 
-            unit, 
-            status, 
-            fileName
-        );
+        Product p = new Product(name, cat.getCategoryID(), unit, status, fileName);
 
         if (productDAO.insert(p)) {
-            if (refreshCallback != null) refreshCallback.run();
+            if (refreshCallback != null) {
+                refreshCallback.run();
+            }
             closeWindow(event);
         } else {
             showAlert(Alert.AlertType.ERROR, "Database Error", "Failed to add product.");
         }
+    }
+
+    private void resetStyles() {
+        txtName.setStyle("");
+        cbCategory.setStyle("");
+        cbStatus.setStyle("");
+    }
+    private void showError(Control control, String message) {
+        control.setStyle("-fx-border-color: #e74c3c; -fx-border-width: 1.5px;");
+        control.requestFocus();
+        showAlert(Alert.AlertType.ERROR, "Validation Error", message);
     }
 
     private String saveImageToProject(File file) {
@@ -123,7 +147,9 @@ public class AddProductController implements Initializable {
 
             // 1. Lưu vào thư mục resources của Source (Để lưu vĩnh viễn)
             File srcDir = new File(projectPath + "/src/main/resources/image/manager");
-            if (!srcDir.exists()) srcDir.mkdirs();
+            if (!srcDir.exists()) {
+                srcDir.mkdirs();
+            }
             Files.copy(file.toPath(), new File(srcDir, fileName).toPath(), StandardCopyOption.REPLACE_EXISTING);
 
             // 2. Đồng bộ sang thư mục Target/Build (Để hiển thị ngay lập tức mà không cần restart)
@@ -144,8 +170,8 @@ public class AddProductController implements Initializable {
     }
 
     @FXML
-    private void onCancel(ActionEvent e) { 
-        closeWindow(e); 
+    private void onCancel(ActionEvent e) {
+        closeWindow(e);
     }
 
     private void closeWindow(ActionEvent e) {

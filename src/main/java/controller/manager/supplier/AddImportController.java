@@ -84,7 +84,12 @@ public class AddImportController implements Initializable {
         loadComboBoxData();
         loadProduct();
 
-        // Tìm kiếm sản phẩm thời gian thực
+        // Xóa viền đỏ khi người dùng tương tác lại
+        cbSupplier.valueProperty().addListener((obs, oldVal, newVal) -> cbSupplier.setStyle(""));
+        cbEmployee.valueProperty().addListener((obs, oldVal, newVal) -> cbEmployee.setStyle(""));
+        dpReceiptDate.valueProperty().addListener((obs, oldVal, newVal) -> dpReceiptDate.setStyle(""));
+        cbStatus.valueProperty().addListener((obs, oldVal, newVal) -> cbStatus.setStyle(""));
+
         txtSearchProduct.textProperty().addListener((obs, oldVal, newVal) -> loadProduct());
     }
 
@@ -150,25 +155,62 @@ public class AddImportController implements Initializable {
 
     @FXML
     private void onSave(ActionEvent event) {
+        // 1. Xóa tất cả style lỗi cũ trước khi kiểm tra
+        resetValidationStyles();
+
+        // 2. Lấy giá trị
         Supplier supplier = cbSupplier.getValue();
         Employee employee = cbEmployee.getValue();
-        String status = cbStatus.getValue();
         LocalDate date = dpReceiptDate.getValue();
+        String status = cbStatus.getValue();
 
-        if (supplier == null || employee == null || detailList.isEmpty()) {
-            showAlert("Validation Error", "Please fill in all information and add products.");
+        // 3. Kiểm tra từng trường (Validation)
+        if (supplier == null) {
+            showValidationError(cbSupplier, "Please select a Supplier!");
             return;
         }
 
-        // Kiểm tra logic cuối cùng trước khi lưu
+        if (employee == null) {
+            showValidationError(cbEmployee, "Please select a Staff member!");
+            return;
+        }
+
+        if (date == null) {
+            showValidationError(dpReceiptDate, "Please select a Receipt Date!");
+            return;
+        }
+
+        if (status == null || status.isEmpty()) {
+            showValidationError(cbStatus, "Please select a Status!");
+            return;
+        }
+
+        // 4. Kiểm tra danh sách sản phẩm
+        if (detailList.isEmpty()) {
+            showAlert("Empty List", "Please select at least one product to import.");
+            return;
+        }
+
+        // 5. Kiểm tra logic chi tiết từng dòng trong bảng
         for (ImportDetail d : detailList) {
+            if (d.getQuantity() <= 0) {
+                showAlert("Invalid Quantity", "Product " + d.getProductName() + " must have a quantity > 0.");
+                return;
+            }
             if (d.getShelfQuantity() > d.getQuantity()) {
-                showAlert("Logical Error", "Product " + d.getProductName() + " has shelf quantity > total quantity.");
+                showAlert("Logical Error", "Product " + d.getProductName()
+                        + ": Shelf quantity cannot be greater than total quantity.");
+                return;
+            }
+            if (d.getImportPrice() <= 0) {
+                showAlert("Invalid Price", "Product " + d.getProductName() + " must have a price > 0.");
                 return;
             }
         }
 
+        // 6. Xác nhận và lưu
         Alert confirm = new Alert(Alert.AlertType.CONFIRMATION, "Create this import receipt?", ButtonType.YES, ButtonType.NO);
+        confirm.setHeaderText(null);
         confirm.showAndWait().ifPresent(response -> {
             if (response == ButtonType.YES) {
                 double totalAmount = detailList.stream().mapToDouble(d -> d.getQuantity() * d.getImportPrice()).sum();
@@ -180,18 +222,44 @@ public class AddImportController implements Initializable {
                 imp.setTotalCost(totalAmount);
                 imp.setStatus(status);
 
-                // Lưu qua DAO (Xử lý transaction cả Header và Detail có ShelfQuantity)
                 if (importDAO.saveImport(imp, detailList)) {
-                    new Alert(Alert.AlertType.INFORMATION, "Saved successfully!").showAndWait();
+                    Alert successAlert = new Alert(Alert.AlertType.INFORMATION, "Import receipt created successfully!");
+                    successAlert.setHeaderText(null);
+                    successAlert.showAndWait();
+
                     onCancel(event);
+
                     Platform.runLater(() -> {
                         sendNotificationToWarehouse(imp, supplier, employee);
                     });
                 } else {
-                    showAlert("Database Error", "Failed to save import receipt.");
+                    showAlert("Database Error", "Failed to save import receipt to database.");
                 }
             }
         });
+    }
+
+    // --- CÁC HÀM HỖ TRỢ VALIDATION ---
+    private void showValidationError(Control field, String message) {
+        field.setStyle("-fx-border-color: #e74c3c; -fx-border-width: 2px; -fx-border-radius: 3px;");
+        showAlert("Validation Error", message);
+        field.requestFocus();
+    }
+
+    private void resetValidationStyles() {
+        cbSupplier.setStyle("");
+        cbEmployee.setStyle("");
+        dpReceiptDate.setStyle("");
+        cbStatus.setStyle("");
+    }
+
+    // Ghi đè lại hàm showAlert để đồng bộ giao diện WARNING
+    private void showAlert(String title, String message) {
+        Alert alert = new Alert(Alert.AlertType.WARNING);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
     }
 
     private void sendNotificationToWarehouse(Import imp, Supplier supplier, Employee creator) {
@@ -309,7 +377,7 @@ public class AddImportController implements Initializable {
     private void loadProduct() {
         String keyword = txtSearchProduct.getText() == null ? "" : txtSearchProduct.getText().trim();
         productContainer.getChildren().clear();
-        List<ProductSummary> products = productDAO.getProductSummaries(keyword, null, null, null);
+        List<ProductSummary> products = productDAO.getProductSummaries(keyword, null, null, null,"Active");
 
         for (ProductSummary product : products) {
             try {
@@ -329,11 +397,4 @@ public class AddImportController implements Initializable {
         ((Stage) cbSupplier.getScene().getWindow()).close();
     }
 
-    private void showAlert(String title, String message) {
-        Alert alert = new Alert(Alert.AlertType.WARNING);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.show();
-    }
 }

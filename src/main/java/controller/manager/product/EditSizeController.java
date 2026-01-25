@@ -11,6 +11,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
@@ -23,6 +24,8 @@ public class EditSizeController implements Initializable {
 
     private final SizeDAO sizeDAO = new SizeDAO();
     private Size selectedSize;
+    @FXML
+    private Label title;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -41,18 +44,35 @@ public class EditSizeController implements Initializable {
     private void onSave(ActionEvent event) {
         String type = txtType.getText().trim();
 
+        // Reset style
+        txtType.setStyle("");
+
+        // 1. Kiểm tra Not Null
         if (type.isEmpty()) {
-            showAlert(Alert.AlertType.ERROR, "Error", "Size Type cannot be empty!");
+            txtType.setStyle("-fx-border-color: #e74c3c;");
+            showAlert(Alert.AlertType.ERROR, "Input Error", "Size type cannot be empty!");
+            txtType.requestFocus();
             return;
         }
 
-        selectedSize.setType(type);
+        // 2. Kiểm tra Unique (Tránh trùng với các Size khác)
+        // Nếu tên mới khác tên cũ, mới cần check unique trong database
+        if (!type.equalsIgnoreCase(selectedSize.getType())) {
+            if (sizeDAO.isTypeExists(type)) {
+                txtType.setStyle("-fx-border-color: #e74c3c;");
+                showAlert(Alert.AlertType.ERROR, "Duplicate Error", "This size type already exists!");
+                txtType.requestFocus();
+                return;
+            }
+        }
 
+        // 3. Thực hiện cập nhật
+        selectedSize.setType(type);
         if (sizeDAO.update(selectedSize)) {
-            showAlert(Alert.AlertType.INFORMATION, "Success", "Size updated successfully!");
+            // Có thể dùng thông báo nhẹ hoặc đóng cửa sổ luôn
             closeWindow(event);
         } else {
-            showAlert(Alert.AlertType.ERROR, "Error", "Failed to update size.");
+            showAlert(Alert.AlertType.ERROR, "Error", "Failed to update size. Please try again.");
         }
     }
 

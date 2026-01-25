@@ -26,7 +26,6 @@ public class EditImportDetailController implements Initializable {
     @FXML private Label lbPrice; 
     @FXML private ComboBox<String> cbSize;
     @FXML private TextField txtQuantity;
-    @FXML private TextField txtShelfQuantity; // Trường mới thêm
     @FXML private DatePicker dpExpiryDate;
 
     private ImportDetail currentDetail;
@@ -52,8 +51,6 @@ public class EditImportDetailController implements Initializable {
         this.lbProductName.setText(detail.getProductName());
         this.txtQuantity.setText(String.valueOf(detail.getQuantity()));
         
-        // --- CẬP NHẬT: Hiển thị Shelf Quantity ---
-        this.txtShelfQuantity.setText(String.valueOf(detail.getShelfQuantity()));
         
         this.dpExpiryDate.setValue(detail.getExpiryDate());
         
@@ -91,29 +88,17 @@ public class EditImportDetailController implements Initializable {
     private void onUpdate(ActionEvent event) {
         String selectedSize = cbSize.getValue();
         String qtyStr = txtQuantity.getText().trim();
-        String shelfQtyStr = txtShelfQuantity.getText().trim();
 
         // Kiểm tra đầu vào trống
-        if (selectedSize == null || qtyStr.isEmpty() || shelfQtyStr.isEmpty()) {
+        if (selectedSize == null || qtyStr.isEmpty()) {
             showAlert("Please fill in all fields (Quantity and Shelf Quantity).");
             return;
         }
 
         try {
             long qty = Long.parseLong(qtyStr);
-            int shelfQty = Integer.parseInt(shelfQtyStr);
 
-            // Ràng buộc số lượng dương
-            if (qty <= 0 || shelfQty < 0) {
-                showAlert("Quantity must be positive and Shelf Quantity cannot be negative.");
-                return;
-            }
 
-            // --- QUAN TRỌNG: Kiểm tra Shelf Quantity không được vượt quá Total Quantity ---
-            if (shelfQty > qty) {
-                showAlert("Shelf Quantity (" + shelfQty + ") cannot exceed Total Quantity (" + qty + ").");
-                return;
-            }
 
             // Tìm đối tượng Size được chọn
             ProductSize selectedObj = fullSizeList.stream()
@@ -126,7 +111,6 @@ public class EditImportDetailController implements Initializable {
                 currentDetail.setProductSizeID(selectedObj.getProductSizeID());
                 currentDetail.setSizeName(selectedObj.getSizeType());
                 currentDetail.setQuantity(qty);
-                currentDetail.setShelfQuantity(shelfQty); // Lưu giá trị mới
                 currentDetail.setImportPrice(selectedObj.getCostPrice());
                 currentDetail.setExpiryDate(dpExpiryDate.getValue());
 

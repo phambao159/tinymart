@@ -20,7 +20,7 @@
    <children>
       <VBox alignment="TOP_CENTER" spacing="20.0" AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="30.0" AnchorPane.rightAnchor="30.0" AnchorPane.topAnchor="20.0">
          <children>
-            <Label text="ADD NEW SHIFT">
+            <Label text="ADD NEW SHIFT" textFill="#2c3e50">
                <font>
                   <Font name="System Bold" size="22.0" />
                </font>
@@ -37,13 +37,28 @@
                 <RowConstraints minHeight="10.0" prefHeight="35.0" vgrow="SOMETIMES" />
               </rowConstraints>
                <children>
-                  <Label text="Shift Name:" />
+                  <HBox alignment="CENTER_LEFT" spacing="3.0" GridPane.rowIndex="0">
+                     <children>
+                        <Label text="Shift Name:" />
+                        <Label text="*" textFill="RED" />
+                     </children>
+                  </HBox>
                   <TextField fx:id="txtShiftName" promptText="e.g., Morning Shift" GridPane.columnIndex="1" />
                   
-                  <Label text="Start Time:" GridPane.rowIndex="1" />
+                  <HBox alignment="CENTER_LEFT" spacing="3.0" GridPane.rowIndex="1">
+                     <children>
+                        <Label text="Start Time:" />
+                        <Label text="*" textFill="RED" />
+                     </children>
+                  </HBox>
                   <TextField fx:id="txtStartTime" promptText="HH:mm (e.g., 08:00)" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                   
-                  <Label text="End Time:" GridPane.rowIndex="2" />
+                  <HBox alignment="CENTER_LEFT" spacing="3.0" GridPane.rowIndex="2">
+                     <children>
+                        <Label text="End Time:" />
+                        <Label text="*" textFill="RED" />
+                     </children>
+                  </HBox>
                   <TextField fx:id="txtEndTime" promptText="HH:mm (e.g., 16:00)" GridPane.columnIndex="1" GridPane.rowIndex="2" />
                </children>
             </GridPane>

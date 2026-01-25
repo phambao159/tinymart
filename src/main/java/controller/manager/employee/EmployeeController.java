@@ -21,29 +21,46 @@ import javafx.stage.Stage;
 
 public class EmployeeController implements Initializable {
 
-    @FXML private TextField txtSearch;
-    @FXML private TableView<Employee> tbEmployee;
-    
+    @FXML
+    private TextField txtSearch;
+    @FXML
+    private TableView<Employee> tbEmployee;
+
     // Only keeping the visible columns
-    @FXML private TableColumn<Employee, Integer> colID;
-    @FXML private TableColumn<Employee, String> colName;
-    @FXML private TableColumn<Employee, String> colPhone;
-    @FXML private TableColumn<Employee, String> colRole;
+    @FXML
+    private TableColumn<Employee, Integer> colID;
+    @FXML
+    private TableColumn<Employee, String> colName;
+    @FXML
+    private TableColumn<Employee, String> colPhone;
+    @FXML
+    private TableColumn<Employee, String> colRole;
 
     private EmployeeDAO employeeDAO = new EmployeeDAO();
     private ObservableList<Employee> allEmployees = FXCollections.observableArrayList();
+    @FXML
+    private ToggleGroup statusGroup;
+    @FXML
+    private RadioButton rbActive;
+    @FXML
+    private RadioButton rbInactive;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         setupColumns();
         loadEmployeeData();
-        
-        // Real-time search filter
+
+        // 1. Filter theo search text (Real-time)
         txtSearch.textProperty().addListener((observable, oldValue, newValue) -> {
-            filterData(newValue);
+            applyFilters();
         });
 
-        // Double-click to open Edit Form (even for hidden data like Address/Salary)
+        // 2. Filter theo RadioButton Status (Real-time)
+        statusGroup.selectedToggleProperty().addListener((observable, oldValue, newValue) -> {
+            applyFilters();
+        });
+
+        // Giữ nguyên logic Double-click để mở Edit
         tbEmployee.setRowFactory(tv -> {
             TableRow<Employee> row = new TableRow<>();
             row.setOnMouseClicked(event -> {
@@ -53,6 +70,32 @@ public class EmployeeController implements Initializable {
             });
             return row;
         });
+    }
+
+    private void applyFilters() {
+        String keyword = txtSearch.getText().toLowerCase().trim();
+
+        // Lấy text của RadioButton đang được chọn (Active hoặc Inactive)
+        RadioButton selectedRadio = (RadioButton) statusGroup.getSelectedToggle();
+        String selectedStatus = (selectedRadio != null) ? selectedRadio.getText() : "";
+
+        ObservableList<Employee> filteredList = allEmployees.stream()
+                .filter(e -> {
+                    // 1. Kiểm tra từ khóa (Tên hoặc Số điện thoại)
+                    boolean matchesSearch = keyword.isEmpty()
+                            || e.getFullName().toLowerCase().contains(keyword)
+                            || e.getPhoneNumber().contains(keyword);
+
+                    // 2. Kiểm tra trạng thái (So sánh String)
+                    // Lưu ý: e.getStatus() phải khớp chính xác với Text của RadioButton (ví dụ: "Active")
+                    boolean matchesStatus = e.getStatus() != null
+                            && e.getStatus().equalsIgnoreCase(selectedStatus);
+
+                    return matchesSearch && matchesStatus;
+                })
+                .collect(Collectors.toCollection(FXCollections::observableArrayList));
+
+        tbEmployee.setItems(filteredList);
     }
 
     private void setupColumns() {
@@ -74,9 +117,9 @@ public class EmployeeController implements Initializable {
         }
         String lowerCaseFilter = keyword.toLowerCase();
         ObservableList<Employee> filteredList = allEmployees.stream()
-            .filter(e -> e.getFullName().toLowerCase().contains(lowerCaseFilter) || 
-                         e.getPhoneNumber().contains(lowerCaseFilter))
-            .collect(Collectors.toCollection(FXCollections::observableArrayList));
+                .filter(e -> e.getFullName().toLowerCase().contains(lowerCaseFilter)
+                || e.getPhoneNumber().contains(lowerCaseFilter))
+                .collect(Collectors.toCollection(FXCollections::observableArrayList));
         tbEmployee.setItems(filteredList);
     }
 
@@ -118,7 +161,6 @@ public class EmployeeController implements Initializable {
         }
     }
 
-    @FXML
     private void onSearch(ActionEvent event) {
         filterData(txtSearch.getText());
     }

@@ -1,100 +1,155 @@
 /* 1. Tổng thể nền và khoảng cách */
 .mainFxmlClass {
     -fx-background-color: #ffffff;
-    -fx-padding: 0 20 20 20; /* Tạo khoảng trống xung quanh mép cửa sổ */
+    -fx-padding: 20; 
 }
 
-/* 2. Thanh công cụ (HBox chứa Search và Button) */
-.hbox {
-    -fx-padding: 15 0 15 0;
+/* 2. Tiêu đề màn hình */
+.label-header {
+    -fx-font-family: "Segoe UI Semibold", Arial;
+    -fx-font-size: 22px;
+    -fx-text-fill: #2c3e50;
 }
 
-/* Ô tìm kiếm */
+/* 3. Thanh tìm kiếm và Filter */
+.hbox-controls {
+    -fx-spacing: 15px;
+    -fx-alignment: CENTER_LEFT;
+}
+
 .text-field {
     -fx-background-color: #ffffff;
     -fx-border-color: #D5DBDB;
-    -fx-border-radius: 4;
-    -fx-background-radius: 4;
-    -fx-min-width: 200px;
+    -fx-border-radius: 5;
+    -fx-background-radius: 5;
     -fx-min-height: 35px;
     -fx-font-size: 13px;
     -fx-padding: 0 10 0 10;
+    -fx-transition: 0.3s;
 }
 
 .text-field:focused {
-    -fx-border-color: #1E8449; /* Xanh lá khi tập trung */
+    -fx-border-color: #2ecc71; /* Màu xanh lá đồng nhất */
     -fx-border-width: 1.5;
+    -fx-effect: dropshadow(three-pass-box, rgba(46, 204, 113, 0.1), 5, 0, 0, 0);
 }
 
-/* Nút Add New Size */
-.button {
-    -fx-background-color: #1E8449;
+/* Style cho RadioButton (Filter) */
+.radio-button {
+    -fx-font-size: 13px;
+    -fx-text-fill: #34495e;
+    -fx-cursor: hand;
+}
+
+.radio-button .radio {
+    -fx-background-color: white;
+    -fx-border-color: #bdc3c7;
+    -fx-border-radius: 10;
+}
+
+.radio-button:selected .radio .dot {
+    -fx-background-color: #2ecc71;
+}
+
+/* 4. Nút bấm Add New */
+.button-add {
+    -fx-background-color: #2ecc71;
     -fx-text-fill: white;
     -fx-font-weight: bold;
     -fx-cursor: hand;
     -fx-min-height: 35px;
-    -fx-padding: 0 20 0 20;
-    -fx-background-radius: 4;
-    -fx-font-family: "Segoe UI", Arial;
+    -fx-padding: 0 20;
+    -fx-background-radius: 5;
 }
 
-.button:hover {
-    -fx-background-color: #145A32;
-    -fx-effect: dropshadow(three-pass-box, rgba(30, 132, 73, 0.2), 10, 0, 0, 0);
+.button-add:hover {
+    -fx-background-color: #27ae60;
 }
 
-/* 3. Tùy chỉnh TableView */
+/* 5. Tùy chỉnh TableView chuyên nghiệp */
 .table-view {
     -fx-background-color: transparent;
     -fx-border-color: #EAECEE;
     -fx-border-width: 1;
-    -fx-border-radius: 4;
+    -fx-border-radius: 5;
+    -fx-background-radius: 5;
 }
 
 /* Tiêu đề cột */
+.table-view .column-header-background {
+    -fx-background-color: #f8f9fa;
+}
+
 .table-view .column-header {
-    -fx-background-color: #F8F9F9;
+    -fx-background-color: #f8f9fa;
     -fx-border-color: #EAECEE;
     -fx-border-width: 0 1 1 0;
-    -fx-padding: 10 5;
+    -fx-padding: 12 5;
 }
 
 .table-view .column-header .label {
     -fx-text-fill: #2C3E50;
     -fx-font-weight: bold;
     -fx-font-size: 13px;
+    -fx-alignment: CENTER_LEFT;
 }
 
 /* Dòng trong bảng */
 .table-row-cell {
-    -fx-cell-size: 40px;
+    -fx-cell-size: 45px;
+    -fx-border-color: #F4F6F6;
+    -fx-border-width: 0 0 1 0;
 }
 
-.table-row-cell:odd {
-    -fx-background-color: #ffffff;
-}
-
-.table-row-cell:even {
-    -fx-background-color: #FBFCFC;
-}
+.table-row-cell:odd { -fx-background-color: #ffffff; }
+.table-row-cell:even { -fx-background-color: #fafbfc; }
 
 .table-row-cell:hover {
-    -fx-background-color: #E8F6F3; /* Màu xanh bạc hà lợt khi hover */
+    -fx-background-color: #e8f8f5;
 }
 
 .table-row-cell:selected {
-    -fx-background-color: #D1F2EB; /* Màu xanh khi chọn dòng */
+    -fx-background-color: #d1f2eb;
+    -fx-background-insets: 0;
 }
 
-/* Ô dữ liệu cụ thể */
 .table-cell {
-    -fx-text-fill: #34495E;
-    -fx-font-size: 13px;
+    -fx-text-fill: #2c3e50;
     -fx-alignment: CENTER_LEFT;
-    -fx-padding: 0 15 0 15;
+    -fx-padding: 0 15;
 }
 
-/* Loại bỏ viền xanh mặc định của bảng khi được chọn */
-.table-view:focused {
-    -fx-background-color: transparent, transparent, transparent;
+/* 6. Các nút Action trong TableCell (Edit/Delete) */
+.btn-edit {
+    -fx-background-color: #3498db;
+    -fx-text-fill: white;
+    -fx-background-radius: 3;
+    -fx-font-size: 11px;
+}
+
+.btn-delete {
+    -fx-background-color: #e74c3c;
+    -fx-text-fill: white;
+    -fx-background-radius: 3;
+    -fx-font-size: 11px;
+}
+
+.btn-edit:hover { -fx-background-color: #2980b9; }
+.btn-delete:hover { -fx-background-color: #c0392b; }
+
+/* Trạng thái Status Badge (Tùy chọn nếu bạn muốn cột Status đẹp hơn) */
+.status-active {
+    -fx-background-color: #d4edda;
+    -fx-text-fill: #155724;
+    -fx-padding: 2 8;
+    -fx-background-radius: 10;
+    -fx-font-size: 11px;
+}
+
+.status-inactive {
+    -fx-background-color: #f8d7da;
+    -fx-text-fill: #721c24;
+    -fx-padding: 2 8;
+    -fx-background-radius: 10;
+    -fx-font-size: 11px;
 }

@@ -42,32 +42,91 @@ public class AddPromotionController implements Initializable {
 
     @FXML
     private void onSave(ActionEvent event) {
-        try {
-            // Kiểm tra các trường bắt buộc (Name và Value)
-            if (txtName.getText().isEmpty() || txtValue.getText().isEmpty() || cbType.getValue() == null) {
-                showAlert("Error", "Please fill required fields!");
-                return;
-            }
-            
-            Promotion p = new Promotion(
-                    0, 
-                    txtName.getText(), 
-                    txtDescription.getText(),
-                    cbType.getValue(), 
-                    Double.parseDouble(txtValue.getText()),
-                    dpStart.getValue(), 
-                    dpEnd.getValue(), 
-                    cbStatus.getValue()
-            );
+        // 1. Reset tất cả style về mặc định trước khi check
+        resetStyles();
 
-            if (dao.insert(p)) {
-                close(event);
-            }
-        } catch (NumberFormatException e) {
-            showAlert("Error", "Value must be a valid number!");
-        } catch (Exception e) {
-            showAlert("Error", "An error occurred: " + e.getMessage());
+        String name = txtName.getText().trim();
+        String description = txtDescription.getText().trim();
+        String type = cbType.getValue();
+        String valueStr = txtValue.getText().trim();
+        LocalDate start = dpStart.getValue();
+        LocalDate end = dpEnd.getValue();
+        String status = cbStatus.getValue();
+
+        // 2. Kiểm tra từng trường (Not Null & Logic)
+        if (name.isEmpty()) {
+            showError(txtName, "Promotion name cannot be empty!");
+            return;
         }
+
+
+        if (type == null) {
+            showError(cbType, "Please select a promotion type!");
+            return;
+        }
+
+        // Kiểm tra Value (Phải là số và > 0)
+        double value = 0;
+        try {
+            if (valueStr.isEmpty()) {
+                throw new Exception("Value cannot be empty!");
+            }
+            value = Double.parseDouble(valueStr);
+            if (value <= 0) {
+                throw new Exception("Value must be greater than 0!");
+            }
+        } catch (Exception e) {
+            showError(txtValue, e instanceof NumberFormatException ? "Value must be a valid number!" : e.getMessage());
+            return;
+        }
+
+        if (start == null) {
+            showError(dpStart, "Please select a start date!");
+            return;
+        }
+
+        if (end == null) {
+            showError(dpEnd, "Please select an end date!");
+            return;
+        }
+
+        // Kiểm tra logic ngày tháng
+        if (end.isBefore(start)) {
+            showError(dpEnd, "End date cannot be earlier than start date!");
+            return;
+        }
+
+        if (status == null) {
+            showError(cbStatus, "Please select a status!");
+            return;
+        }
+
+        // 3. Nếu mọi thứ OK -> Tiến hành lưu
+        Promotion p = new Promotion(0, name, description, type, value, start, end, status);
+
+        if (dao.insert(p)) {
+            close(event);
+        } else {
+            showAlert("Error", "Database error. Could not save promotion.");
+        }
+    }
+
+// Hàm hỗ trợ đổi màu viền đỏ và thông báo lỗi
+    private void showError(Control control, String message) {
+        control.setStyle("-fx-border-color: #e74c3c; -fx-border-width: 1.5px;");
+        control.requestFocus();
+        showAlert("Validation Error", message);
+    }
+
+// Hàm reset lại style bình thường
+    private void resetStyles() {
+        txtName.setStyle("");
+        txtDescription.setStyle("");
+        cbType.setStyle("");
+        txtValue.setStyle("");
+        dpStart.setStyle("");
+        dpEnd.setStyle("");
+        cbStatus.setStyle("");
     }
 
     @FXML

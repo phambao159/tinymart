@@ -37,23 +37,38 @@ import model.manager.supplier.Supplier;
 
 public class EditImportController implements Initializable {
 
-    @FXML private ComboBox<Supplier> cbSupplier;
-    @FXML private ComboBox<Employee> cbEmployee;
-    @FXML private ComboBox<String> cbStatus;
-    @FXML private DatePicker dpReceiptDate;
+    @FXML
+    private ComboBox<Supplier> cbSupplier;
+    @FXML
+    private ComboBox<Employee> cbEmployee;
+    @FXML
+    private ComboBox<String> cbStatus;
+    @FXML
+    private DatePicker dpReceiptDate;
 
-    @FXML private TableView<ImportDetail> tbDetails;
-    @FXML private TableColumn<ImportDetail, String> colProductName;
-    @FXML private TableColumn<ImportDetail, String> colSize;
-    @FXML private TableColumn<ImportDetail, Long> colQuantity;
-    @FXML private TableColumn<ImportDetail, Integer> colShelfQuantity; // Đã cập nhật kiểu dữ liệu
-    @FXML private TableColumn<ImportDetail, Double> colPrice;
-    @FXML private TableColumn<ImportDetail, LocalDate> colExpireDay;
-    @FXML private TableColumn<ImportDetail, Double> colTotal;
+    @FXML
+    private TableView<ImportDetail> tbDetails;
+    @FXML
+    private TableColumn<ImportDetail, String> colProductName;
+    @FXML
+    private TableColumn<ImportDetail, String> colSize;
+    @FXML
+    private TableColumn<ImportDetail, Long> colQuantity;
+    @FXML
+    private TableColumn<ImportDetail, Integer> colShelfQuantity; // Đã cập nhật kiểu dữ liệu
+    @FXML
+    private TableColumn<ImportDetail, Double> colPrice;
+    @FXML
+    private TableColumn<ImportDetail, LocalDate> colExpireDay;
+    @FXML
+    private TableColumn<ImportDetail, Double> colTotal;
 
-    @FXML private Label lblTotalCost;
-    @FXML private TextField txtSearchProduct;
-    @FXML private FlowPane productContainer;
+    @FXML
+    private Label lblTotalCost;
+    @FXML
+    private TextField txtSearchProduct;
+    @FXML
+    private FlowPane productContainer;
 
     private final ObservableList<ImportDetail> detailList = FXCollections.observableArrayList();
     private final SupplierDAO supplierDAO = new SupplierDAO();
@@ -62,7 +77,7 @@ public class EditImportController implements Initializable {
     private final ImportDAO importDAO = new ImportDAO();
     private final ImportDetailDAO detailDAO = new ImportDetailDAO();
 
-    private Import currentImport; 
+    private Import currentImport;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -147,7 +162,7 @@ public class EditImportController implements Initializable {
 
         tbDetails.setItems(detailList);
         tbDetails.setEditable(true); // Cho phép sửa bảng
-        
+
         tbDetails.setRowFactory(tv -> {
             TableRow<ImportDetail> row = new TableRow<>();
             row.setOnMouseClicked(event -> {
@@ -161,35 +176,83 @@ public class EditImportController implements Initializable {
 
     @FXML
     private void onSave(ActionEvent event) {
-        if (cbSupplier.getValue() == null || cbEmployee.getValue() == null || detailList.isEmpty()) {
-            showAlert("Error", "Please fill all information!");
+        // Xóa style lỗi cũ trước khi kiểm tra
+        resetImportStyles();
+
+        // 1. Kiểm tra Nhà cung cấp (Supplier)
+        if (cbSupplier.getValue() == null) {
+            showValidationError(cbSupplier, "Please select a Supplier!");
             return;
         }
 
-        // Kiểm tra logic ShelfQuantity cho toàn bộ danh sách
-        for (ImportDetail d : detailList) {
-            if (d.getShelfQuantity() > d.getQuantity()) {
-                showAlert("Logical Error", "Product " + d.getProductName() + " has shelf quantity > total quantity.");
-                return;
-            }
+        // 2. Kiểm tra Nhân viên (Staff)
+        if (cbEmployee.getValue() == null) {
+            showValidationError(cbEmployee, "Please select a Staff member!");
+            return;
         }
 
-        // Cập nhật thông tin Header
+        // 3. Kiểm tra Ngày nhập (Receipt Date)
+        if (dpReceiptDate.getValue() == null) {
+            showValidationError(dpReceiptDate, "Please select a Receipt Date!");
+            return;
+        }
+
+        // 4. Kiểm tra Trạng thái (Status)
+        if (cbStatus.getValue() == null) {
+            showValidationError(cbStatus, "Please select a Status!");
+            return;
+        }
+
+        // 5. Kiểm tra danh sách sản phẩm (Table)
+        if (detailList.isEmpty()) {
+            showAlert("Empty List", "Please add at least one product to the import list!");
+            return;
+        }
+
+        // 6. Kiểm tra tính hợp lệ của từng dòng trong bảng
+        for (ImportDetail d : detailList) {
+            if (d.getQuantity() <= 0) {
+                showAlert("Invalid Quantity", "Product " + d.getProductName() + " must have a quantity greater than 0.");
+                return;
+            }
+            // Nếu bạn đã bỏ ShelfQuantity ở UI, hãy chắc chắn logic ở đây phù hợp 
+            // (Ví dụ: mặc định gán ShelfQuantity = 0 hoặc bằng Quantity tùy nghiệp vụ)
+        }
+
+        // --- TIẾN HÀNH CẬP NHẬT NẾU MỌI THỨ HỢP LỆ ---
+        // Cập nhật thông tin đối tượng currentImport
         currentImport.setSupplierID(cbSupplier.getValue().getSupplierID());
         currentImport.setEmployeeID(cbEmployee.getValue().getEmployeeID());
         currentImport.setReceiptDate(dpReceiptDate.getValue().atStartOfDay());
         currentImport.setStatus(cbStatus.getValue());
         currentImport.setTotalCost(detailList.stream().mapToDouble(d -> d.getQuantity() * d.getImportPrice()).sum());
 
-        // Thực thi Update Transaction (Xóa detail cũ, thêm detail mới có ShelfQuantity)
+        // Gọi DAO để cập nhật database
         boolean success = importDAO.updateImport(currentImport, detailList);
 
         if (success) {
-            new Alert(Alert.AlertType.INFORMATION, "Import updated successfully!").showAndWait();
-            onCancel(event);
+            Alert alert = new Alert(Alert.AlertType.INFORMATION, "Import updated successfully!");
+            alert.setHeaderText(null);
+            alert.showAndWait();
+            onCancel(event); // Đóng cửa sổ
         } else {
-            showAlert("Error", "Failed to update database.");
+            showAlert("Database Error", "Failed to update database. Please check your connection.");
         }
+    }
+    // Hàm hiển thị lỗi, tô đỏ và focus vào trường sai
+
+    private void showValidationError(Control field, String message) {
+        field.setStyle("-fx-border-color: #e74c3c; -fx-border-width: 2px; -fx-border-radius: 3px;");
+        showAlert("Validation Error", message);
+        field.requestFocus();
+    }
+
+// Hàm xóa viền đỏ
+    private void resetImportStyles() {
+        cbSupplier.setStyle("");
+        cbEmployee.setStyle("");
+        dpReceiptDate.setStyle("");
+        cbStatus.setStyle("");
     }
 
     private void addProductToTable(ImportDetail detail) {
@@ -209,11 +272,10 @@ public class EditImportController implements Initializable {
     }
 
     // --- CÁC HÀM HỖ TRỢ HIỂN THỊ ---
-
     private void loadComboBoxData() {
         cbSupplier.setItems(FXCollections.observableArrayList(supplierDAO.getAllSuppliers()));
         cbEmployee.setItems(FXCollections.observableArrayList(
-            employeeDAO.getData().stream().filter(e -> "Warehouse".equalsIgnoreCase(e.getRole())).collect(Collectors.toList())
+                employeeDAO.getData().stream().filter(e -> "Warehouse".equalsIgnoreCase(e.getRole())).collect(Collectors.toList())
         ));
         cbStatus.setItems(FXCollections.observableArrayList("Pending", "Completed", "Cancelled"));
         setupComboBoxDisplay();
@@ -221,12 +283,26 @@ public class EditImportController implements Initializable {
 
     private void setupComboBoxDisplay() {
         cbSupplier.setConverter(new javafx.util.StringConverter<>() {
-            @Override public String toString(Supplier s) { return s == null ? "" : s.getName(); }
-            @Override public Supplier fromString(String string) { return null; }
+            @Override
+            public String toString(Supplier s) {
+                return s == null ? "" : s.getName();
+            }
+
+            @Override
+            public Supplier fromString(String string) {
+                return null;
+            }
         });
         cbEmployee.setConverter(new javafx.util.StringConverter<>() {
-            @Override public String toString(Employee e) { return e == null ? "" : e.getFullName(); }
-            @Override public Employee fromString(String string) { return null; }
+            @Override
+            public String toString(Employee e) {
+                return e == null ? "" : e.getFullName();
+            }
+
+            @Override
+            public Employee fromString(String string) {
+                return null;
+            }
         });
     }
 
@@ -235,11 +311,15 @@ public class EditImportController implements Initializable {
             @Override
             protected void updateItem(LocalDate item, boolean empty) {
                 super.updateItem(item, empty);
-                if (empty || item == null) setText("N/A");
-                else {
+                if (empty || item == null) {
+                    setText("N/A");
+                } else {
                     setText(DateTimeFormatter.ofPattern("dd/MM/yyyy").format(item));
-                    if (item.isBefore(LocalDate.now())) setStyle("-fx-text-fill: red;");
-                    else setStyle("");
+                    if (item.isBefore(LocalDate.now())) {
+                        setStyle("-fx-text-fill: red;");
+                    } else {
+                        setStyle("");
+                    }
                 }
             }
         });
@@ -248,7 +328,7 @@ public class EditImportController implements Initializable {
     private void loadProduct() {
         String keyword = txtSearchProduct.getText() == null ? "" : txtSearchProduct.getText().trim();
         productContainer.getChildren().clear();
-        List<ProductSummary> products = productDAO.getProductSummaries(keyword, null, null, null);
+        List<ProductSummary> products = productDAO.getProductSummaries(keyword, null, null, null,"Active");
         for (ProductSummary product : products) {
             try {
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("/manager/supplier/productcard.fxml"));
@@ -256,7 +336,9 @@ public class EditImportController implements Initializable {
                 ProductCardController ctrl = loader.getController();
                 ctrl.setData(product, this::addProductToTable);
                 productContainer.getChildren().add(card);
-            } catch (IOException e) { e.printStackTrace(); }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -271,14 +353,22 @@ public class EditImportController implements Initializable {
             VBox root = loader.load();
             EditImportDetailController editController = loader.getController();
             editController.setData(detail, detail.getProductID(),
-                    updated -> { tbDetails.refresh(); calculateTotal(); },
-                    deleted -> { detailList.remove(deleted); calculateTotal(); }
+                    updated -> {
+                        tbDetails.refresh();
+                        calculateTotal();
+                    },
+                    deleted -> {
+                        detailList.remove(deleted);
+                        calculateTotal();
+                    }
             );
             Stage stage = new Stage();
             stage.setScene(new Scene(root));
             stage.initModality(Modality.APPLICATION_MODAL);
             stage.showAndWait();
-        } catch (IOException e) { e.printStackTrace(); }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @FXML

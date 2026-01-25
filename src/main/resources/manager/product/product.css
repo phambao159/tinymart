@@ -3,16 +3,6 @@
     -fx-background-color: #F8F9FA;
 }
 
-/* Thanh công cụ (Bộ lọc & Nút bấm) */
-#hSearch {
-    -fx-padding: 10 0; /* Chỉ padding trên dưới */
-    -fx-background-color: transparent;
-}
-#hAdd{
-    -fx-padding: 10 0; /* Chỉ padding trên dưới */
-    -fx-background-color: transparent;
-}
-
 /* Kiểu cho TextField tìm kiếm */
 .text-field {
     -fx-background-color: white;
@@ -86,4 +76,45 @@
 .scroll-pane .scroll-bar:vertical .thumb {
     -fx-background-color: #BDC3C7;
     -fx-background-radius: 5;
+}
+
+/* Container bọc các RadioButton trạng thái */
+.status-filter-container {
+    -fx-background-color: white;
+    -fx-border-color: #DCDDE1;
+    -fx-border-radius: 5;
+    -fx-background-radius: 5;
+    -fx-padding: 5 10;
+    -fx-alignment: CENTER_LEFT;
+}
+
+/* Kiểu dáng chung cho RadioButton */
+.radio-button {
+    -fx-font-size: 13px;
+    -fx-text-fill: #2C3E50;
+    -fx-cursor: hand;
+    -fx-padding: 0 5;
+}
+
+/* Tùy chỉnh vòng tròn của RadioButton */
+.radio-button .radio {
+    -fx-background-color: white;
+    -fx-border-color: #BDC3C7;
+    -fx-border-width: 1;
+}
+
+/* Màu khi được chọn (Đồng bộ với màu xanh lá của dự án) */
+.radio-button:selected .radio .dot {
+    -fx-background-color: #1E8449;
+    -fx-background-insets: 2;
+}
+
+.radio-button:selected {
+    -fx-text-fill: #1E8449;
+    -fx-font-weight: bold;
+}
+
+/* Hiệu ứng hover cho radio */
+.radio-button:hover .radio {
+    -fx-border-color: #1E8449;
 }

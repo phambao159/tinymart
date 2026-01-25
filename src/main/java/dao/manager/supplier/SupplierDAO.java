@@ -148,4 +148,19 @@ public class SupplierDAO {
         }
         return null;
     }
+
+    public boolean isPhoneExists(String phone, int excludeId) {
+        String sql = "SELECT COUNT(*) FROM Supplier WHERE PhoneNumber = ? AND SupplierID <> ?";
+        try (Connection conn = dc.getConnect(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, phone);
+            pstmt.setInt(2, excludeId);
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1) > 0;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
 }

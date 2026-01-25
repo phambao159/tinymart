@@ -40,23 +40,42 @@
                         <RowConstraints minHeight="10.0" prefHeight="100.0" vgrow="SOMETIMES" /> 
                     </rowConstraints>
                     <children>
-                        <Label text="Supplier ID:" />
+                        <Label text="Supplier ID" />
                         <TextField fx:id="txtId" editable="false" prefHeight="35.0" GridPane.columnIndex="1" />
                   
-                        <Label text="Supplier Name:" GridPane.rowIndex="1" />
+                        <HBox alignment="CENTER_LEFT" spacing="3.0" GridPane.rowIndex="1">
+                            <children>
+                                <Label text="Supplier Name" />
+                                <Label style="-fx-font-weight: bold;" text="*" textFill="#e74c3c" />
+                            </children>
+                        </HBox>
                         <TextField fx:id="txtName" prefHeight="35.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                   
-                        <Label text="Contact Person:" GridPane.rowIndex="2" />
+                        <HBox alignment="CENTER_LEFT" spacing="3.0" GridPane.rowIndex="2">
+                            <children>
+                                <Label text="Contact Person" />
+                                <Label style="-fx-font-weight: bold;" text="*" textFill="#e74c3c" />
+                            </children>
+                        </HBox>
                         <TextField fx:id="txtContactPerson" prefHeight="35.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
                   
-                        <Label text="Phone Number:" GridPane.rowIndex="3" />
+                        <HBox alignment="CENTER_LEFT" spacing="3.0" GridPane.rowIndex="3">
+                            <children>
+                                <Label text="Phone Number" />
+                                <Label style="-fx-font-weight: bold;" text="*" textFill="#e74c3c" />
+                            </children>
+                        </HBox>
                         <TextField fx:id="txtPhone" prefHeight="35.0" GridPane.columnIndex="1" GridPane.rowIndex="3" />
                   
-                        <Label text="Address:" GridPane.rowIndex="4" GridPane.valignment="TOP">
+                        <HBox alignment="TOP_LEFT" spacing="3.0" GridPane.rowIndex="4">
+                            <children>
+                                <Label text="Address" />
+                                <Label style="-fx-font-weight: bold;" text="*" textFill="#e74c3c" />
+                            </children>
                             <GridPane.margin>
                                 <Insets top="5.0" />
                             </GridPane.margin>
-                        </Label>
+                        </HBox>
                         <TextArea fx:id="txtAddress" prefHeight="100.0" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="4" />
                     </children>
                 </GridPane>

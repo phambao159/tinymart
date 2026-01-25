@@ -132,3 +132,49 @@
     -fx-faint-focus-color: transparent;
     -fx-focus-color: transparent;
 }
+
+/* 6. Định dạng Radio Button */
+.radio-button {
+    -fx-cursor: hand;
+    -fx-padding: 5 15 5 0;
+    -fx-text-fill: #566573; /* Màu chữ xám nhẹ khi chưa chọn */
+    -fx-font-family: "Segoe UI", Arial;
+    -fx-font-size: 13px;
+}
+
+/* Khi Radio Button được chọn */
+.radio-button:selected {
+    -fx-text-fill: #1E8449; /* Chuyển chữ sang xanh lục */
+    -fx-font-weight: bold;
+}
+
+/* Thay đổi màu sắc của vòng tròn bên ngoài */
+.radio-button .radio {
+    -fx-background-color: white;
+    -fx-border-color: #D5DBDB;
+    -fx-border-radius: 10px;
+    -fx-background-radius: 10px;
+    -fx-border-width: 1px;
+}
+
+/* Hiệu ứng khi di chuột qua */
+.radio-button:hover .radio {
+    -fx-border-color: #1E8449;
+}
+
+/* Khi được chọn - thay đổi màu vòng tròn và dấu chấm bên trong */
+.radio-button:selected .radio {
+    -fx-border-color: #1E8449;
+}
+
+.radio-button:selected .radio .dot {
+    -fx-background-color: #1E8449; /* Dấu chấm màu xanh lục */
+    -fx-background-insets: 2px; /* Khoảng cách giữa chấm và vòng ngoài */
+}
+
+/* Xóa viền mờ mặc định khi click vào */
+.radio-button:focused .radio {
+    -fx-background-insets: 0;
+    -fx-faint-focus-color: transparent;
+    -fx-focus-color: transparent;
+}

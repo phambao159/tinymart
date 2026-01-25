@@ -35,8 +35,7 @@
           <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
           <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
           <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" /> 
-        </rowConstraints>
+          </rowConstraints>
          <children>
             <Label text="Product Name:" GridPane.rowIndex="0" />
             <Label fx:id="lbProductName" text="Product Name" GridPane.columnIndex="1" GridPane.rowIndex="0">
@@ -54,11 +53,8 @@
             <Label text="Total Quantity:" GridPane.rowIndex="3" />
             <TextField fx:id="txtQuantity" prefWidth="230.0" GridPane.columnIndex="1" GridPane.rowIndex="3" />
 
-            <Label text="Shelf Quantity:" GridPane.rowIndex="4" />
-            <TextField fx:id="txtShelfQuantity" prefWidth="230.0" GridPane.columnIndex="1" GridPane.rowIndex="4" />
-
-            <Label text="Expiry Date:" GridPane.rowIndex="5" />
-            <DatePicker fx:id="dpExpiryDate" prefWidth="230.0" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+            <Label text="Expiry Date:" GridPane.rowIndex="4" />
+            <DatePicker fx:id="dpExpiryDate" prefWidth="230.0" GridPane.columnIndex="1" GridPane.rowIndex="4" />
          </children>
       </GridPane>
 

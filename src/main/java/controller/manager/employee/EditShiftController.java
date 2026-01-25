@@ -23,10 +23,8 @@ public class EditShiftController implements Initializable {
     private Shift selectedShift;
 
     @Override
-    public void initialize(URL url, ResourceBundle rb) {
-    }
+    public void initialize(URL url, ResourceBundle rb) {}
 
-    // Method to receive data from the main TableView
     public void initData(Shift shift) {
         this.selectedShift = shift;
         txtShiftName.setText(shift.getShiftName());
@@ -36,10 +34,56 @@ public class EditShiftController implements Initializable {
 
     @FXML
     private void onUpdate(ActionEvent event) {
+        resetStyles(); // Xóa viền đỏ cũ
+        
+        String newName = txtShiftName.getText().trim();
+        String startStr = txtStartTime.getText().trim();
+        String endStr = txtEndTime.getText().trim();
+
+        // 1. Kiểm tra rỗng (Not Null)
+        StringBuilder errorMsg = new StringBuilder();
+        if (newName.isEmpty()) {
+            errorMsg.append("- Shift Name is required.\n");
+            txtShiftName.setStyle("-fx-border-color: red;");
+        }
+        if (startStr.isEmpty()) {
+            errorMsg.append("- Start Time is required.\n");
+            txtStartTime.setStyle("-fx-border-color: red;");
+        }
+        if (endStr.isEmpty()) {
+            errorMsg.append("- End Time is required.\n");
+            txtEndTime.setStyle("-fx-border-color: red;");
+        }
+
+        if (errorMsg.length() > 0) {
+            showAlert(Alert.AlertType.WARNING, "Validation Error", errorMsg.toString());
+            return;
+        }
+
         try {
-            selectedShift.setShiftName(txtShiftName.getText().trim());
-            selectedShift.setStartTime(LocalTime.parse(txtStartTime.getText().trim()));
-            selectedShift.setEndTime(LocalTime.parse(txtEndTime.getText().trim()));
+            // 2. Kiểm tra trùng tên (Ngoại trừ tên hiện tại của chính nó)
+            // Nếu người dùng đổi sang một tên mới, ta mới check xem tên mới đó có ai dùng chưa
+            if (!newName.equalsIgnoreCase(selectedShift.getShiftName())) {
+                if (shiftDAO.isShiftNameExists(newName)) {
+                    showAlert(Alert.AlertType.ERROR, "Duplicate Name", "The name '" + newName + "' is already taken.");
+                    txtShiftName.setStyle("-fx-border-color: red;");
+                    return;
+                }
+            }
+
+            // 3. Parse giờ và kiểm tra logic
+            LocalTime startTime = LocalTime.parse(startStr);
+            LocalTime endTime = LocalTime.parse(endStr);
+
+            if (!startTime.isBefore(endTime)) {
+                showAlert(Alert.AlertType.WARNING, "Invalid Schedule", "Start time must be earlier than end time.");
+                return;
+            }
+
+            // 4. Cập nhật đối tượng
+            selectedShift.setShiftName(newName);
+            selectedShift.setStartTime(startTime);
+            selectedShift.setEndTime(endTime);
 
             if (shiftDAO.updateShift(selectedShift)) {
                 showAlert(Alert.AlertType.INFORMATION, "Success", "Shift updated successfully!");
@@ -47,6 +91,7 @@ public class EditShiftController implements Initializable {
             } else {
                 showAlert(Alert.AlertType.ERROR, "Error", "Failed to update shift in database.");
             }
+
         } catch (DateTimeParseException e) {
             showAlert(Alert.AlertType.ERROR, "Invalid Format", "Please use HH:mm format (e.g. 09:00).");
         }
@@ -56,7 +101,8 @@ public class EditShiftController implements Initializable {
     private void onDelete(ActionEvent event) {
         Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
         confirm.setTitle("Confirm Delete");
-        confirm.setContentText("Are you sure you want to delete this shift?");
+        confirm.setHeaderText("Delete Shift: " + selectedShift.getShiftName());
+        confirm.setContentText("Are you sure? This action cannot be undone.");
         
         Optional<ButtonType> result = confirm.showAndWait();
         if (result.isPresent() && result.get() == ButtonType.OK) {
@@ -72,6 +118,12 @@ public class EditShiftController implements Initializable {
     @FXML
     private void onClose(ActionEvent event) {
         ((Stage) txtShiftName.getScene().getWindow()).close();
+    }
+
+    private void resetStyles() {
+        txtShiftName.setStyle(null);
+        txtStartTime.setStyle(null);
+        txtEndTime.setStyle(null);
     }
 
     private void showAlert(Alert.AlertType type, String title, String content) {
