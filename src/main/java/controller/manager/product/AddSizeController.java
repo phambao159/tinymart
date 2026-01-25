@@ -9,6 +9,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
@@ -21,6 +22,8 @@ public class AddSizeController implements Initializable {
     private TextField txtType;
 
     private final SizeDAO sizeDAO = new SizeDAO();
+    @FXML
+    private Label title;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -34,21 +37,33 @@ public class AddSizeController implements Initializable {
     private void onSave(ActionEvent event) {
         String type = txtType.getText().trim();
 
-        // 1. Input Validation
+        // Reset style về mặc định trước khi kiểm tra
+        txtType.setStyle("");
+
+        // 1. Kiểm tra Not Null (Trống)
         if (type.isEmpty()) {
-            showAlert(Alert.AlertType.ERROR, "Input Error", "Please enter the size type!");
+            txtType.setStyle("-fx-border-color: #e74c3c; -fx-focus-color: #e74c3c;");
+            showAlert(Alert.AlertType.ERROR, "Input Error", "Size type cannot be empty!");
+            txtType.requestFocus();
             return;
         }
 
-        // 2. Create Model object (SizeID is 0 as it's auto-incremented in DB)
-        Size newSize = new Size(0, type, "Active");
+        // 2. Kiểm tra Unique (Duy nhất)
+        // Giả sử bạn thêm hàm isTypeExists(String type) vào SizeDAO
+        if (sizeDAO.isTypeExists(type)) {
+            txtType.setStyle("-fx-border-color: #e74c3c; -fx-focus-color: #e74c3c;");
+            showAlert(Alert.AlertType.ERROR, "Duplicate Error", "This size type already exists!");
+            txtType.requestFocus();
+            return;
+        }
 
-        // 3. Call DAO to perform database insertion
+        // 3. Thực hiện lưu nếu mọi thứ hợp lệ
+        Size newSize = new Size(0, type, "Active");
         if (sizeDAO.insert(newSize)) {
-            showAlert(Alert.AlertType.INFORMATION, "Success", "New size added successfully!");
-            closeWindow(event); // Close form after successful save
+            // Thông báo thành công (có thể dùng Toast hoặc Alert)
+            closeWindow(event);
         } else {
-            showAlert(Alert.AlertType.ERROR, "Failure", "Could not add size. Please try again!");
+            showAlert(Alert.AlertType.ERROR, "Failure", "Database error. Please try again!");
         }
     }
 

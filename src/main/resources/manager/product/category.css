@@ -1,106 +1,100 @@
-/* 1. Tổng thể nền */
+/* 1. Tổng thể */
 .mainFxmlClass {
-    -fx-background-color: #ffffff;
-    -fx-padding: 0 20 20 20;
+    -fx-background-color: #F4F7F6; /* Màu xám cực lợt giúp bảng nổi bật hơn */
 }
 
-/* 2. Thanh tìm kiếm và nút bấm (HBox trên cùng) */
-.hbox {
-    -fx-padding: 10 0 10 0;
+/* 2. Thanh công cụ */
+.top-bar {
+    -fx-padding: 5 0 5 0;
 }
 
-.text-field {
-    -fx-background-color: #ffffff;
+.search-field {
+    -fx-background-color: white;
     -fx-border-color: #D5DBDB;
-    -fx-border-radius: 4;
-    -fx-background-radius: 4;
-    -fx-min-width: 250px;
-    -fx-min-height: 35px;
+    -fx-border-radius: 20; /* Bo tròn thanh tìm kiếm */
+    -fx-background-radius: 20;
+    -fx-min-height: 38px;
+    -fx-padding: 0 15 0 15;
     -fx-font-size: 13px;
-    -fx-padding: 0 10 0 10;
+    -fx-transition: 0.3s;
 }
 
-.text-field:focused {
-    -fx-border-color: #1E8449; /* Màu xanh khi focus */
-    -fx-border-width: 1.5;
+.search-field:focused {
+    -fx-border-color: #27ae60;
+    -fx-effect: dropshadow(three-pass-box, rgba(39, 174, 96, 0.1), 5, 0, 0, 0);
 }
 
-/* 3. Nút "Add New Category" */
-.button {
-    -fx-background-color: #1E8449;
+/* 3. Nút bấm */
+.add-button {
+    -fx-background-color: #27ae60;
     -fx-text-fill: white;
     -fx-font-weight: bold;
+    -fx-min-height: 38px;
+    -fx-background-radius: 20;
     -fx-cursor: hand;
-    -fx-min-height: 35px;
-    -fx-padding: 0 20 0 20;
-    -fx-background-radius: 4;
+    -fx-padding: 0 25;
 }
 
-.button:hover {
-    -fx-background-color: #145A32;
-    -fx-effect: dropshadow(three-pass-box, rgba(30, 132, 73, 0.2), 10, 0, 0, 0);
+.add-button:hover {
+    -fx-background-color: #219150;
 }
 
-/* 4. Định dạng Bảng (TableView) */
+/* 4. RadioButton */
+.filter-group {
+    -fx-padding: 0 0 0 10;
+}
+
+.radio-button {
+    -fx-text-fill: #566573;
+    -fx-font-size: 13px;
+    -fx-cursor: hand;
+}
+
+.radio-button:selected {
+    -fx-text-fill: #27ae60;
+    -fx-font-weight: bold;
+}
+
+/* 5. TableView Custom */
 .table-view {
-    -fx-background-color: transparent;
+    -fx-background-color: white;
+    -fx-background-radius: 8;
+    -fx-border-radius: 8;
     -fx-border-color: #EAECEE;
-    -fx-border-width: 1;
+    -fx-padding: 5;
 }
 
-/* Tiêu đề cột (Header) */
+.table-view .column-header-background {
+    -fx-background-color: #f8f9f9;
+    -fx-background-radius: 8 8 0 0;
+}
+
 .table-view .column-header {
-    -fx-background-color: #F8F9F9;
-    -fx-border-color: #EAECEE;
-    -fx-border-width: 0 1 1 0;
-    -fx-padding: 10 5;
+    -fx-background-color: transparent;
+    -fx-size: 45px;
+    -fx-border-color: transparent transparent #EAECEE transparent;
 }
 
 .table-view .column-header .label {
     -fx-text-fill: #2C3E50;
     -fx-font-weight: bold;
-    -fx-font-size: 13px;
-    -fx-alignment: CENTER_LEFT;
 }
 
-/* Các hàng trong bảng (Rows) */
 .table-row-cell {
-    -fx-cell-size: 45px; /* Độ cao mỗi dòng */
+    -fx-cell-size: 50px;
+    -fx-background-color: white;
     -fx-border-color: transparent transparent #F2F4F4 transparent;
 }
 
-.table-row-cell:odd {
-    -fx-background-color: #ffffff;
-}
-
-.table-row-cell:even {
-    -fx-background-color: #FBFCFC;
-}
-
 .table-row-cell:hover {
-    -fx-background-color: #E8F6F3; /* Màu xanh lợt khi di chuột qua */
+    -fx-background-color: #F1F9F5;
 }
 
 .table-row-cell:selected {
     -fx-background-color: #D1F2EB;
-    -fx-background-background-color: #D1F2EB;
 }
 
-/* Các ô trong bảng (Cells) */
 .table-cell {
-    -fx-text-fill: #34495E;
-    -fx-font-size: 13px;
     -fx-alignment: CENTER_LEFT;
-    -fx-padding: 0 10 0 10;
-}
-
-/* Thanh cuộn (Scrollbar) tùy chỉnh nhẹ nhàng */
-.table-view .virtual-flow .scroll-bar:vertical,
-.table-view .virtual-flow .scroll-bar:horizontal {
-    -fx-background-color: transparent;
-}
-
-.table-view .scroll-bar .thumb {
-    -fx-background-color: #D5DBDB;
-    -fx-background-radius: 5;
+    -fx-padding: 0 15;
 }

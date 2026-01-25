@@ -14,10 +14,10 @@ public class ProductDAO {
 
     private final DBConnection dc = new DBConnection();
 
-    public List<ProductSummary> getProductSummaries(String keyword, String category, String size, String promotion) {
+    public List<ProductSummary> getProductSummaries(String keyword, String category, String size, String promotion, String status) {
         List<ProductSummary> productSummaries = new ArrayList<>();
 
-        // Cập nhật SQL: Lấy PromotionID từ bảng PS (ProductSize) thay vì bảng P (Product)
+        // 1. Khởi tạo StringBuilder SQL
         StringBuilder sql = new StringBuilder(
                 "SELECT P.ProductID, P.Name, P.CategoryID, P.Unit, P.Image, P.Status, "
                 + "MIN(PS.SellingPrice) AS MinSellingPrice, "
@@ -28,10 +28,11 @@ public class ProductDAO {
                 + "LEFT JOIN Import I ON ID.ImportID = I.ImportID "
                 + "LEFT JOIN Category C ON P.CategoryID = C.CategoryID "
                 + "LEFT JOIN Size S ON PS.SizeID = S.SizeID "
-                + "LEFT JOIN Promotion PR ON PS.PromotionID = PR.PromotionID " // JOIN qua bảng PS
+                + "LEFT JOIN Promotion PR ON PS.PromotionID = PR.PromotionID "
                 + "WHERE 1=1 "
         );
 
+        // 2. Thêm các điều kiện lọc động
         if (keyword != null && !keyword.isEmpty()) {
             sql.append(" AND P.Name LIKE ? ");
         }
@@ -44,13 +45,20 @@ public class ProductDAO {
         if (promotion != null && !promotion.isEmpty()) {
             sql.append(" AND PR.Name = ? ");
         }
+        // Lọc theo trạng thái (Active/Inactive)
+        if (status != null && !status.isEmpty()) {
+            sql.append(" AND P.Status = ? ");
+        }
 
-        // Bỏ P.PromotionID khỏi GROUP BY vì nó không còn ở bảng Product
+        // 3. Group By và Order By
         sql.append(" GROUP BY P.ProductID, P.Name, P.CategoryID, P.Unit, P.Image, P.Status ");
-        sql.append(" ORDER BY P.ProductID ");
+        sql.append(" ORDER BY P.ProductID DESC");
 
         try (Connection conn = dc.getConnect(); PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+
             int index = 1;
+
+            // 4. Set tham số cho PreparedStatement theo đúng thứ tự
             if (keyword != null && !keyword.isEmpty()) {
                 ps.setString(index++, "%" + keyword + "%");
             }
@@ -63,10 +71,13 @@ public class ProductDAO {
             if (promotion != null && !promotion.isEmpty()) {
                 ps.setString(index++, promotion);
             }
+            if (status != null && !status.isEmpty()) {
+                ps.setString(index++, status);
+            }
 
+            // 5. Thực thi và map dữ liệu
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
-                    // Sử dụng Constructor của ProductSummary đã lược bỏ PromotionID
                     productSummaries.add(new ProductSummary(
                             rs.getInt("ProductID"),
                             rs.getString("Name"),
@@ -130,6 +141,35 @@ public class ProductDAO {
     }
 
     public List<ProductSummary> getProductSummaries() {
-        return getProductSummaries(null, null, null, null);
+        return getProductSummaries(null, null, null, null, null);
     }
+
+    public boolean isNameExists(String name) {
+        String sql = "SELECT COUNT(*) FROM Product WHERE name = ?";
+        try (Connection conn = dc.getConnect(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, name);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1) > 0;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+    public boolean isNameExistsForEdit(String name, int currentID) {
+    // Câu lệnh SQL này tìm xem có sản phẩm NÀO KHÁC (ID khác) đang dùng tên này không
+    String sql = "SELECT COUNT(*) FROM Product WHERE name = ? AND productID != ?";
+    try (Connection conn = dc.getConnect(); PreparedStatement ps = conn.prepareStatement(sql)) {
+        ps.setString(1, name);
+        ps.setInt(2, currentID); // Truyền ID của sản phẩm đang sửa vào đây
+        ResultSet rs = ps.executeQuery();
+        if (rs.next()) {
+            return rs.getInt(1) > 0;
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+    return false;
+}
 }

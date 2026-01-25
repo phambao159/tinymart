@@ -601,7 +601,8 @@ public class CashierController implements Initializable {
                 } catch (Exception e) {
                 }
             }
-
+            
+            
             if (currentCustomer != null) {
                 int pointsEarned = (int) (finalTotal / 10);
 

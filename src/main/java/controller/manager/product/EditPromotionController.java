@@ -33,7 +33,7 @@ public class EditPromotionController implements Initializable {
 
     private final PromotionDAO promotionDAO = new PromotionDAO();
     private Promotion selectedPromotion;
-    
+
     @FXML
     private Label title;
     @FXML
@@ -55,7 +55,7 @@ public class EditPromotionController implements Initializable {
         txtID.setText(String.valueOf(promotion.getPromotionID()));
         txtName.setText(promotion.getName());
         txtDescription.setText(promotion.getDescription());
-        cbType.setValue(promotion.getType()); 
+        cbType.setValue(promotion.getType());
         txtValue.setText(String.valueOf(promotion.getValue()));
         dpStart.setValue(promotion.getStartDate());
         dpEnd.setValue(promotion.getEndDate());
@@ -64,44 +64,108 @@ public class EditPromotionController implements Initializable {
 
     @FXML
     private void onSave(ActionEvent event) {
+        // 1. Reset styles về mặc định
+        resetStyles();
+
         try {
-            // 1. Kiểm tra dữ liệu
+            // Lấy dữ liệu từ giao diện
             String name = txtName.getText().trim();
+            String description = txtDescription.getText().trim();
             String type = cbType.getValue();
             String valueStr = txtValue.getText().trim();
             LocalDate start = dpStart.getValue();
             LocalDate end = dpEnd.getValue();
+            String status = cbStatus.getValue();
 
-            if (name.isEmpty() || type == null || type.isEmpty() || valueStr.isEmpty() || start == null || end == null) {
-                showAlert(Alert.AlertType.ERROR, "Form Error", "Please fill in all required fields!");
+            // 2. Kiểm tra Not Null và Validation cho từng trường
+            if (name.isEmpty()) {
+                showError(txtName, "Promotion name cannot be empty!");
                 return;
             }
 
+
+            if (type == null) {
+                showError(cbType, "Please select a promotion type!");
+                return;
+            }
+
+            // Kiểm tra Value
+            double value;
+            try {
+                if (valueStr.isEmpty()) {
+                    throw new Exception("Value cannot be empty!");
+                }
+                value = Double.parseDouble(valueStr);
+                if (value <= 0) {
+                    throw new Exception("Value must be greater than 0!");
+                }
+            } catch (Exception e) {
+                showError(txtValue, e instanceof NumberFormatException ? "Value must be a valid number!" : e.getMessage());
+                return;
+            }
+
+            if (start == null) {
+                showError(dpStart, "Please select a start date!");
+                return;
+            }
+
+            if (end == null) {
+                showError(dpEnd, "Please select an end date!");
+                return;
+            }
+
+            // Kiểm tra logic ngày tháng
             if (end.isBefore(start)) {
-                showAlert(Alert.AlertType.ERROR, "Date Error", "End date must be after start date!");
+                showError(dpEnd, "End date cannot be earlier than start date!");
                 return;
             }
 
-            // 2. Cập nhật đối tượng
+            if (status == null) {
+                showError(cbStatus, "Please select a status!");
+                return;
+            }
+
+            // 3. Cập nhật đối tượng và gọi DAO
             selectedPromotion.setName(name);
-            selectedPromotion.setDescription(txtDescription.getText().trim());
+            selectedPromotion.setDescription(description);
             selectedPromotion.setType(type);
-            selectedPromotion.setValue(Double.parseDouble(valueStr));
+            selectedPromotion.setValue(value);
             selectedPromotion.setStartDate(start);
             selectedPromotion.setEndDate(end);
-            selectedPromotion.setStatus(cbStatus.getValue());
+            selectedPromotion.setStatus(status);
 
-            // 3. Gọi DAO cập nhật database
             if (promotionDAO.update(selectedPromotion)) {
-                showAlert(Alert.AlertType.INFORMATION, "Success", "Promotion updated successfully!");
-                promotionDAO.forceUpdateExpired();
+                promotionDAO.forceUpdateExpired(); // Cập nhật trạng thái hết hạn nếu cần
                 closeWindow(event);
             } else {
                 showAlert(Alert.AlertType.ERROR, "Database Error", "Failed to update promotion.");
             }
-        } catch (NumberFormatException e) {
-            showAlert(Alert.AlertType.ERROR, "Input Error", "Value must be a valid number!");
+
+        } catch (Exception e) {
+            showAlert(Alert.AlertType.ERROR, "Error", "An unexpected error occurred: " + e.getMessage());
         }
+    }
+
+    /**
+     * Hiển thị lỗi: Đổi màu viền và thông báo
+     */
+    private void showError(Control control, String message) {
+        control.setStyle("-fx-border-color: #e74c3c; -fx-border-width: 1.5px;");
+        control.requestFocus();
+        showAlert(Alert.AlertType.ERROR, "Validation Error", message);
+    }
+
+    /**
+     * Xóa bỏ các đánh dấu lỗi trước đó
+     */
+    private void resetStyles() {
+        txtName.setStyle("");
+        txtDescription.setStyle("");
+        cbType.setStyle("");
+        txtValue.setStyle("");
+        dpStart.setStyle("");
+        dpEnd.setStyle("");
+        cbStatus.setStyle("");
     }
 
     @FXML

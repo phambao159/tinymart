@@ -17,18 +17,16 @@ public class ShiftDAO {
     public List<Shift> getAllShifts() {
         List<Shift> list = new ArrayList<>();
         String sql = "SELECT * FROM Shift";
-        
-        try (Connection conn = dc.getConnect();
-             PreparedStatement pstmt = conn.prepareStatement(sql);
-             ResultSet rs = pstmt.executeQuery()) {
-            
+
+        try (Connection conn = dc.getConnect(); PreparedStatement pstmt = conn.prepareStatement(sql); ResultSet rs = pstmt.executeQuery()) {
+
             while (rs.next()) {
                 // Converting SQL Time to Java LocalTime
                 list.add(new Shift(
-                    rs.getInt("ShiftID"),
-                    rs.getTime("StartTime").toLocalTime(),
-                    rs.getTime("EndTime").toLocalTime(),
-                    rs.getString("ShiftName")
+                        rs.getInt("ShiftID"),
+                        rs.getTime("StartTime").toLocalTime(),
+                        rs.getTime("EndTime").toLocalTime(),
+                        rs.getString("ShiftName")
                 ));
             }
         } catch (SQLException e) {
@@ -42,15 +40,14 @@ public class ShiftDAO {
      */
     public boolean addShift(Shift shift) {
         String sql = "INSERT INTO Shift (StartTime, EndTime, ShiftName) VALUES (?, ?, ?)";
-        
-        try (Connection conn = dc.getConnect();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            
+
+        try (Connection conn = dc.getConnect(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
             // Converting LocalTime to SQL Time
             pstmt.setTime(1, Time.valueOf(shift.getStartTime()));
             pstmt.setTime(2, Time.valueOf(shift.getEndTime()));
             pstmt.setString(3, shift.getShiftName());
-            
+
             return pstmt.executeUpdate() > 0;
         } catch (SQLException e) {
             System.err.println("Error adding new shift: " + e.getMessage());
@@ -63,15 +60,14 @@ public class ShiftDAO {
      */
     public boolean updateShift(Shift shift) {
         String sql = "UPDATE Shift SET StartTime = ?, EndTime = ?, ShiftName = ? WHERE ShiftID = ?";
-        
-        try (Connection conn = dc.getConnect();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            
+
+        try (Connection conn = dc.getConnect(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
             pstmt.setTime(1, Time.valueOf(shift.getStartTime()));
             pstmt.setTime(2, Time.valueOf(shift.getEndTime()));
             pstmt.setString(3, shift.getShiftName());
             pstmt.setInt(4, shift.getShiftID());
-            
+
             return pstmt.executeUpdate() > 0;
         } catch (SQLException e) {
             System.err.println("Error updating shift ID " + shift.getShiftID() + ": " + e.getMessage());
@@ -84,10 +80,9 @@ public class ShiftDAO {
      */
     public boolean deleteShift(int shiftID) {
         String sql = "DELETE FROM Shift WHERE ShiftID = ?";
-        
-        try (Connection conn = dc.getConnect();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            
+
+        try (Connection conn = dc.getConnect(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
             pstmt.setInt(1, shiftID);
             return pstmt.executeUpdate() > 0;
         } catch (SQLException e) {
@@ -102,18 +97,17 @@ public class ShiftDAO {
     public List<Shift> searchByShiftName(String name) {
         List<Shift> list = new ArrayList<>();
         String sql = "SELECT * FROM Shift WHERE ShiftName LIKE ?";
-        
-        try (Connection conn = dc.getConnect();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            
+
+        try (Connection conn = dc.getConnect(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
             pstmt.setString(1, "%" + name + "%");
             try (ResultSet rs = pstmt.executeQuery()) {
                 while (rs.next()) {
                     list.add(new Shift(
-                        rs.getInt("ShiftID"),
-                        rs.getTime("StartTime").toLocalTime(),
-                        rs.getTime("EndTime").toLocalTime(),
-                        rs.getString("ShiftName")
+                            rs.getInt("ShiftID"),
+                            rs.getTime("StartTime").toLocalTime(),
+                            rs.getTime("EndTime").toLocalTime(),
+                            rs.getString("ShiftName")
                     ));
                 }
             }
@@ -121,5 +115,25 @@ public class ShiftDAO {
             System.err.println("Error searching for shift '" + name + "': " + e.getMessage());
         }
         return list;
+    }
+
+    public boolean isShiftNameExists(String name) {
+        String sql = "SELECT COUNT(*) FROM Shift WHERE ShiftName = ?";
+
+        try (Connection conn = dc.getConnect(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, name);
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    int count = rs.getInt(1);
+                    return count > 0; // Nếu count > 0 nghĩa là đã tồn tại
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error checking shift name existence: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return false; // Mặc định trả về false nếu có lỗi hoặc không tìm thấy
     }
 }

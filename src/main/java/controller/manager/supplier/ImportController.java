@@ -48,84 +48,108 @@ public class ImportController implements Initializable {
     @FXML
     private TableColumn<Import, String> colStatus;
 
+    @FXML
+    private HBox hSearch;
+    @FXML
+    private ToggleGroup filterGroup; // Phải trùng với fx:id trong FXML
+
     private final ImportDAO importDAO = new ImportDAO();
     private final SupplierDAO supplierDAO = new SupplierDAO();
     private final EmployeeDAO employeeDAO = new EmployeeDAO();
     private final ImportDetailDAO detailDAO = new ImportDetailDAO();
 
     private ObservableList<Import> allImports = FXCollections.observableArrayList();
-    @FXML
-    private HBox hSearch;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         setupColumns();
         loadImportData();
 
-        // Tìm kiếm nhanh (Instant Search)
-        txtSearch.textProperty().addListener((observable, oldValue, newValue) -> filterData(newValue));
+        // 1. Lắng nghe sự thay đổi của ô tìm kiếm
+        txtSearch.textProperty().addListener((observable, oldValue, newValue) -> applyFilters());
 
-        // Double click để xem chi tiết
+        // 2. Lắng nghe sự thay đổi của ToggleGroup (RadioButton)
+        filterGroup.selectedToggleProperty().addListener((observable, oldValue, newValue) -> applyFilters());
+
+        // 3. Double click để xem chi tiết
         tbImport.setRowFactory(tv -> {
             TableRow<Import> row = new TableRow<>();
             row.setOnMouseClicked(event -> {
-                // Kiểm tra Double Click và dòng không rỗng
                 if (event.getClickCount() == 2 && (!row.isEmpty())) {
-                    Import selectedImport = row.getItem();
-
-                    // In log để kiểm tra
-                    System.out.println("Double clicked on Import ID: " + selectedImport.getImportID());
-
-                    // Gọi hàm mở Popup đã có logic FXMLLoader
-                    openEditImportPopup(selectedImport);
+                    openEditImportPopup(row.getItem());
                 }
             });
             return row;
         });
     }
 
+    /**
+     * Hàm quan trọng nhất: Kết hợp lọc theo từ khóa VÀ lọc theo trạng thái
+     */
+    private void applyFilters() {
+        String keyword = txtSearch.getText() == null ? "" : txtSearch.getText().toLowerCase().trim();
+        
+        // Lấy text của RadioButton đang chọn (All, Completed, Pending, Canceled)
+        RadioButton selectedRadio = (RadioButton) filterGroup.getSelectedToggle();
+        String statusFilter = (selectedRadio != null) ? selectedRadio.getText() : "All";
+
+        ObservableList<Import> filteredList = allImports.stream()
+                .filter(item -> {
+                    // Lọc theo từ khóa (ID hoặc Trạng thái)
+                    boolean matchesSearch = keyword.isEmpty() 
+                            || String.valueOf(item.getImportID()).contains(keyword)
+                            || item.getStatus().toLowerCase().contains(keyword);
+
+                    // Lọc theo trạng thái RadioButton
+                    boolean matchesStatus = statusFilter.equals("All") 
+                            || item.getStatus().equalsIgnoreCase(statusFilter);
+
+                    return matchesSearch && matchesStatus;
+                })
+                .collect(Collectors.toCollection(FXCollections::observableArrayList));
+
+        tbImport.setItems(filteredList);
+    }
+
     private void setupColumns() {
         colID.setCellValueFactory(new PropertyValueFactory<>("importID"));
 
-        // 1. Hiển thị Tên nhà cung cấp thay vì ID
+        // Hiển thị Tên nhà cung cấp
         colSupplierID.setCellValueFactory(new PropertyValueFactory<>("supplierID"));
         colSupplierID.setCellFactory(tc -> new TableCell<>() {
             @Override
             protected void updateItem(Integer id, boolean empty) {
                 super.updateItem(id, empty);
-                if (empty || id == null) {
-                    setText(null);
-                } else {
+                if (empty || id == null) setText(null);
+                else {
                     var s = supplierDAO.getSupplierById(id);
                     setText(s != null ? s.getName() : "Unknown ID: " + id);
                 }
             }
         });
 
-        // 2. Hiển thị Tên nhân viên thay vì ID
+        // Hiển thị Tên nhân viên
         colEmployeeID.setCellValueFactory(new PropertyValueFactory<>("employeeID"));
         colEmployeeID.setCellFactory(tc -> new TableCell<>() {
             @Override
             protected void updateItem(Integer id, boolean empty) {
                 super.updateItem(id, empty);
-                if (empty || id == null) {
-                    setText(null);
-                } else {
+                if (empty || id == null) setText(null);
+                else {
                     var e = employeeDAO.getEmployeeById(id);
                     setText(e != null ? e.getFullName() : "Staff ID: " + id);
                 }
             }
         });
 
-        // 3. Hiển thị danh sách sản phẩm (Dùng comma-separated string)
+        // Hiển thị danh sách sản phẩm
         colProduct.setCellValueFactory(new PropertyValueFactory<>("importID"));
         colProduct.setCellFactory(tc -> new TableCell<>() {
             @Override
             protected void updateItem(Integer importID, boolean empty) {
                 super.updateItem(importID, empty);
-                if (empty || importID == null) {
-                    setText(null);
-                } else {
+                if (empty || importID == null) setText(null);
+                else {
                     List<ImportDetail> details = detailDAO.getDetailsByImportID(importID);
                     String summary = details.stream()
                             .map(ImportDetail::getProductName)
@@ -136,44 +160,34 @@ public class ImportController implements Initializable {
             }
         });
 
-        // 4. Status Column (SỬA ĐỔI CHÍNH Ở ĐÂY)
-        // 4. Status Column (Cập nhật màu sắc: Completed - Xanh, Pending - Vàng)
+        // Định dạng Badge cho Status
         colStatus.setCellValueFactory(new PropertyValueFactory<>("status"));
         colStatus.setCellFactory(tc -> new TableCell<>() {
             @Override
             protected void updateItem(String status, boolean empty) {
                 super.updateItem(status, empty);
                 if (empty || status == null) {
-                    setText(null);
                     setGraphic(null);
                 } else {
-                    // Tạo một Label để làm Badge (nhãn)
                     Label statusLabel = new Label(status.toUpperCase());
-
-                    // Cấu hình Style chung: Chữ trắng, bo góc, khoảng cách đệm
-                    String baseStyle = "-fx-text-fill: white; "
-                            + "-fx-font-weight: bold; "
-                            + "-fx-padding: 5 10 5 10; "
-                            + "-fx-background-radius: 5; ";
-
+                    String baseStyle = "-fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 3 8 3 8; -fx-background-radius: 10; -fx-font-size: 11px;";
+                    
                     if (status.equalsIgnoreCase("Completed")) {
-                        // Background màu xanh #1E8449
                         statusLabel.setStyle(baseStyle + "-fx-background-color: #1E8449;");
                     } else if (status.equalsIgnoreCase("Pending")) {
-                        // Background màu vàng (Gold/Orange)
                         statusLabel.setStyle(baseStyle + "-fx-background-color: #FF9800;");
+                    } else if (status.equalsIgnoreCase("Canceled")) {
+                        statusLabel.setStyle(baseStyle + "-fx-background-color: #E74C3C;");
                     } else {
-                        // Màu mặc định cho các trạng thái khác (nếu có)
                         statusLabel.setStyle(baseStyle + "-fx-background-color: #BDC3C7;");
                     }
-
-                    setGraphic(statusLabel); // Hiển thị Label vào trong ô
-                    setText(null); // Xóa text mặc định của Cell để không bị trùng
+                    setGraphic(statusLabel);
+                    setText(null);
                 }
             }
         });
 
-        // 5. Định dạng ngày tháng
+        // Định dạng ngày
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
         colDate.setCellValueFactory(new PropertyValueFactory<>("receiptDate"));
         colDate.setCellFactory(tc -> new TableCell<>() {
@@ -184,7 +198,7 @@ public class ImportController implements Initializable {
             }
         });
 
-        // 6. Định dạng tiền tệ
+        // Định dạng tiền tệ
         colTotal.setCellValueFactory(new PropertyValueFactory<>("totalCost"));
         colTotal.setCellFactory(tc -> new TableCell<>() {
             @Override
@@ -197,20 +211,12 @@ public class ImportController implements Initializable {
 
     private void loadImportData() {
         allImports.setAll(importDAO.getAllImports());
-        tbImport.setItems(allImports);
+        applyFilters(); // Đảm bảo khi load dữ liệu vẫn tuân thủ bộ lọc đang chọn
     }
 
-    private void filterData(String keyword) {
-        if (keyword == null || keyword.isEmpty()) {
-            tbImport.setItems(allImports);
-            return;
-        }
-        String lowerCaseFilter = keyword.toLowerCase();
-        ObservableList<Import> filteredList = allImports.stream()
-                .filter(i -> String.valueOf(i.getImportID()).contains(lowerCaseFilter)
-                || i.getStatus().toLowerCase().contains(lowerCaseFilter))
-                .collect(Collectors.toCollection(FXCollections::observableArrayList));
-        tbImport.setItems(filteredList);
+    @FXML
+    private void onSearch(ActionEvent event) {
+        applyFilters();
     }
 
     @FXML
@@ -224,50 +230,29 @@ public class ImportController implements Initializable {
             stage.initModality(Modality.WINDOW_MODAL);
             stage.initOwner(tbImport.getScene().getWindow());
             stage.showAndWait();
-
-            loadImportData(); // Refresh lại bảng sau khi đóng cửa sổ thêm mới
+            loadImportData();
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    private void openImportDetails(Import selected) {
-        // Logic mở popup xem chi tiết chi tiết (View Only)
-        System.out.println("Opening Details for Import ID: " + selected.getImportID());
-    }
-
-    @FXML
-    private void onSearch(ActionEvent event) {
-        filterData(txtSearch.getText());
-    }
-
     private void openEditImportPopup(Import selected) {
         try {
-            // 1. Load file FXML của màn hình Edit
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/manager/supplier/editImport.fxml"));
             Parent root = loader.load();
-
-            // 2. Lấy Controller của màn hình Edit
             EditImportController controller = loader.getController();
-
-            // 3. QUAN TRỌNG: Truyền đối tượng Import vừa chọn sang Controller mới
             controller.setData(selected);
 
-            // 4. Hiển thị cửa sổ mới dưới dạng Modal (bắt buộc xử lý xong mới được quay lại)
             Stage stage = new Stage();
             stage.setTitle("Edit Import Receipt: #" + selected.getImportID());
             stage.setScene(new Scene(root));
             stage.initModality(Modality.WINDOW_MODAL);
             stage.initOwner(tbImport.getScene().getWindow());
-
             stage.showAndWait();
-
-            // 5. Sau khi đóng cửa sổ Edit, tự động làm mới bảng dữ liệu ở màn hình chính
+            
             loadImportData();
-
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
-
 }

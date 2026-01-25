@@ -16,11 +16,17 @@ public class EditCategoryController {
     private TextField txtName;
     @FXML
     private TextArea txtDescription;
+    @FXML
+    private Label title;
 
     private CategoryDAO categoryDAO = new CategoryDAO();
     private Category selectedCategory;
+    private Runnable refreshCallback;
 
-    // Hàm này dùng để truyền dữ liệu từ màn hình chính sang form edit
+    public void setOnSave(Runnable callback) {
+        this.refreshCallback = callback;
+    }
+
     public void initData(Category category) {
         this.selectedCategory = category;
         txtID.setText(String.valueOf(category.getCategoryID()));
@@ -30,23 +36,48 @@ public class EditCategoryController {
 
     @FXML
     private void onSave(ActionEvent event) {
+        resetStyles(); // Xóa viền đỏ cũ
+
         String name = txtName.getText().trim();
         String description = txtDescription.getText().trim();
+        int currentID = selectedCategory.getCategoryID();
 
+        // 1. Kiểm tra Not Null cho Name
         if (name.isEmpty()) {
-            showAlert(Alert.AlertType.ERROR, "Error", "Name cannot be empty!");
+            showError(txtName, "Category name cannot be empty!");
             return;
         }
 
+        // 2. Kiểm tra trùng tên (loại trừ chính nó)
+        // Lưu ý: Bạn cần thêm hàm isNameExistsForEdit vào CategoryDAO tương tự như ProductDAO
+        if (categoryDAO.isNameExistsForEdit(name, currentID)) {
+            showError(txtName, "This category name already exists!");
+            return;
+        }
+
+        // 3. Cập nhật dữ liệu (Description có thể để trống)
         selectedCategory.setName(name);
-        selectedCategory.setDescription(description);
+        selectedCategory.setDescription(description.isEmpty() ? null : description);
 
         if (categoryDAO.update(selectedCategory)) {
             showAlert(Alert.AlertType.INFORMATION, "Success", "Update successful!");
+            if (refreshCallback != null) refreshCallback.run();
             closeWindow(event);
         } else {
             showAlert(Alert.AlertType.ERROR, "Error", "Update failed!");
         }
+    }
+
+    // --- Helpers để bôi đỏ và reset style ---
+    
+    private void showError(Control control, String message) {
+        control.setStyle("-fx-border-color: #e74c3c; -fx-border-width: 1.5px;");
+        control.requestFocus();
+        showAlert(Alert.AlertType.ERROR, "Validation Error", message);
+    }
+
+    private void resetStyles() {
+        txtName.setStyle("");
     }
 
     @FXML
@@ -60,9 +91,10 @@ public class EditCategoryController {
         if (result.isPresent() && result.get() == ButtonType.OK) {
             if (categoryDAO.delete(selectedCategory.getCategoryID())) {
                 showAlert(Alert.AlertType.INFORMATION, "Success", "Category deleted!");
+                if (refreshCallback != null) refreshCallback.run();
                 closeWindow(event);
             } else {
-                showAlert(Alert.AlertType.ERROR, "Error", "Cannot delete! This category might be in use.");
+                showAlert(Alert.AlertType.ERROR, "Error", "Cannot delete! This category might be in use by products.");
             }
         }
     }
@@ -80,7 +112,8 @@ public class EditCategoryController {
     private void showAlert(Alert.AlertType type, String title, String content) {
         Alert alert = new Alert(type);
         alert.setTitle(title);
+        alert.setHeaderText(null);
         alert.setContentText(content);
         alert.showAndWait();
     }
-}   
+}

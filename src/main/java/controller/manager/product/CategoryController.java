@@ -14,12 +14,8 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.input.MouseEvent;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
@@ -29,7 +25,6 @@ public class CategoryController implements Initializable {
     private TextField txtSearch;
     @FXML
     private TableView<Category> tbCategory;
-
     @FXML
     private TableColumn<Category, Integer> colID;
     @FXML
@@ -37,20 +32,33 @@ public class CategoryController implements Initializable {
     @FXML
     private TableColumn<Category, String> colDes;
 
-    private ObservableList<Category> categoryData = FXCollections.observableArrayList();
-    private CategoryDAO categoryDAO = new CategoryDAO();
+    @FXML
+    private RadioButton rbActive, rbInactive;
+    @FXML
+    private ToggleGroup statusGroup;
+
+    private final ObservableList<Category> categoryData = FXCollections.observableArrayList();
+    private final CategoryDAO categoryDAO = new CategoryDAO();
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         setupTableColumns();
         loadData();
 
+        // Lắng nghe thay đổi trên RadioButtons để lọc Active/Inactive
+        statusGroup.selectedToggleProperty().addListener((observable, oldValue, newValue) -> {
+            loadData();
+        });
+
         // Xử lý Double Click vào dòng trong bảng
-        tbCategory.setOnMouseClicked((MouseEvent event) -> {
-            // Kiểm tra click 2 lần và dòng được chọn không rỗng
-            if (event.getClickCount() == 2 && tbCategory.getSelectionModel().getSelectedItem() != null) {
-                openEditForm(tbCategory.getSelectionModel().getSelectedItem());
-            }
+        tbCategory.setRowFactory(tv -> {
+            TableRow<Category> row = new TableRow<>();
+            row.setOnMouseClicked(event -> {
+                if (event.getClickCount() == 2 && (!row.isEmpty())) {
+                    openEditForm(row.getItem());
+                }
+            });
+            return row;
         });
     }
 
@@ -62,7 +70,11 @@ public class CategoryController implements Initializable {
 
     private void loadData() {
         categoryData.clear();
-        List<Category> dataFromDB = categoryDAO.getData();
+        String status = rbActive.isSelected() ? "Active" : "Inactive";
+        
+        // Bạn cần viết thêm hàm getDataByStatus(status) trong CategoryDAO
+        List<Category> dataFromDB = categoryDAO.getDataByStatus(status);
+        
         categoryData.addAll(dataFromDB);
         tbCategory.setItems(categoryData);
     }
@@ -70,14 +82,15 @@ public class CategoryController implements Initializable {
     @FXML
     private void onSearch(ActionEvent event) {
         String keyword = txtSearch.getText().trim();
+        String status = rbActive.isSelected() ? "Active" : "Inactive";
+        
         categoryData.clear();
-
+        // Bạn nên viết hàm searchByNameAndStatus trong DAO để search chuẩn hơn
         List<Category> result = keyword.isEmpty() 
-                ? categoryDAO.getData() 
-                : categoryDAO.searchByName(keyword);
+                ? categoryDAO.getDataByStatus(status) 
+                : categoryDAO.searchByNameAndStatus(keyword, status);
 
         categoryData.addAll(result);
-        tbCategory.setItems(categoryData);
     }
 
     @FXML
@@ -85,28 +98,19 @@ public class CategoryController implements Initializable {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/manager/product/addCategory.fxml"));
             Parent root = loader.load();
+            
+            AddCategoryController controller = loader.getController();
+            controller.setOnSave(this::loadData); // Callback để refresh bảng
+
             Stage stage = new Stage();
             stage.setTitle("Add New Category");
             stage.initModality(Modality.APPLICATION_MODAL);
             stage.setScene(new Scene(root));
-            stage.setOnHiding(e -> loadData()); // Refresh sau khi đóng
             stage.show();
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
-
-    // Nút Edit (nếu bạn vẫn muốn giữ nút bấm trên giao diện)
-    @FXML
-    private void onEdit(ActionEvent event) {
-        Category selected = tbCategory.getSelectionModel().getSelectedItem();
-        if (selected != null) {
-            openEditForm(selected);
-        } else {
-            showAlert("Thông báo", "Vui lòng chọn một danh mục để sửa!");
-        }
-    }
-
 
     private void openEditForm(Category selected) {
         try {
@@ -115,24 +119,15 @@ public class CategoryController implements Initializable {
 
             EditCategoryController controller = loader.getController();
             controller.initData(selected);
+            controller.setOnSave(this::loadData); // Callback để refresh bảng
 
             Stage stage = new Stage();
             stage.setTitle("Edit Category: " + selected.getName());
             stage.initModality(Modality.APPLICATION_MODAL);
             stage.setScene(new Scene(root));
-            stage.setOnHiding(e -> loadData()); // Tự động load lại bảng khi đóng form Edit/Delete
             stage.show();
         } catch (IOException e) {
-            System.err.println("Lỗi load EditCategory.fxml: " + e.getMessage());
             e.printStackTrace();
         }
-    }
-
-    private void showAlert(String title, String content) {
-        Alert alert = new Alert(Alert.AlertType.WARNING);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(content);
-        alert.showAndWait();
     }
 }

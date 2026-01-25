@@ -17,10 +17,8 @@ public class CategoryDAO {
     public List<Category> getData() {
         List<Category> categories = new ArrayList<>();
         String sql = "SELECT CategoryID, Name, Description, Status FROM Category WHERE Status = 'Active'";
-        
-        try (Connection conn = dc.getConnect(); 
-             PreparedStatement ps = conn.prepareStatement(sql); 
-             ResultSet rs = ps.executeQuery()) {
+
+        try (Connection conn = dc.getConnect(); PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
                 categories.add(new Category(
@@ -40,8 +38,7 @@ public class CategoryDAO {
     // 2. INSERT: Mặc định Status trong Database nên là 'Active'
     public boolean insert(Category category) {
         String sql = "INSERT INTO Category (Name, Description, Status) VALUES (?, ?, 'Active')";
-        try (Connection conn = dc.getConnect(); 
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = dc.getConnect(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, category.getName());
             ps.setString(2, category.getDescription());
             return ps.executeUpdate() > 0;
@@ -54,8 +51,7 @@ public class CategoryDAO {
     // 3. UPDATE: Cập nhật thông tin
     public boolean update(Category category) {
         String sql = "UPDATE Category SET Name = ?, Description = ? WHERE CategoryID = ?";
-        try (Connection conn = dc.getConnect(); 
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = dc.getConnect(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, category.getName());
             ps.setString(2, category.getDescription());
             ps.setInt(3, category.getCategoryID());
@@ -69,8 +65,7 @@ public class CategoryDAO {
     // 4. DELETE (SOFT DELETE): Chuyển trạng thái thành Inactive
     public boolean delete(int categoryID) {
         String sql = "UPDATE Category SET Status = 'Inactive' WHERE CategoryID = ?";
-        try (Connection conn = dc.getConnect(); 
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = dc.getConnect(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, categoryID);
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
@@ -83,8 +78,7 @@ public class CategoryDAO {
     public List<Category> searchByName(String keyword) {
         List<Category> categories = new ArrayList<>();
         String sql = "SELECT CategoryID, Name, Description, Status FROM Category WHERE Name LIKE ? AND Status = 'Active'";
-        try (Connection conn = dc.getConnect(); 
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = dc.getConnect(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, "%" + keyword + "%");
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
@@ -105,8 +99,7 @@ public class CategoryDAO {
     // 6. GET BY ID
     public Category getByID(int categoryID) {
         String sql = "SELECT * FROM Category WHERE CategoryID = ? AND Status = 'Active'";
-        try (Connection conn = dc.getConnect(); 
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = dc.getConnect(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, categoryID);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
@@ -122,5 +115,88 @@ public class CategoryDAO {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public boolean isNameExistsForEdit(String name, int currentID) {
+        // Tương tự, kiểm tra bảng Categories
+        String sql = "SELECT COUNT(*) FROM Category WHERE name = ? AND categoryID != ?";
+        try (Connection conn = dc.getConnect(); PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, name);
+            ps.setInt(2, currentID);
+
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1) > 0;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public boolean isNameExists(String name) {
+        String sql = "SELECT COUNT(*) FROM Category WHERE name = ?";
+        try (Connection conn = dc.getConnect(); PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, name);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                return rs.getInt(1) > 0;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public List<Category> getDataByStatus(String status) {
+        List<Category> list = new ArrayList<>();
+        String sql = "SELECT * FROM Category WHERE status = ?";
+
+        try (Connection conn = dc.getConnect(); PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, status);
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                list.add(new Category(
+                        rs.getInt("categoryID"),
+                        rs.getString("name"),
+                        rs.getString("description"),
+                        rs.getString("status")
+                ));
+            }
+        } catch (SQLException e) {
+            System.err.println("Error getDataByStatus: " + e.getMessage());
+        }
+        return list;
+    }
+
+    // 2. Tìm kiếm theo tên và lọc theo trạng thái
+    public List<Category> searchByNameAndStatus(String name, String status) {
+        List<Category> list = new ArrayList<>();
+        String sql = "SELECT * FROM Category WHERE name LIKE ? AND status = ?";
+
+        try (Connection conn = dc.getConnect(); PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, "%" + name + "%");
+            ps.setString(2, status);
+
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                list.add(new Category(
+                        rs.getInt("categoryID"),
+                        rs.getString("name"),
+                        rs.getString("description"),
+                        rs.getString("status")
+                ));
+            }
+        } catch (SQLException e) {
+            System.err.println("Error searchByNameAndStatus: " + e.getMessage());
+        }
+        return list;
     }
 }

@@ -47,16 +47,36 @@
                                 <RowConstraints minHeight="10.0" prefHeight="35.0" vgrow="SOMETIMES" />
                             </rowConstraints>
                             <children>
-                                <Label text="Supplier:" />
+                                <HBox alignment="CENTER_LEFT" spacing="2.0">
+                                    <children>
+                                        <Label text="Supplier:" />
+                                        <Label text="*" textFill="#d63031" style="-fx-font-weight: bold;" />
+                                    </children>
+                                </HBox>
                                 <ComboBox fx:id="cbSupplier" maxWidth="1.7976931348623157E308" promptText="Select Supplier" GridPane.columnIndex="1" />
-                                
-                                <Label text="Staff:" GridPane.columnIndex="2" />
+        
+                                <HBox alignment="CENTER_LEFT" spacing="2.0" GridPane.columnIndex="2">
+                                    <children>
+                                        <Label text="Staff:" />
+                                        <Label text="*" textFill="#d63031" style="-fx-font-weight: bold;" />
+                                    </children>
+                                </HBox>
                                 <ComboBox fx:id="cbEmployee" maxWidth="1.7976931348623157E308" promptText="Select Staff" GridPane.columnIndex="3" />
-                                
-                                <Label text="Date:" GridPane.rowIndex="1" />
+        
+                                <HBox alignment="CENTER_LEFT" spacing="2.0" GridPane.rowIndex="1">
+                                    <children>
+                                        <Label text="Date:" />
+                                        <Label text="*" textFill="#d63031" style="-fx-font-weight: bold;" />
+                                    </children>
+                                </HBox>
                                 <DatePicker fx:id="dpReceiptDate" maxWidth="1.7976931348623157E308" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                                
-                                <Label text="Status:" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+        
+                                <HBox alignment="CENTER_LEFT" spacing="2.0" GridPane.columnIndex="2" GridPane.rowIndex="1">
+                                    <children>
+                                        <Label text="Status:" />
+                                        <Label text="*" textFill="#d63031" style="-fx-font-weight: bold;" />
+                                    </children>
+                                </HBox>
                                 <ComboBox fx:id="cbStatus" maxWidth="1.7976931348623157E308" promptText="Select Status" GridPane.columnIndex="3" GridPane.rowIndex="1" />
                             </children>
                         </GridPane>
