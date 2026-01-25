@@ -508,45 +508,80 @@ public class CashierDAO {
 
     public java.util.Map<String, String> getShiftStatistics(int employeeId) {
         java.util.Map<String, String> stats = new java.util.HashMap<>();
+
         stats.put("StartTime", "N/A");
         stats.put("TotalOrders", "0");
         stats.put("TotalRevenue", "0.00");
+        stats.put("CashRevenue", "0.00");
+        stats.put("StartCash", "0.0");
 
         Connection conn = null;
+        Timestamp checkInTime = null;
+
         try {
             conn = dc.getConnect();
 
-            String sqlShift = "SELECT StartTime FROM EmployeeShift "
-                    + "WHERE EmployeeID = ? AND EndTime IS NULL "
-                    + "ORDER BY StartTime DESC LIMIT 1";
+            String sqlShift = "SELECT CheckInTime, StartCash FROM EmployeeShift "
+                    + "WHERE EmployeeID = ? AND CheckOutTime IS NULL "
+                    + "ORDER BY CheckInTime DESC LIMIT 1";
 
-            Timestamp startTime = null;
             try (PreparedStatement ps = conn.prepareStatement(sqlShift)) {
                 ps.setInt(1, employeeId);
                 ResultSet rs = ps.executeQuery();
                 if (rs.next()) {
-                    startTime = rs.getTimestamp("StartTime");
+                    double startCash = rs.getDouble("StartCash");
+                    stats.put("StartCash", String.valueOf(startCash));
+
+                    Timestamp dbTime = rs.getTimestamp("CheckInTime");
+
+                    java.util.Calendar now = java.util.Calendar.getInstance();
+                    java.util.Calendar checkInCal = java.util.Calendar.getInstance();
+                    checkInCal.setTimeInMillis(dbTime.getTime());
+
+                    now.set(java.util.Calendar.HOUR_OF_DAY, checkInCal.get(java.util.Calendar.HOUR_OF_DAY));
+                    now.set(java.util.Calendar.MINUTE, checkInCal.get(java.util.Calendar.MINUTE));
+                    now.set(java.util.Calendar.SECOND, checkInCal.get(java.util.Calendar.SECOND));
+
+                    checkInTime = new Timestamp(now.getTimeInMillis());
+
                     java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("HH:mm:ss dd/MM/yyyy");
-                    stats.put("StartTime", sdf.format(startTime));
+                    stats.put("StartTime", sdf.format(checkInTime));
                 }
             }
 
-            if (startTime == null) {
-                startTime = new Timestamp(System.currentTimeMillis());
+            if (checkInTime == null) {
+                java.util.Calendar cal = java.util.Calendar.getInstance();
+                cal.set(java.util.Calendar.HOUR_OF_DAY, 0);
+                cal.set(java.util.Calendar.MINUTE, 0);
+                cal.set(java.util.Calendar.SECOND, 0);
+                cal.set(java.util.Calendar.MILLISECOND, 0);
+
+                checkInTime = new Timestamp(cal.getTimeInMillis());
+
+                stats.put("StartTime", "Today (No Check-in)");
+                stats.put("StartCash", "0.0");
             }
 
-            String sqlStats = "SELECT COUNT(*) as TotalOrd, SUM(TotalAmount) as TotalRev "
+            String sqlStats = "SELECT "
+                    + "COUNT(*) as TotalOrd, "
+                    + "SUM(TotalAmount) as TotalRev, "
+                    + "SUM(CASE WHEN PaymentMethod = 'Cash' THEN TotalAmount ELSE 0 END) as CashRev "
                     + "FROM `Order` "
                     + "WHERE EmployeeID = ? AND OrderDateTime >= ?";
 
             try (PreparedStatement ps2 = conn.prepareStatement(sqlStats)) {
                 ps2.setInt(1, employeeId);
-                ps2.setTimestamp(2, startTime);
+                ps2.setTimestamp(2, checkInTime);
+
                 ResultSet rs2 = ps2.executeQuery();
                 if (rs2.next()) {
                     stats.put("TotalOrders", String.valueOf(rs2.getInt("TotalOrd")));
+
                     double rev = rs2.getDouble("TotalRev");
                     stats.put("TotalRevenue", String.format("%.2f", rev));
+
+                    double cashRev = rs2.getDouble("CashRev");
+                    stats.put("CashRevenue", String.valueOf(cashRev));
                 }
             }
 
@@ -558,8 +593,10 @@ public class CashierDAO {
                     conn.close();
                 }
             } catch (SQLException ex) {
+                ex.printStackTrace();
             }
         }
+
         return stats;
     }
 }
