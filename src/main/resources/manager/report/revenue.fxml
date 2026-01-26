@@ -68,6 +68,8 @@
 
                                 <VBox alignment="CENTER" spacing="10.0" style="-fx-padding: 15; -fx-background-color: #f1f8ff; -fx-background-radius: 8;">
                                     <children>
+                              <Label fx:id="lbRevenueA" text="Revenue 1/2025 : 0$ " />
+                              <Label fx:id="lbRevenueB" text="Revenue 1/2026 : 0$ " />
                                         <Label text="Growth Rate (%)" />
                                         <Label fx:id="lblGrowth" text="0% (0$)" textFill="#28a745">
                                             <font>

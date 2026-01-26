@@ -217,7 +217,7 @@ public class CashierController implements Initializable {
             colHistTime.prefWidthProperty().bind(tblHistory.widthProperty().multiply(0.25));
             colHistCashier.prefWidthProperty().bind(tblHistory.widthProperty().multiply(0.2));
             colHistCustomer.prefWidthProperty().bind(tblHistory.widthProperty().multiply(0.45));
-            
+
             colName.prefWidthProperty().bind(tblCart.widthProperty().multiply(0.30));
             colPrice.prefWidthProperty().bind(tblCart.widthProperty().multiply(0.20));
             colQty.prefWidthProperty().bind(tblCart.widthProperty().multiply(0.25));
@@ -538,107 +538,145 @@ public class CashierController implements Initializable {
             showAlert("Empty Cart", "Please add items before payment.", Alert.AlertType.WARNING);
             return;
         }
-
-        paymentDialogResult result = showPaymentDialog();
-        if (result == null) {
+        paymentDialogResult payResult = showPaymentDialog();
+        if (payResult == null) {
             return;
         }
-        double subTotal = 0;
-        double productDiscount = 0;
 
-        for (CartItem item : cartList) {
-            double originalPrice = item.getPrice();
-            int qty = item.getQuantity();
-            double itemTotal = originalPrice * qty;
+        double amountDue = Double.parseDouble(lblGrandTotal.getText().replace("$", "").trim());
+        if ("Cash".equalsIgnoreCase(payResult.paymentMethod)) {
+            TextInputDialog payDialog = new TextInputDialog(String.format("%.2f", amountDue));
+            payDialog.setTitle("Cash Payment");
+            payDialog.setHeaderText("Total Due: $" + String.format("%.2f", amountDue));
+            payDialog.setContentText("Cash Received ($):");
 
-            subTotal += itemTotal;
+            Optional<String> cashInput = payDialog.showAndWait();
 
-            double itemDiscountAmt = 0;
-            String promoType = item.getPromotionType();
-            double promoVal = item.getPromotionValue();
-
-            if (promoType != null) {
-                if ("BOGO".equalsIgnoreCase(promoType)) {
-                    int freeItems = qty / 2;
-                    itemDiscountAmt = freeItems * originalPrice;
-                } else if (promoType.toLowerCase().contains("discount") || promoType.toLowerCase().contains("percentage")) {
-                    if (promoVal > 0) {
-                        itemDiscountAmt = itemTotal * (promoVal / 100.0);
+            if (cashInput.isPresent()) {
+                try {
+                    double cashGiven = Double.parseDouble(cashInput.get());
+                    if (cashGiven < amountDue) {
+                        showAlert("Insufficient Amount", "Cash received is less than total amount!", Alert.AlertType.ERROR);
+                        return;
                     }
+
+                    double change = cashGiven - amountDue;
+                    Alert changeAlert = new Alert(Alert.AlertType.INFORMATION);
+                    changeAlert.setTitle("Transaction Success");
+                    changeAlert.setHeaderText("Change: $" + String.format("%.2f", change));
+                    changeAlert.setContentText("Click OK to complete transaction.");
+                    changeAlert.showAndWait();
+
+                } catch (NumberFormatException e) {
+                    showAlert("Invalid Input", "Please enter a valid number.", Alert.AlertType.ERROR);
+                    return;
                 }
+            } else {
+                return;
             }
-            productDiscount += itemDiscountAmt;
-            double finalLineTotal = itemTotal - itemDiscountAmt;
-            double sellingPrice = (qty > 0) ? (finalLineTotal / qty) : 0;
-            item.setSellingPrice(sellingPrice);
         }
 
-        double pointDiscountMoney = 0;
-        int pointsUsed = 0;
-        double amountBeforePoint = subTotal - productDiscount;
-
-        if (currentCustomer != null && currentCustomer.getPoints() >= 100 && amountBeforePoint >= 10) {
-            int blocksFromPoints = currentCustomer.getPoints() / 100;
-            int blocksFromBill = (int) (amountBeforePoint / 10);
-            int redeemableBlocks = Math.min(blocksFromPoints, blocksFromBill);
-            pointDiscountMoney = redeemableBlocks * 10.0;
-            pointsUsed = redeemableBlocks * 100;
-        }
-
-        double finalTotal = amountBeforePoint - pointDiscountMoney;
-        double totalDiscount = productDiscount + pointDiscountMoney;
-
-        Integer custId = (currentCustomer != null) ? currentCustomer.getId() : null;
-        int orderId = cashierDAO.createOrder(currentEmployeeID, custId, finalTotal, totalDiscount, pointDiscountMoney, result.paymentMethod, new ArrayList<>(cartList));
-
-        if (orderId != -1) {
-            currentSessionSales += finalTotal;
+        try {
+            double subTotal = 0;
+            double productDiscount = 0;
 
             for (CartItem item : cartList) {
-                try {
-                    int pId = Integer.parseInt(item.getProductId());
-                    cashierDAO.reduceStock(pId, item.getSizeId(), item.getQuantity());
-                } catch (Exception e) {
+                double originalPrice = item.getPrice();
+                int qty = item.getQuantity();
+                double itemTotal = originalPrice * qty;
+
+                subTotal += itemTotal;
+
+                double itemDiscountAmt = 0;
+                String promoType = item.getPromotionType();
+                double promoVal = item.getPromotionValue();
+
+                if (promoType != null) {
+                    if ("BOGO".equalsIgnoreCase(promoType)) {
+                        int freeItems = qty / 2;
+                        itemDiscountAmt = freeItems * originalPrice;
+                    } else if (promoType.toLowerCase().contains("discount") || promoType.toLowerCase().contains("percentage")) {
+                        if (promoVal > 0) {
+                            itemDiscountAmt = itemTotal * (promoVal / 100.0);
+                        }
+                    }
                 }
-            }
-            
-            
-            if (currentCustomer != null) {
-                int pointsEarned = (int) (finalTotal / 10);
-
-                int oldPoints = currentCustomer.getPoints();
-                int newPointBalance = oldPoints - pointsUsed + pointsEarned;
-                cashierDAO.updateCustomerPoints(currentCustomer.getId(), newPointBalance);
-                currentCustomer.setPoints(newPointBalance);
+                productDiscount += itemDiscountAmt;
+                double finalLineTotal = itemTotal - itemDiscountAmt;
+                double sellingPrice = (qty > 0) ? (finalLineTotal / qty) : 0;
+                item.setSellingPrice(sellingPrice);
             }
 
-            String billContent = "";
-            if (result.isPrintBill) {
-                billContent = generateBillContent(orderId, finalTotal, result.paymentMethod, subTotal, productDiscount, pointDiscountMoney);
+            double pointDiscountMoney = 0;
+            int pointsUsed = 0;
+            double amountBeforePoint = subTotal - productDiscount;
+
+            if (currentCustomer != null && currentCustomer.getPoints() >= 100 && amountBeforePoint >= 10) {
+                int blocksFromPoints = currentCustomer.getPoints() / 100;
+                int blocksFromBill = (int) (amountBeforePoint / 10);
+                int redeemableBlocks = Math.min(blocksFromPoints, blocksFromBill);
+                pointDiscountMoney = redeemableBlocks * 10.0;
+                pointsUsed = redeemableBlocks * 100;
             }
 
-            isUpdatingHistory = true;
-            dpHistoryDate.setValue(null);
-            txtSearchHistory.clear();
-            isUpdatingHistory = false;
+            double finalTotal = amountBeforePoint - pointDiscountMoney;
+            double totalDiscount = productDiscount + pointDiscountMoney;
 
-            filterHistory();
-            if (!tblHistory.getItems().isEmpty()) {
-                tblHistory.getSelectionModel().selectFirst();
-                tblHistory.scrollTo(0);
-            }
+            Integer custId = (currentCustomer != null) ? currentCustomer.getId() : null;
 
-            if (result.isPrintBill) {
-                showBillAlert(billContent);
+            int orderId = cashierDAO.createOrder(currentEmployeeID, custId, finalTotal, totalDiscount, pointDiscountMoney, payResult.paymentMethod, new ArrayList<>(cartList));
+
+            if (orderId != -1) {
+                currentSessionSales += finalTotal;
+
+                for (CartItem item : cartList) {
+                    try {
+                        int pId = Integer.parseInt(item.getProductId());
+                        cashierDAO.reduceStock(pId, item.getSizeId(), item.getQuantity());
+                    } catch (Exception e) {
+                    }
+                }
+
+                if (currentCustomer != null) {
+                    int pointsEarned = (int) (finalTotal / 10);
+                    int oldPoints = currentCustomer.getPoints();
+                    int newPointBalance = oldPoints - pointsUsed + pointsEarned;
+                    cashierDAO.updateCustomerPoints(currentCustomer.getId(), newPointBalance);
+                    currentCustomer.setPoints(newPointBalance);
+                }
+
+                String billContent = "";
+                if (payResult.isPrintBill) {
+                    billContent = generateBillContent(orderId, finalTotal, payResult.paymentMethod, subTotal, productDiscount, pointDiscountMoney);
+                }
+
+                isUpdatingHistory = true;
+                dpHistoryDate.setValue(null);
+                txtSearchHistory.clear();
+                isUpdatingHistory = false;
+                filterHistory();
+
+                if (!tblHistory.getItems().isEmpty()) {
+                    tblHistory.getSelectionModel().selectFirst();
+                    tblHistory.scrollTo(0);
+                }
+
+                if (payResult.isPrintBill) {
+                    showBillAlert(billContent);
+                } else {
+                    showAlert("Success", "Transaction #" + orderId + " completed!", Alert.AlertType.INFORMATION);
+                }
+
+                resetCart();
+                setCustomerToBill(null);
+
             } else {
-                showAlert("Success", "Transaction #" + orderId + " completed!", Alert.AlertType.INFORMATION);
+                showAlert("Error", "Transaction failed. Could not save order.", Alert.AlertType.ERROR);
             }
 
-            resetCart();
-            setCustomerToBill(null);
-
-        } else {
-            showAlert("Error", "Transaction failed. Could not save order.", Alert.AlertType.ERROR);
+        } catch (Exception e) {
+            e.printStackTrace();
+            showAlert("System Error", "An unexpected error occurred during processing.", Alert.AlertType.ERROR);
         }
     }
 
@@ -800,6 +838,10 @@ public class CashierController implements Initializable {
         if (result.isPresent()) {
             try {
                 double startCash = Double.parseDouble(result.get());
+                if (startCash <= 100) {
+                    showAlert("Invalid Amount", "Start Cash must be greater than $100 for change.", Alert.AlertType.WARNING);
+                    return;
+                }
                 int empId = currentEmployeeID;
 
                 if (shiftDAO.checkIn(empId, currentShiftID, startCash)) {
@@ -821,16 +863,23 @@ public class CashierController implements Initializable {
     @FXML
     public void ShiftEnd(ActionEvent event) {
         java.util.Map<String, String> stats = cashierDAO.getShiftStatistics(currentEmployeeID);
-
         String startTime = stats.get("StartTime");
         String totalOrders = stats.get("TotalOrders");
-        String strRevenue = stats.get("TotalRevenue");
+        String strTotalRevenue = stats.get("TotalRevenue");
 
-        double dbRevenue = 0;
+        double totalRevenue = 0;
+        double cashRevenue = 0;
+        double startCash = 0;
+
         try {
-            dbRevenue = Double.parseDouble(strRevenue);
+            totalRevenue = Double.parseDouble(stats.get("TotalRevenue"));
+            cashRevenue = Double.parseDouble(stats.getOrDefault("CashRevenue", "0"));
+            startCash = Double.parseDouble(stats.getOrDefault("StartCash", "0"));
         } catch (Exception e) {
+            e.printStackTrace();
         }
+
+        double expectedCash = startCash + cashRevenue;
 
         Alert reportAlert = new Alert(Alert.AlertType.CONFIRMATION);
         reportAlert.setTitle("End Shift Report (Z-Report)");
@@ -840,7 +889,12 @@ public class CashierController implements Initializable {
                 + "------------------------------------------------\n"
                 + "Start Time:   " + startTime + "\n"
                 + "Total Orders: " + totalOrders + "\n"
-                + "System Sales: $" + strRevenue + "\n"
+                + "Total Sales:  $" + strTotalRevenue + " (All methods)\n"
+                + "------------------------------------------------\n"
+                + "Start Cash:   $" + String.format("%.2f", startCash) + "\n"
+                + "Cash Sales:   $" + String.format("%.2f", cashRevenue) + "\n"
+                + "------------------------------------------------\n"
+                + "Expected Drawer: $" + String.format("%.2f", expectedCash) + "\n"
                 + "------------------------------------------------\n"
                 + "Confirm to Close Shift?";
 
@@ -852,7 +906,8 @@ public class CashierController implements Initializable {
 
             TextInputDialog dialog = new TextInputDialog("0");
             dialog.setTitle("End Shift - Cash Count");
-            dialog.setHeaderText("System calculated: $" + strRevenue);
+            String hint = String.format("Start ($%.2f) + Cash Sales ($%.2f)", startCash, cashRevenue);
+            dialog.setHeaderText("System Estimate: $" + String.format("%.2f", expectedCash) + "\n(" + hint + ")");
             dialog.setContentText("Enter Actual Cash in Drawer:");
 
             try {
@@ -864,12 +919,12 @@ public class CashierController implements Initializable {
             if (cashResult.isPresent()) {
                 try {
                     double endCash = Double.parseDouble(cashResult.get());
-                    if (shiftDAO.checkOut(currentEmployeeID, currentShiftID, dbRevenue, endCash)) {
+                    if (shiftDAO.checkOut(currentEmployeeID, currentShiftID, totalRevenue, endCash)) {
+                        double variance = endCash - expectedCash;
 
-                        double variance = endCash - dbRevenue;
                         String msg = "Shift closed successfully.\n";
                         if (Math.abs(variance) > 0.01) {
-                            msg += String.format("Variance: $%.2f", variance);
+                            msg += String.format("Variance: $%.2f (Mismatch)", variance);
                         } else {
                             msg += "Balance: Perfect Match!";
                         }
