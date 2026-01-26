@@ -24,7 +24,6 @@
                 <Insets bottom="10" left="10" right="10" top="10" />
             </padding>
             <Label style="-fx-font-size: 24px; -fx-font-weight: bold;"
-                   styleClass="label-title"
                    text="Inventory Report" />
         </HBox>
     </top>

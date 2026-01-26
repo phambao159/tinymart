@@ -25,8 +25,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/CascadeStyleSheet.css to ed
 
 
 /* Label */
-.label {
-    -fx-text-fill: white;          /* chữ màu trắng */
+.label {       /* chữ màu trắng */
     -fx-font-weight: bold;
     -fx-font-size: 16px;           /* tăng size chữ */
 }
@@ -51,7 +50,6 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/CascadeStyleSheet.css to ed
 /* Nút Search */
 .button {
     -fx-background-color: #FF9800;
-    -fx-text-fill: white;
     -fx-font-weight: bold;
     -fx-background-radius: 12;   /* tăng từ 4 → 12 để bo tròn hơn */
     -fx-border-radius: 12;

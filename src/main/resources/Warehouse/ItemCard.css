@@ -55,7 +55,6 @@
 .button {
     -fx-font-size: 13px;
     -fx-background-color: #3399ff;
-    -fx-text-fill: white;
     -fx-background-radius: 5;
 }
 

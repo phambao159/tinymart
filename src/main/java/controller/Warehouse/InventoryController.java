@@ -47,36 +47,60 @@ public class InventoryController {
 
     private void displayItems(List<InventoryItemCard> items) {
         productGrid.getChildren().clear();
-        System.out.println("Controller: Found items = " + items.size());
-        items.sort((a, b) -> Integer.compare(a.getShelfQuantity(), b.getShelfQuantity()));
+        System.out.println("[DEBUG] Controller: Found items = " + items.size());
+
+        // In ra danh sách trước khi sort
         for (InventoryItemCard item : items) {
-            System.out.println("Controller: Loading card for " + item.getProductName());
+            System.out.println("[DEBUG] Pre-sort → "
+                    + item.getProductName()
+                    + " | Stock=" + item.getStock()
+                    + " | ShelfQuantity=" + item.getShelfQuantity());
+        }
+
+        // Giữ nguyên logic sort theo ShelfQuantity
+        items.sort((a, b) -> Integer.compare(a.getShelfQuantity(), b.getShelfQuantity()));
+
+        // In ra danh sách sau khi sort
+        System.out.println("[DEBUG] After sort:");
+        for (InventoryItemCard item : items) {
+            System.out.println("  " + item.getProductName()
+                    + " | Stock=" + item.getStock()
+                    + " | ShelfQuantity=" + item.getShelfQuantity());
+        }
+
+        // Load từng card
+        for (InventoryItemCard item : items) {
+            System.out.println("[DEBUG] Controller: Loading card for " + item.getProductName());
             try {
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("/Warehouse/InventoryItemCard.fxml"));
                 VBox card = loader.load();
 
                 if (card == null) {
-                    System.out.println("Controller: card is null for " + item.getProductName());
+                    System.out.println("[DEBUG] Controller: card is null for " + item.getProductName());
                     continue;
                 }
 
                 InventoryItemCardController controller = loader.getController();
                 if (controller == null) {
-                    System.out.println("Controller: controller is null for " + item.getProductName());
+                    System.out.println("[DEBUG] Controller: controller is null for " + item.getProductName());
                     continue;
                 }
 
                 controller.setData(item);
                 productGrid.getChildren().add(card);
-                System.out.println("Controller: card added for " + item.getProductName());
+
+                System.out.println("[DEBUG] Controller: Card added for "
+                        + item.getProductName()
+                        + " | Stock=" + item.getStock()
+                        + " | ShelfQuantity=" + item.getShelfQuantity());
 
             } catch (Exception e) {
-                System.out.println("Controller: Error loading card for " + item.getProductName());
+                System.out.println("[DEBUG] Controller: Error loading card for " + item.getProductName());
                 e.printStackTrace();
             }
         }
 
-        System.out.println("Controller: Grid children count = " + productGrid.getChildren().size());
+        System.out.println("[DEBUG] Controller: Grid children count = " + productGrid.getChildren().size());
     }
 
     @FXML

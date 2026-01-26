@@ -17,7 +17,6 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/CascadeStyleSheet.css to ed
 
 /* Style cho tiêu đề */
 .label-title {
-    -fx-text-fill: white; /* màu chữ trắng */
     -fx-font-size: 28px; /* tăng kích thước cho nổi bật */
     -fx-font-family: "Segoe UI", sans-serif;
     -fx-font-weight: bold;
