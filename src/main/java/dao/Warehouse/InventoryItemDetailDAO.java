@@ -17,7 +17,9 @@ public class InventoryItemDetailDAO {
                 + "FROM ImportDetail id "
                 + "JOIN Import i ON id.ImportID = i.ImportID "
                 + "WHERE i.Status = 'Completed' AND id.ProductSizeID = ? "
-                + "ORDER BY id.ExpiryDate ASC";
+                + "AND (id.Quantity > 0 OR id.ShelfQuantity > 0) "
+                + // ✅ chỉ lấy lô còn hàng
+                "ORDER BY id.ExpiryDate ASC";
 
         try (Connection conn = new DBConnection().getConnect(); PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, productSizeId);
