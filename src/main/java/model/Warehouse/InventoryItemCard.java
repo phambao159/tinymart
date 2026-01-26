@@ -1,14 +1,16 @@
 package model.Warehouse;
 
 public class InventoryItemCard {
+
     private int productSizeId;
     private String productName;
     private String sizeType;
     private int stock;              // tổng Quantity + ShelfQuantity
     private String imageFileName;
+    private int shelfQuantity;
 
     public InventoryItemCard(int productSizeId, String productName, String sizeType,
-                             int stock, String imageFileName) {
+            int stock, String imageFileName) {
         this.productSizeId = productSizeId;
         this.productName = productName;
         this.sizeType = sizeType;
@@ -16,13 +18,36 @@ public class InventoryItemCard {
         this.imageFileName = imageFileName;
     }
 
-    public int getProductSizeId() { return productSizeId; }
-    public String getProductName() { return productName; }
-    public String getSizeType() { return sizeType; }
-    public int getStock() { return stock; }
+    // Getter
+    public int getShelfQuantity() {
+        return shelfQuantity;
+    }
+
+    // Setter
+    public void setShelfQuantity(int shelfQuantity) {
+        this.shelfQuantity = shelfQuantity;
+    }
+
+    public int getProductSizeId() {
+        return productSizeId;
+    }
+
+    public String getProductName() {
+        return productName;
+    }
+
+    public String getSizeType() {
+        return sizeType;
+    }
+
+    public int getStock() {
+        return stock;
+    }
 
     public String getImagePath() {
-        if (imageFileName == null || imageFileName.isEmpty()) return null;
+        if (imageFileName == null || imageFileName.isEmpty()) {
+            return null;
+        }
         return "/image/manager/" + imageFileName;
     }
 }

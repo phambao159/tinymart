@@ -96,7 +96,7 @@ public class ImportDetailController {
                 detail.setExpiryDate(parsedDate);
                 detail.setExpiryDateString(newValue);
             } catch (DateTimeParseException e) {
-                Alert alert = new Alert(Alert.AlertType.ERROR, "Ngày không hợp lệ! Vui lòng nhập theo định dạng dd-MM-yyyy.");
+                Alert alert = new Alert(Alert.AlertType.ERROR, "Invalid date! Please enter in dd-MM-yyyy format.");
                 alert.showAndWait();
             }
             tbImportDetail.refresh();
@@ -131,7 +131,7 @@ public class ImportDetailController {
 
             if (!allDatesFilled) {
                 Alert alert = new Alert(Alert.AlertType.WARNING,
-                        "Vui lòng nhập ExpiryDate cho tất cả sản phẩm trước khi xác nhận!");
+                        "Please enter the ExpiryDate for all products before confirming!");
                 alert.showAndWait();
                 return;
             }
@@ -147,7 +147,7 @@ public class ImportDetailController {
             }
 
             if (!expiryUpdated) {
-                Alert alert = new Alert(Alert.AlertType.ERROR, "Cập nhật ExpiryDate thất bại!");
+                Alert alert = new Alert(Alert.AlertType.ERROR, "The ExpiryDate update failed!");
                 alert.showAndWait();
                 return;
             }
@@ -156,7 +156,7 @@ public class ImportDetailController {
             boolean success = importDAO.updateStatus(importData.getImportID(), "Completed");
             if (success) {
                 txtLyDo.setText("Completed");
-                Alert alert = new Alert(Alert.AlertType.INFORMATION, "Xác nhận thành công!");
+                Alert alert = new Alert(Alert.AlertType.INFORMATION, "Confirm successful!");
                 alert.showAndWait();
                 btnConfirm.setDisable(true);
                 tbImportDetail.setEditable(false);

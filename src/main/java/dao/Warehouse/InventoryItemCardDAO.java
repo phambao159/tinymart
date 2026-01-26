@@ -10,17 +10,20 @@ import java.util.List;
 public class InventoryItemCardDAO {
 
     // Lọc theo tên sản phẩm và tổng stock (Quantity + ShelfQuantity) chỉ từ Import Completed
+    // Sort theo ShelfQuantity từ bé đến lớn
     public List<InventoryItemCard> searchItems(String name, Integer stockMin, Integer stockMax) throws SQLException {
         List<InventoryItemCard> items = new ArrayList<>();
 
-        // ✅ Query chính từ ProductSize, join Product và Size
-        // Stock tính bằng subquery từ ImportDetail
         StringBuilder sql = new StringBuilder(
                 "SELECT ps.ProductSizeID, p.Name, s.Type, p.Image, " +
                 "       COALESCE((SELECT SUM(id.Quantity + id.ShelfQuantity) " +
                 "                 FROM ImportDetail id " +
                 "                 JOIN Import i ON id.ImportID = i.ImportID " +
-                "                 WHERE i.Status = 'Completed' AND id.ProductSizeID = ps.ProductSizeID), 0) AS TotalStock " +
+                "                 WHERE i.Status = 'Completed' AND id.ProductSizeID = ps.ProductSizeID), 0) AS TotalStock, " +
+                "       COALESCE((SELECT SUM(id.ShelfQuantity) " +   // ✅ riêng ShelfQuantity
+                "                 FROM ImportDetail id " +
+                "                 JOIN Import i ON id.ImportID = i.ImportID " +
+                "                 WHERE i.Status = 'Completed' AND id.ProductSizeID = ps.ProductSizeID), 0) AS TotalShelfQuantity " +
                 "FROM ProductSize ps " +
                 "JOIN Product p ON ps.ProductID = p.ProductID " +
                 "JOIN Size s ON ps.SizeID = s.SizeID " +
@@ -40,6 +43,9 @@ public class InventoryItemCardDAO {
             sql.append("AND TotalStock <= ? ");
         }
 
+        // ✅ Sort theo ShelfQuantity tăng dần
+        sql.append("ORDER BY TotalShelfQuantity ASC");
+
         System.out.println("Executing SQL: " + sql);
 
         Connection conn = new DBConnection().getConnect();
@@ -58,15 +64,21 @@ public class InventoryItemCardDAO {
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
                 System.out.println("DAO result: " + rs.getString("Name")
-                        + " Stock=" + rs.getInt("TotalStock"));
+                        + " Stock=" + rs.getInt("TotalStock")
+                        + " Shelf=" + rs.getInt("TotalShelfQuantity"));
 
-                items.add(new InventoryItemCard(
+                InventoryItemCard card = new InventoryItemCard(
                         rs.getInt("ProductSizeID"),
                         rs.getString("Name"),
                         rs.getString("Type"),
-                        rs.getInt("TotalStock"),   // ✅ chỉ còn Stock
+                        rs.getInt("TotalStock"),   // ✅ tổng Quantity + ShelfQuantity
                         rs.getString("Image")
-                ));
+                );
+
+                // ✅ set riêng ShelfQuantity
+                card.setShelfQuantity(rs.getInt("TotalShelfQuantity"));
+
+                items.add(card);
             }
         }
         System.out.println("DAO returned items: " + items.size());

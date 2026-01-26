@@ -48,7 +48,7 @@ public class InventoryController {
     private void displayItems(List<InventoryItemCard> items) {
         productGrid.getChildren().clear();
         System.out.println("Controller: Found items = " + items.size());
-
+        items.sort((a, b) -> Integer.compare(a.getShelfQuantity(), b.getShelfQuantity()));
         for (InventoryItemCard item : items) {
             System.out.println("Controller: Loading card for " + item.getProductName());
             try {
