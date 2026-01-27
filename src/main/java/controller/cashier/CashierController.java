@@ -169,7 +169,6 @@ public class CashierController implements Initializable {
         setupTable();
         setupHistoryTable();
         setupUI();
-        setupShiftStatus();
         loadCategories();
         loadDataFromDB("");
         setSidebarActive(btnHome);
@@ -196,7 +195,7 @@ public class CashierController implements Initializable {
 
             setEmployeeID(emp.getEmployeeID());
             setEmployeeName(emp.getFullName());
-
+            setupShiftStatus();
         } else {
             javafx.application.Platform.runLater(() -> {
                 showAlert("Access Denied", "No active session found. Please login again.", Alert.AlertType.ERROR);
@@ -222,8 +221,10 @@ public class CashierController implements Initializable {
             colPrice.prefWidthProperty().bind(tblCart.widthProperty().multiply(0.20));
             colQty.prefWidthProperty().bind(tblCart.widthProperty().multiply(0.25));
             colTotal.prefWidthProperty().bind(tblCart.widthProperty().multiply(0.25));
-        }
 
+            String currentShiftName = cashierDAO.getCurrentShiftName(currentEmployeeID);
+            lblShift.setText("Shift: " + currentShiftName);
+        }
     }
 
     private void setSidebarActive(Button activeBtn) {
@@ -414,6 +415,11 @@ public class CashierController implements Initializable {
     }
 
     private void openOverlay(Product p) {
+        if (!shiftDAO.isCheckedIn(currentEmployeeID, currentShiftID)) {
+            showAlert("Action Blocked", "Please Check In to start selling!", Alert.AlertType.WARNING);
+            return;
+        }
+
         this.selectedProductTemp = p;
         this.selectedSizeTemp = null;
 
@@ -534,6 +540,11 @@ public class CashierController implements Initializable {
 
     @FXML
     public void Payment(ActionEvent event) {
+        if (!shiftDAO.isCheckedIn(currentEmployeeID, currentShiftID)) {
+            showAlert("Action Blocked", "You must Check In before payment.", Alert.AlertType.WARNING);
+            return;
+        }
+        
         if (cartList.isEmpty()) {
             showAlert("Empty Cart", "Please add items before payment.", Alert.AlertType.WARNING);
             return;
@@ -882,7 +893,7 @@ public class CashierController implements Initializable {
         double expectedCash = startCash + cashRevenue;
 
         Alert reportAlert = new Alert(Alert.AlertType.CONFIRMATION);
-        reportAlert.setTitle("End Shift Report (Z-Report)");
+        reportAlert.setTitle("End Shift Report");
         reportAlert.setHeaderText("Session Summary");
 
         String content = "Cashier: " + lblWelcome.getText().replace("Welcome, ", "") + "\n"
@@ -899,8 +910,10 @@ public class CashierController implements Initializable {
                 + "Confirm to Close Shift?";
 
         reportAlert.setContentText(content);
-        reportAlert.getDialogPane().setStyle("-fx-font-family: 'Monospaced';");
-
+        reportAlert.getDialogPane().setStyle("-fx-font-family: 'Monospaced'; -fx-font-size: 16px;");
+        reportAlert.getDialogPane().setMinWidth(600);
+        reportAlert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
+        reportAlert.setResizable(true);
         Optional<ButtonType> reportResult = reportAlert.showAndWait();
         if (reportResult.isPresent() && reportResult.get() == ButtonType.OK) {
 
@@ -1244,15 +1257,25 @@ public class CashierController implements Initializable {
     }
 
     private void setupShiftStatus() {
-        currentShiftID = shiftDAO.getCurrentShiftID();
-        lblShift.setText("Shift: " + (currentShiftID == 1 ? "Morning" : "Afternoon"));
-        int empId = currentEmployeeID;
-        if (empId != 0 && shiftDAO.isCheckedIn(empId, currentShiftID)) {
+        String currentShiftName = cashierDAO.getCurrentShiftName(currentEmployeeID);
+        lblShift.setText("Shift: " + currentShiftName);
+
+        int assignedID = cashierDAO.getAssignedShiftID(currentEmployeeID);
+
+        if (assignedID != 0) {
+            currentShiftID = assignedID;
+        } else {
+            int hour = java.time.LocalTime.now().getHour();
+            currentShiftID = (hour < 14) ? 1 : 2;
+        }
+
+        if (shiftDAO.isCheckedIn(currentEmployeeID, currentShiftID)) {
             btnCheckIn.setDisable(true);
             btnCheckIn.setText("Checked In");
             btnCheckOut.setDisable(false);
         } else {
             btnCheckIn.setDisable(false);
+            btnCheckIn.setText("Check In");
             btnCheckOut.setDisable(true);
         }
     }
