@@ -599,4 +599,71 @@ public class CashierDAO {
 
         return stats;
     }
+
+    public String getCurrentShiftName(int employeeId) {
+        String shiftName = "Not in Shift";
+
+        Connection conn = null;
+        try {
+            conn = dc.getConnect();
+            String sql = "SELECT s.ShiftName "
+                    + "FROM EmployeeShift es "
+                    + "JOIN Shift s ON es.ShiftID = s.ShiftID "
+                    + "WHERE es.EmployeeID = ? "
+                    + "AND es.WorkDate = CURDATE() "
+                    + "AND CURTIME() BETWEEN s.StartTime AND s.EndTime";
+            try (PreparedStatement ps = conn.prepareStatement(sql)) {
+                ps.setInt(1, employeeId);
+                ResultSet rs = ps.executeQuery();
+
+                if (rs.next()) {
+                    shiftName = rs.getString("ShiftName");
+                }
+            }
+
+            if (shiftName.equals("Not in Shift")) {
+                String sqlNext = "SELECT s.ShiftName FROM EmployeeShift es "
+                        + "JOIN Shift s ON es.ShiftID = s.ShiftID "
+                        + "WHERE es.EmployeeID = ? AND es.WorkDate = CURDATE() "
+                        + "ORDER BY s.StartTime ASC LIMIT 1";
+
+                try (PreparedStatement ps2 = conn.prepareStatement(sqlNext)) {
+                    ps2.setInt(1, employeeId);
+                    ResultSet rs2 = ps2.executeQuery();
+                    if (rs2.next()) {
+                        shiftName = rs2.getString("ShiftName");
+                    }
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
+        }
+
+        return shiftName;
+    }
+
+    public int getAssignedShiftID(int employeeId) {
+        int shiftId = 0; 
+        String sql = "SELECT ShiftID FROM EmployeeShift WHERE EmployeeID = ? AND WorkDate = CURDATE() AND CheckInTime IS NULL LIMIT 1";
+
+        try (Connection conn = dc.getConnect(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, employeeId);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                shiftId = rs.getInt("ShiftID");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return shiftId;
+    }
 }
