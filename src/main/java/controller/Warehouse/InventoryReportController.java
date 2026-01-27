@@ -62,25 +62,29 @@ public class InventoryReportController implements Initializable {
     }
 
     /**
-     * Hiển thị 2 cảnh báo: 1. Sản phẩm có expireDate cận nhất 2. Sản phẩm có
-     * stock thấp nhất
+     * Hiển thị toàn bộ cảnh báo: - Các sản phẩm có stock thấp - Các sản phẩm có
+     * hạn sử dụng gần nhất (Một sản phẩm có thể xuất hiện trong cả hai danh
+     * sách nếu thỏa cả hai điều kiện)
      */
     private void loadAlerts() {
         try {
             System.out.println("[DEBUG] Loading alerts...");
             alertCardContainer.getChildren().clear();
 
-            InventoryReport nearestExpire = reportDAO.getNearestExpireProduct();
-            InventoryReport lowestStock = reportDAO.getLowestStockProduct();
+            // Lấy danh sách sản phẩm từ DAO
+            List<InventoryReport> nearestExpireList = reportDAO.getAllNearestExpireProducts();
+            List<InventoryReport> lowStockList = reportDAO.getAllLowStockProducts();
 
+            // Gom tất cả vào một list chung
             List<InventoryReport> alerts = new ArrayList<>();
-            if (nearestExpire != null) {
-                alerts.add(nearestExpire);
+            if (nearestExpireList != null && !nearestExpireList.isEmpty()) {
+                alerts.addAll(nearestExpireList);
             }
-            if (lowestStock != null) {
-                alerts.add(lowestStock);
+            if (lowStockList != null && !lowStockList.isEmpty()) {
+                alerts.addAll(lowStockList);
             }
 
+            // Hiển thị từng card cảnh báo
             for (InventoryReport report : alerts) {
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("/Warehouse/InventoryReportCard.fxml"));
                 Node cardRoot = loader.load();
@@ -89,12 +93,17 @@ public class InventoryReportController implements Initializable {
                 InventoryReportCardController cardController = loader.getController();
                 cardController.setData(report);
 
-                // Gắn logic kéo lên node gốc của card
+                // Gắn logic kéo lên node gốc của card (nếu có)
                 attachDragFromCard(cardRoot, report);
 
                 alertCardContainer.getChildren().add(cardRoot);
-                System.out.println("[DEBUG] Added card for product: " + report.getProductName());
+                System.out.println("[DEBUG] Added alert card for product: " + report.getProductName());
             }
+
+            if (alerts.isEmpty()) {
+                System.out.println("[DEBUG] No alerts found.");
+            }
+
         } catch (IOException e) {
             System.err.println("[ERROR] Failed to load alert card FXML: " + e.getMessage());
             e.printStackTrace();
