@@ -17,7 +17,7 @@
             <Label text="ShelfQuantity Range:"/>
             <TextField fx:id="minQuantityField" promptText="Min"/>
             <TextField fx:id="maxQuantityField" promptText="Max"/>
-            <Button text="Search" onAction="#onSearch"/>
+            <Button text="Search" style="-fx-text-fill: white;" onAction="#onSearch"/>
         </HBox>
     </top>
 

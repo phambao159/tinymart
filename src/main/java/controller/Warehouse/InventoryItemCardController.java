@@ -25,6 +25,8 @@ public class InventoryItemCardController {
     @FXML
     private Label stockLabel;   // ✅ hiển thị tổng stock
     @FXML
+    private Label shelfLabel;   // ✅ thêm label hiển thị ShelfQuantity
+    @FXML
     private VBox cardRoot;
 
     public void setData(InventoryItemCard item) {
@@ -35,6 +37,14 @@ public class InventoryItemCardController {
         productName.setText(item.getProductName());
         sizeType.setText(item.getSizeType());
         stockLabel.setText("Stock: " + item.getStock());
+        shelfLabel.setText("On Shelf: " + item.getShelfQuantity()); // ✅ hiển thị riêng ShelfQuantity
+
+        // ✅ Logic đổi viền nếu ShelfQuantity < 10
+        if (item.getShelfQuantity() < 10) {
+            cardRoot.setStyle("-fx-border-color: red; -fx-border-width: 2; -fx-border-radius: 5;");
+        } else {
+            cardRoot.setStyle(""); // reset style nếu không cần viền đỏ
+        }
 
         // Load ảnh
         if (item.getImagePath() != null) {
@@ -68,7 +78,6 @@ public class InventoryItemCardController {
             InventoryItemDetailController controller = loader.getController();
             controller.setData(item.getProductName(), item.getSizeType(), "active",
                    item.getProductSizeId(), details);
-            // ✅ status có thể bỏ, hoặc set mặc định "active"
 
             // Mở cửa sổ mới
             Stage stage = new Stage();

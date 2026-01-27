@@ -65,7 +65,7 @@
             <HBox spacing="10">
                 <children>
                     <ComboBox fx:id="cbReceiver" promptText="Receiver" prefWidth="200"/>
-                    <Button fx:id="btnSend" text="Send" onAction="#onSend" prefWidth="100"/>
+                    <Button fx:id="btnSend" style="-fx-text-fill: white;" text="Send" onAction="#onSend" prefWidth="100"/>
                 </children>
             </HBox>
         </VBox>

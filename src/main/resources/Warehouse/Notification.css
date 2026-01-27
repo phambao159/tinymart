@@ -47,7 +47,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/CascadeStyleSheet.css to ed
 
 /* Hover effect for buttons */
 .button:hover {
-    -fx-background-color: #FB8C00;
+    -fx-background-color: #FF9800;
 }
 
 /* TableView styling */
@@ -61,11 +61,10 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/CascadeStyleSheet.css to ed
 }
 /* Style cho label tiêu đề */
 .create-title {
-    -fx-text-fill: #ffd700;                /* chữ màu trắng */
+    -fx-text-fill: #1E8449;                /* chữ màu trắng */
     -fx-font-size: 20px;                  /* hơi lớn hơn để nổi bật */
     -fx-font-weight: bold;                /* chữ đậm */
-     -fx-font-family: "Segoe UI", sans-serif;
-    -fx-effect: dropshadow( gaussian , rgba(0,0,0,0.6) , 4,0,0,1 ); /* thêm bóng nhẹ */
+    -fx-font-family: "Segoe UI", sans-serif;
 }
 /* Tab mặc định */
 .tab {
@@ -76,9 +75,8 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/CascadeStyleSheet.css to ed
     -fx-border-radius: 10;
     -fx-padding: 6 12 6 12;
 }
-
 .tab:hover {
-    -fx-background-color: #FFA726;   /* Orange 500 */
+    -fx-background-color: #FF9800;   /* Orange 500 */
     -fx-text-fill: white;
 }
 .tab:selected {

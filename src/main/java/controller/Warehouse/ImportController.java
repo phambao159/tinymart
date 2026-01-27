@@ -6,8 +6,7 @@ import model.Warehouse.Imports;
 import util.DBConnection;
 
 import javafx.scene.shape.Circle;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
+import java.sql.Connection;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -17,7 +16,6 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 
 import java.net.URL;
-import java.sql.Connection;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -32,9 +30,9 @@ public class ImportController implements Initializable {
     @FXML
     private TableColumn<Imports, Integer> colImportID;
     @FXML
-    private TableColumn<Imports, String> colSupplierID;   // đổi sang String để hiển thị tên
+    private TableColumn<Imports, String> colSupplierID;   // hiển thị tên
     @FXML
-    private TableColumn<Imports, String> colEmployeeID;   // đổi sang String để hiển thị tên
+    private TableColumn<Imports, String> colEmployeeID;   // hiển thị tên
     @FXML
     private TableColumn<Imports, LocalDate> colReceiptDate;
     @FXML
@@ -52,7 +50,7 @@ public class ImportController implements Initializable {
     @FXML
     private DatePicker dpToDate;
     @FXML
-    private TextField txtStatus;
+    private ComboBox<String> cbStatus;   // ✅ thay TextField bằng ComboBox
 
     private ImportDAO importDAO;
 
@@ -64,6 +62,40 @@ public class ImportController implements Initializable {
         colReceiptDate.setCellValueFactory(new PropertyValueFactory<>("receiptDate"));
         colTotalCost.setCellValueFactory(new PropertyValueFactory<>("totalCost"));
         colStatus.setCellValueFactory(new PropertyValueFactory<>("status"));
+
+        // ✅ Custom cell factory cho Status (pill màu)
+        colStatus.setCellFactory(column -> new TableCell<Imports, String>() {
+            private final Label pill = new Label();
+
+            @Override
+            protected void updateItem(String status, boolean empty) {
+                super.updateItem(status, empty);
+
+                if (empty || status == null) {
+                    setGraphic(null);
+                } else {
+                    pill.setText(status);
+                    pill.setStyle("-fx-padding: 4 10; -fx-background-radius: 12; -fx-text-fill: white;");
+
+                    switch (status.toLowerCase()) {
+                        case "completed":
+                            pill.setStyle(pill.getStyle() + "-fx-background-color: #4CAF50;"); // xanh
+                            break;
+                        case "pending":
+                            pill.setStyle(pill.getStyle() + "-fx-background-color: #FFC107; -fx-text-fill: black;"); // vàng
+                            break;
+                        case "cancelled":
+                            pill.setStyle(pill.getStyle() + "-fx-background-color: #F44336;"); // đỏ
+                            break;
+                        default:
+                            pill.setStyle(pill.getStyle() + "-fx-background-color: #9E9E9E;"); // xám cho trạng thái khác
+                            break;
+                    }
+
+                    setGraphic(pill);
+                }
+            }
+        });
 
         // Cột số thứ tự
         colIndex.setCellFactory(col -> new TableCell<Imports, Integer>() {
@@ -81,7 +113,11 @@ public class ImportController implements Initializable {
         Connection conn = new DBConnection().getConnect();
         importDAO = new ImportDAO(conn);
 
+        // ✅ Nạp sẵn giá trị cho ComboBox Status
+        cbStatus.getItems().addAll("Completed", "Pending", "Cancelled");
+
         resetSearch();
+
         // Double click row -> mở ImportDetail.fxml
         tbImport.setRowFactory(tv -> {
             TableRow<Imports> row = new TableRow<>();
@@ -100,7 +136,7 @@ public class ImportController implements Initializable {
         String importIdText = txtImportID.getText().trim();
         LocalDate fromDate = dpFromDate.getValue();
         LocalDate toDate = dpToDate.getValue();
-        String statusText = txtStatus.getText().trim();
+        String statusValue = cbStatus.getValue();   // ✅ lấy từ ComboBox
 
         List<Imports> allImports = importDAO.getAllImports();
         ObservableList<Imports> filtered = FXCollections.observableArrayList();
@@ -124,7 +160,8 @@ public class ImportController implements Initializable {
             if (toDate != null && imp.getReceiptDate().isAfter(toDate)) {
                 match = false;
             }
-            if (!statusText.isEmpty() && !imp.getStatus().equalsIgnoreCase(statusText)) {
+            if (statusValue != null && !statusValue.isEmpty()
+                    && !imp.getStatus().equalsIgnoreCase(statusValue)) {
                 match = false;
             }
 
@@ -139,7 +176,7 @@ public class ImportController implements Initializable {
     @FXML
     private void resetSearch() {
         txtImportID.clear();
-        txtStatus.clear();
+        cbStatus.setValue(null);   // ✅ reset ComboBox
         dpFromDate.setValue(null);
         dpToDate.setValue(null);
 
@@ -162,5 +199,5 @@ public class ImportController implements Initializable {
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }   
+    }
 }

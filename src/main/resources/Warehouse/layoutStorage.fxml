@@ -43,7 +43,7 @@
                 <!-- Welcome -->
                 <HBox fx:id="hBoxWelcome" alignment="CENTER" prefHeight="39.0" prefWidth="168.0">
                     <children>
-                        <Label fx:id="lbWelcome" text="Welcome!" />
+                        <Label fx:id="lbWelcome" text="Welcome! Huy" />
                     </children>
                 </HBox>
 

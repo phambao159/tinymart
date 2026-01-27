@@ -20,7 +20,10 @@
     <!-- Size -->
     <Label fx:id="sizeType" styleClass="card-label"/>
 
-    <!-- ✅ Tổng Stock -->
+    <!-- Tổng Stock -->
     <Label fx:id="stockLabel" styleClass="card-label"/>
+
+    <!-- ✅ Shelf Quantity -->
+    <Label fx:id="shelfLabel" styleClass="card-label"/>
 
 </VBox>

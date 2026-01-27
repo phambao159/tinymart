@@ -17,7 +17,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/CascadeStyleSheet.css to ed
 
 /* Button màu cam, bo tròn */
 .button {
-    -fx-background-color: #e67e22;
+    -fx-background-color: #FF9800;
 /*    -fx-text-fill: white;*/
     -fx-font-weight: bold;
     -fx-background-radius: 8;
@@ -34,6 +34,8 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/CascadeStyleSheet.css to ed
 
 /* Tiêu đề phụ: Logs */
 .label-logs {
-    -fx-font-weight: bold;
-    -fx-text-fill: #ffd700; /* vàng */
+    -fx-text-fill: #1E8449;                /* chữ màu trắng */
+    -fx-font-size: 20px;                  /* hơi lớn hơn để nổi bật */
+    -fx-font-weight: bold;                /* chữ đậm */
+    -fx-font-family: "Segoe UI", sans-serif;
 }

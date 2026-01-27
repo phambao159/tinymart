@@ -40,7 +40,7 @@
                         <TextField fx:id="txtImportID" promptText="Import ID"/>
                         <DatePicker fx:id="dpFromDate" promptText="From date"/>
                         <DatePicker fx:id="dpToDate" promptText="To date"/>
-                        <TextField fx:id="txtStatus" promptText="Status"/>
+                        <ComboBox fx:id="cbStatus" promptText="Status"/>
                         <Button fx:id="btnSearch" onAction="#onSearch" text="Search"/>
                     </children>
                 </HBox>

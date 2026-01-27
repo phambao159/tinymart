@@ -91,7 +91,33 @@ public class NotificationController {
         colRecvDate.setCellValueFactory(new PropertyValueFactory<>("sentDate"));
         colRecvStatus.setCellValueFactory(cell
                 -> new SimpleStringProperty(cell.getValue().isRead() ? "Read" : "Unread"));
+        colRecvStatus.setCellFactory(column -> new TableCell<Notification, String>() {
+            private final Label pill = new Label();
 
+            @Override
+            protected void updateItem(String status, boolean empty) {
+                super.updateItem(status, empty);
+
+                if (empty || status == null) {
+                    setGraphic(null);
+                    setText(null); // ✅ reset text mặc định
+                } else {
+                    pill.setText(status);
+                    pill.setStyle("-fx-padding: 4 10; -fx-background-radius: 12; -fx-font-weight: bold;");
+
+                    if ("Read".equalsIgnoreCase(status)) {
+                        pill.setStyle(pill.getStyle() + "-fx-background-color: #9E9E9E; -fx-text-fill: white;");
+                    } else if ("Unread".equalsIgnoreCase(status)) {
+                        pill.setStyle(pill.getStyle() + "-fx-background-color: #4CAF50; -fx-text-fill: white;");
+                    } else {
+                        pill.setStyle(pill.getStyle() + "-fx-background-color: #BDBDBD; -fx-text-fill: black;");
+                    }
+
+                    setGraphic(pill);
+                    setText(null); // ✅ đảm bảo chỉ hiển thị graphic
+                }
+            }
+        });
         // Cột Sent
         colSentTitle.setCellValueFactory(new PropertyValueFactory<>("title"));
         colSentContent.setCellValueFactory(new PropertyValueFactory<>("content"));
