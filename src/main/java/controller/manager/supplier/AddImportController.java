@@ -216,6 +216,7 @@ public class AddImportController implements Initializable {
                 double totalAmount = detailList.stream().mapToDouble(d -> d.getQuantity() * d.getImportPrice()).sum();
 
                 Import imp = new Import();
+               
                 imp.setSupplierID(supplier.getSupplierID());
                 imp.setEmployeeID(employee.getEmployeeID());
                 imp.setReceiptDate(date.atStartOfDay());
@@ -275,7 +276,6 @@ public class AddImportController implements Initializable {
             StringBuilder sb = new StringBuilder();
             sb.append("Dear Warehouse Team,\n\n");
             sb.append("A new import has been confirmed:\n");
-            sb.append("- Import ID: ").append(imp.getImportID()).append("\n");
             sb.append("- Supplier: ").append(supplier.getName()).append("\n");
             sb.append("- Date: ").append(LocalDate.now()).append("\n\n");
             sb.append("Items List:\n");
