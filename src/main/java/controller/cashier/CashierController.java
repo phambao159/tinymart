@@ -863,7 +863,7 @@ public class CashierController implements Initializable {
                     btnCheckOut.setDisable(false);
                     currentSessionSales = 0.0;
                 } else {
-                    showAlert("Error", "Check-in failed (You might have already checked in).", Alert.AlertType.ERROR);
+                    showAlert("Error", "Check-in failed (You might have already checked in).f", Alert.AlertType.ERROR);
                 }
             } catch (NumberFormatException e) {
                 showAlert("Invalid Input", "Please enter a valid number.", Alert.AlertType.ERROR);
@@ -1191,7 +1191,10 @@ public class CashierController implements Initializable {
             boxHistoryInfo.setVisible(false);
             boxHistoryInfo.setManaged(false);
         }
-
+        
+        loadCategories();
+        loadDataFromDB("");
+        
         setSidebarActive(btnHome);
         resetCart();
     }
